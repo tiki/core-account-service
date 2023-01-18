@@ -8,6 +8,7 @@ package com.mytiki.l0_auth.features.latest.refresh;
 import com.mytiki.l0_auth.utilities.Constants;
 import com.nimbusds.jose.*;
 import com.nimbusds.jwt.JWTClaimsSet;
+import jakarta.transaction.Transactional;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
@@ -17,7 +18,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 
-import javax.transaction.Transactional;
 import java.sql.Date;
 import java.time.Instant;
 import java.time.ZonedDateTime;

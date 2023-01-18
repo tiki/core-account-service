@@ -7,13 +7,13 @@ package com.mytiki.l0_auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.spring_rest_api.ApiError;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class AccessDeniedHandler implements org.springframework.security.web.access.AccessDeniedHandler {

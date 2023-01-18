@@ -32,6 +32,8 @@ import java.util.List;
 @RequestMapping(value = OauthController.PATH_CONTROLLER)
 public class OauthController {
     public static final String PATH_CONTROLLER = ApiConstants.API_LATEST_ROUTE + "oauth";
+    public static final String PATH_TOKEN = "/token";
+    public static final String PATH_REVOKE = "/revoke";
     private final OtpService otpService;
     private final RefreshService refreshService;
 
@@ -44,7 +46,7 @@ public class OauthController {
             summary = "Token Grant", description = "Issue authorization token. Use password grant for OTP flow.")
     @RequestMapping(
             method = RequestMethod.POST,
-            path = "/token",
+            path = PATH_TOKEN,
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE},
             params = {"username", "password"})
     public OAuth2AccessTokenResponse tokenGrantPw(
@@ -63,7 +65,7 @@ public class OauthController {
 
     @RequestMapping(
             method = RequestMethod.POST,
-            path = "/token",
+            path = PATH_TOKEN,
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE},
             params = {"refresh_token"})
     public OAuth2AccessTokenResponse tokenGrantRefresh(
@@ -76,7 +78,7 @@ public class OauthController {
 
     @RequestMapping(
             method = RequestMethod.POST,
-            path = "/token",
+            path = PATH_TOKEN,
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE},
             params = {"assertion"})
     public OAuth2AccessTokenResponse tokenGrantJwt(
@@ -96,7 +98,7 @@ public class OauthController {
     @ApiResponse(responseCode = "200")
     @RequestMapping(
             method = RequestMethod.POST,
-            path = "/revoke",
+            path = PATH_REVOKE,
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public void revoke(@RequestParam String token) {
         refreshService.revoke(token);

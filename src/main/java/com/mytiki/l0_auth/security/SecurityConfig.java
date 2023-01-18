@@ -6,54 +6,40 @@
 package com.mytiki.l0_auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mytiki.l0_auth.features.latest.oauth.OauthController;
+import com.mytiki.l0_auth.features.latest.otp.OtpController;
+import com.mytiki.spring_rest_api.SecurityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import java.util.Arrays;
-import java.util.Collections;
-
-@Order(Ordered.HIGHEST_PRECEDENCE)
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    private static final String FEATURE_POLICY = "accelerometer" + " 'none'" + "ambient-light-sensor" + " 'none'" +
-            "autoplay" + " 'none'" + "battery" + " 'none'" + "camera" + " 'none'" + "display-capture" + " 'none'" +
-            "document-domain" + " 'none'" + "encrypted-media" + " 'none'" + "execution-while-not-rendered" + " 'none'" +
-            "execution-while-out-of-viewport" + " 'none'" + "fullscreen" + " 'none'" + "geolocation" + " 'none'" +
-            "gyroscope" + " 'none'" + "layout-animations" + " 'none'" + "legacy-image-formats" + " 'none'" +
-            "magnetometer" + " 'none'" + "microphone" + " 'none'" + "midi" + " 'none'" + "navigation-override" + " 'none'" +
-            "oversized-images" + " 'none'" + "payment" + " 'none'" + "picture-in-picture" + " 'none'" + "publickey-credentials-get" + " 'none'" +
-            "sync-xhr" + " 'none'" + "usb" + " 'none'" + "vr wake-lock" + " 'none'" + "xr-spatial-tracking" + " 'none'";
-
-    private static final String CONTENT_SECURITY_POLICY = "default-src" + "' self'";
+public class SecurityConfig {
     private final AccessDeniedHandler accessDeniedHandler;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
     public SecurityConfig(@Autowired ObjectMapper objectMapper) {
-        super(true);
         this.accessDeniedHandler = new AccessDeniedHandler(objectMapper);
         this.authenticationEntryPoint = new AuthenticationEntryPoint(objectMapper);
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .addFilter(new WebAsyncManagerIntegrationFilter())
                 .servletApi().and()
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler)
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .authenticationEntryPoint(authenticationEntryPoint).and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .securityContext().and()
                 .headers()
                 .cacheControl().and()
@@ -62,23 +48,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .frameOptions().and()
                 .xssProtection().and()
                 .referrerPolicy().and()
-                .permissionsPolicy().policy(FEATURE_POLICY).and()
-                .httpPublicKeyPinning().and()
-                .contentSecurityPolicy(CONTENT_SECURITY_POLICY).and()
-                .and()
+                .permissionsPolicy().policy(SecurityConstants.FEATURE_POLICY).and()
+                .contentSecurityPolicy(SecurityConstants.CONTENT_SECURITY_POLICY).and().and()
                 .anonymous().and()
-                .cors().configurationSource(corsConfigurationSource()).and()
-                .authorizeRequests().anyRequest().permitAll();
-    }
-
-    private CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "PUT", "POST", "DELETE"));
-        configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "Accept"));
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
+                .cors().configurationSource(SecurityConstants.corsConfigurationSource()).and()
+                .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .ignoringRequestMatchers(
+                        new AntPathRequestMatcher(OauthController.PATH_CONTROLLER + "/**"),
+                        new AntPathRequestMatcher(OtpController.PATH_CONTROLLER + OtpController.PATH_ISSUE,
+                                HttpMethod.POST.name())
+                ).and()
+                .authorizeHttpRequests().anyRequest().permitAll();
+        return http.build();
     }
 }
