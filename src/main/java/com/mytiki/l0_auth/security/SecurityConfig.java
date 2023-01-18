@@ -8,6 +8,7 @@ package com.mytiki.l0_auth.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.l0_auth.features.latest.oauth.OauthController;
 import com.mytiki.l0_auth.features.latest.otp.OtpController;
+import com.mytiki.spring_rest_api.ApiConstants;
 import com.mytiki.spring_rest_api.SecurityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -58,7 +59,12 @@ public class SecurityConfig {
                         new AntPathRequestMatcher(OtpController.PATH_CONTROLLER + OtpController.PATH_ISSUE,
                                 HttpMethod.POST.name())
                 ).and()
-                .authorizeHttpRequests().anyRequest().permitAll();
+                .authorizeHttpRequests()
+                .requestMatchers(HttpMethod.GET, ApiConstants.HEALTH_ROUTE).permitAll()
+                .requestMatchers(HttpMethod.POST, OauthController.PATH_CONTROLLER + "/**").permitAll()
+                .requestMatchers(HttpMethod.POST,
+                        OtpController.PATH_CONTROLLER + OtpController.PATH_ISSUE).permitAll()
+                .anyRequest().authenticated();
         return http.build();
     }
 }
