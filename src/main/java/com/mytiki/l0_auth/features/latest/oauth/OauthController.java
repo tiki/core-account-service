@@ -50,7 +50,7 @@ public class OauthController {
     public OAuth2AccessTokenResponse tokenGrantPw(
             @Parameter(
                     schema = @Schema(type = "string"),
-                    description = "(password, refresh, urn:ietf:params:oauth:grant-type:jwt-bearer)")
+                    description = "(password, refresh_token, urn:ietf:params:oauth:grant-type:jwt-bearer)")
             @RequestParam(name = "grant_type") AuthorizationGrantType grantType,
             @RequestParam(required = false) String scope,
             @RequestParam(name = "username") String deviceId,
