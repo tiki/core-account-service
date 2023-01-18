@@ -3,7 +3,7 @@ name: CodeQL
 on:
   pull_request:
     branches:
-      - develop
+      - main
 
 # Cancel any active builds when new commits are pushed
 concurrency:

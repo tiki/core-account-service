@@ -5,10 +5,11 @@
 
 package com.mytiki.l0_auth.features.latest.user_info;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -22,7 +23,6 @@ public class UserInfoDO {
 
     @Id
     @Column(name = "uid")
-    @org.hibernate.annotations.Type(type="org.hibernate.type.PostgresUUIDType")
     public UUID getUid() {
         return uid;
     }

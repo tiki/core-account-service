@@ -40,7 +40,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 
-@Import({ExHandler.class})
+@Import(ExHandler.class)
 public class UtilitiesConfig {
     @Bean
     public Sendgrid sendgrid(@Value("${com.mytiki.l0_auth.sendgrid.apikey}") String sendgridApiKey) {
