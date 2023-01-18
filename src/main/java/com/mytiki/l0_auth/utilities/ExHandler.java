@@ -6,14 +6,13 @@
 package com.mytiki.l0_auth.utilities;
 
 import com.mytiki.spring_rest_api.ApiExceptionHandler;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class ExHandler extends ApiExceptionHandler {
 
