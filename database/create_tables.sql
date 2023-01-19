@@ -24,13 +24,37 @@ CREATE TABLE IF NOT EXISTS refresh(
     PRIMARY KEY(jti)
 );
 
+
+-- -----------------------------------------------------------------------
+-- APP INFO
+-- -----------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS app_info(
+    app_info_id BIGSERIAL PRIMARY KEY,
+    app_id UUID NOT NULL UNIQUE,
+    app_name TEXT NOT NULL,
+    created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
+    modified_utc TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+
 -- -----------------------------------------------------------------------
 -- USER INFO
 -- -----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS user_info(
-    uid UUID NOT NULL,
+    user_info_id BIGSERIAL PRIMARY KEY,
+    user_id UUID NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
-    modified_utc TIMESTAMP WITH TIME ZONE NOT NULL,
-    PRIMARY KEY(uid)
+    modified_utc TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+-- -----------------------------------------------------------------------
+-- APP_USER JOIN TABLE
+-- -----------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS app_user(
+    app_user_id BIGSERIAL PRIMARY KEY,
+    app_info_id BIGINT REFERENCES app_info(app_info_id) NOT NULL,
+    user_info_id BIGINT REFERENCES user_info(user_info_id) NOT NULL,
+    created_utc TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    UNIQUE(app_info_id, user_info_id)
 );

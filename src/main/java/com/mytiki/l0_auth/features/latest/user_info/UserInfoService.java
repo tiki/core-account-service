@@ -32,10 +32,10 @@ public class UserInfoService {
         if(jwt.getSubject() == null)
             throw new ApiException(HttpStatus.FORBIDDEN);
 
-        Optional<UserInfoDO> found = repository.findByUid(UUID.fromString(jwt.getSubject()));
+        Optional<UserInfoDO> found = repository.findByUserId(UUID.fromString(jwt.getSubject()));
         UserInfoAO rsp = new UserInfoAO();
         if(found.isPresent()){
-            rsp.setSub(found.get().getUid().toString());
+            rsp.setSub(found.get().getUserId().toString());
             rsp.setEmail(found.get().getEmail());
             rsp.setUpdatedAt(found.get().getModified());
         }
@@ -48,7 +48,7 @@ public class UserInfoService {
             return found.get();
         else {
             UserInfoDO userInfo = new UserInfoDO();
-            userInfo.setUid(UUID.randomUUID());
+            userInfo.setUserId(UUID.randomUUID());
             userInfo.setEmail(email);
             ZonedDateTime now = ZonedDateTime.now();
             userInfo.setCreated(now);
@@ -59,7 +59,7 @@ public class UserInfoService {
 
     public UserInfoAO update(String token, UserInfoAOUpdate update){
         Jwt jwt = jwtDecoder.decode(token);
-        Optional<UserInfoDO> found = repository.findByUid(UUID.fromString(jwt.getSubject()));
+        Optional<UserInfoDO> found = repository.findByUserId(UUID.fromString(jwt.getSubject()));
         if(found.isEmpty())
             throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
                     .message("Invalid sub claim")
@@ -72,7 +72,7 @@ public class UserInfoService {
         saved = repository.save(saved);
 
         UserInfoAO rsp = new UserInfoAO();
-        rsp.setSub(saved.getUid().toString());
+        rsp.setSub(saved.getUserId().toString());
         rsp.setEmail(saved.getEmail());
         rsp.setUpdatedAt(saved.getModified());
         return rsp;

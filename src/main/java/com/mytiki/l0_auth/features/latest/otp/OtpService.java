@@ -101,7 +101,7 @@ public class OtpService {
             String subject = null;
             if(found.get().getEmail() != null) {
                 UserInfoDO userInfo = userInfoService.createIfNotExists(found.get().getEmail());
-                subject = userInfo.getUid().toString();
+                subject = userInfo.getUserId().toString();
             }
 
             if(audience != null && audience.contains("storage.l0.mytiki.com") && subject == null)
