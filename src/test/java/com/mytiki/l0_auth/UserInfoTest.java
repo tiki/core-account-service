@@ -7,7 +7,6 @@ package com.mytiki.l0_auth;
 
 import com.mytiki.l0_auth.features.latest.user_info.*;
 import com.mytiki.l0_auth.main.App;
-import com.nimbusds.jose.JOSEException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -37,7 +36,7 @@ public class UserInfoTest {
     private UserInfoService service;
 
     @Test
-    public void Test_Get_Success() throws JOSEException {
+    public void Test_Get_Success() {
         UserInfoDO saved = new UserInfoDO();
         saved.setEmail("test+" + UUID.randomUUID() + "@test.com");
         saved.setUserId(UUID.randomUUID());
@@ -47,23 +46,27 @@ public class UserInfoTest {
 
         UserInfoAO user = service.get(saved.getUserId().toString());
         assertEquals(saved.getEmail(), user.getEmail());
-        assertEquals(saved.getModified().withNano(0), user.getUpdatedAt().withNano(0));
+        assertEquals(saved.getModified().withNano(0), user.getModified().withNano(0));
+        assertEquals(saved.getCreated().withNano(0), user.getCreated().withNano(0));
         assertEquals(0, user.getApps().size());
         assertEquals(saved.getUserId().toString(), user.getSub());
+        assertEquals(saved.getUserId().toString(), user.getUserId());
     }
 
     @Test
-    public void Test_Get_NoUser_Success() throws JOSEException {
+    public void Test_Get_NoUser_Success() {
         String sub = UUID.randomUUID().toString();
         UserInfoAO user = service.get(sub);
         assertNull(user.getEmail());
-        assertNull(user.getUpdatedAt());
+        assertNull(user.getModified());
+        assertNull(user.getCreated());
         assertNull(user.getApps());
         assertEquals(sub, user.getSub());
+        assertEquals(sub, user.getUserId());
     }
 
     @Test
-    public void Test_Update_Success() throws JOSEException {
+    public void Test_Update_Success() {
         UserInfoDO saved = new UserInfoDO();
         saved.setEmail("test+" + UUID.randomUUID() + "@test.com");
         saved.setUserId(UUID.randomUUID());
@@ -76,6 +79,6 @@ public class UserInfoTest {
 
         UserInfoAO user = service.update(saved.getUserId().toString(), update);
         assertEquals(saved.getEmail() + "updated", user.getEmail());
-        assertNotEquals(saved.getModified(), user.getUpdatedAt());
+        assertNotEquals(saved.getModified(), user.getModified());
     }
 }

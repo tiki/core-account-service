@@ -3,18 +3,41 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.l0_auth.utilities;
+package com.mytiki.l0_auth.security;
 
-import com.mytiki.spring_rest_api.ApiExceptionHandler;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
+import org.springframework.security.oauth2.core.http.converter.OAuth2ErrorHttpMessageConverter;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-public class ExHandler extends ApiExceptionHandler {
+import java.lang.invoke.MethodHandles;
+
+@Order(value = Integer.MIN_VALUE)
+@ControllerAdvice
+public class OauthConfig {
+    protected static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    @Bean
+    public HttpMessageConverter<OAuth2AccessTokenResponse> oAuth2AccessTokenResponseHttpMessageConverter() {
+        return new OAuth2AccessTokenResponseHttpMessageConverter();
+    }
+
+    @Bean
+    public HttpMessageConverter<OAuth2Error> oAuth2ErrorHttpMessageConverter() {
+        return new OAuth2ErrorHttpMessageConverter();
+    }
 
     @ExceptionHandler({OAuth2AuthorizationException.class})
     public ResponseEntity<OAuth2Error> handleException(OAuth2AuthorizationException e, HttpServletRequest request) {

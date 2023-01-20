@@ -5,23 +5,22 @@
 
 package com.mytiki.l0_auth.features.latest.app_info;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.time.ZonedDateTime;
 import java.util.Set;
 
 public class AppInfoAO {
-    private String sub;
+    private String appId;
     private String name;
     private Set<String> users;
-    private ZonedDateTime updatedAt;
+    private ZonedDateTime modified;
+    private ZonedDateTime created;
 
-    public String getSub() {
-        return sub;
+    public String getAppId() {
+        return appId;
     }
 
-    public void setSub(String sub) {
-        this.sub = sub;
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     public String getName() {
@@ -40,12 +39,19 @@ public class AppInfoAO {
         this.users = users;
     }
 
-    @JsonProperty("updated_at")
-    public ZonedDateTime getUpdatedAt() {
-        return updatedAt;
+    public ZonedDateTime getModified() {
+        return modified;
     }
 
-    public void setUpdatedAt(ZonedDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setModified(ZonedDateTime modified) {
+        this.modified = modified;
+    }
+
+    public ZonedDateTime getCreated() {
+        return created;
+    }
+
+    public void setCreated(ZonedDateTime created) {
+        this.created = created;
     }
 }

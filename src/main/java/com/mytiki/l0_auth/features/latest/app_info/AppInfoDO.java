@@ -16,7 +16,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "app_info")
 public class AppInfoDO implements Serializable {
-
     private Long id;
     private UUID appId;
     private String name;

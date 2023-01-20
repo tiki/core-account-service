@@ -7,21 +7,19 @@
 -- ONE-TIME PASSWORD
 -- -----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS otp(
-    otp_hashed TEXT NOT NULL,
+    otp_hashed TEXT PRIMARY KEY,
     issued_utc TIMESTAMP WITH TIME ZONE NOT NULL,
     expires_utc TIMESTAMP WITH TIME ZONE NOT NULL,
-    email TEXT,
-    PRIMARY KEY(otp_hashed)
+    email TEXT
 );
 
 -- -----------------------------------------------------------------------
 -- REFRESH TOKEN
 -- -----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS refresh(
-    jti UUID NOT NULL,
+    jti UUID PRIMARY KEY,
     issued_utc TIMESTAMP WITH TIME ZONE NOT NULL,
-    expires_utc TIMESTAMP WITH TIME ZONE NOT NULL,
-    PRIMARY KEY(jti)
+    expires_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 
@@ -57,4 +55,14 @@ CREATE TABLE IF NOT EXISTS app_user(
     user_info_id BIGINT REFERENCES user_info(user_info_id) NOT NULL,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     UNIQUE(app_info_id, user_info_id)
+);
+
+-- -----------------------------------------------------------------------
+-- API KEY
+-- -----------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS api_key(
+    api_key_id UUID PRIMARY KEY,
+    secret_hash BYTEA,
+    app_info_id BIGINT REFERENCES app_info(app_info_id),
+    created_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );
