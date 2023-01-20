@@ -40,6 +40,6 @@ public class ApiKeyController {
 
     @RequestMapping(method = RequestMethod.DELETE, path = PATH_KEY)
     public void revoke(Principal principal, @PathVariable String keyId) {
-        //TODO
+        service.revoke(principal.getName(), keyId);
     }
 }

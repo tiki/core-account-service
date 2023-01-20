@@ -11,6 +11,7 @@ import com.mytiki.l0_auth.features.latest.user_info.UserInfoAO;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -62,6 +63,15 @@ public class ApiKeyService {
             rsp.setCreated(key.getCreated());
             return rsp;
         }).toList();
+    }
+
+    @Transactional
+    public void revoke(String userId, String keyId){
+        Optional<ApiKeyDO> found = repository.findById(UUID.fromString(keyId));
+        if(found.isPresent()){
+            guardAppUser(userId, found.get().getApp().getAppId().toString());
+            repository.delete(found.get());
+        }
     }
 
     private void guardAppUser(String userId, String appId){
