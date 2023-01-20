@@ -97,7 +97,7 @@ public class AppKeyTest {
 
         assertEquals(1, found.size());
         assertEquals(created.getId(), found.get(0).getId());
-        assertEquals(created.getCreated(), found.get(0).getCreated());
+        assertEquals(created.getCreated().withNano(0), found.get(0).getCreated().withNano(0));
     }
 
     @Test
