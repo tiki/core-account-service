@@ -21,11 +21,11 @@ public class UserInfoService {
         this.repository = repository;
     }
 
-    public UserInfoAO get(String subject){
-        Optional<UserInfoDO> found = repository.findByUserId(UUID.fromString(subject));
+    public UserInfoAO get(String userId){
+        Optional<UserInfoDO> found = repository.findByUserId(UUID.fromString(userId));
         return found.map(this::toAO).orElseGet(() -> {
             UserInfoAO rsp = new UserInfoAO();
-            rsp.setSub(subject);
+            rsp.setSub(userId);
             return rsp;
         });
     }

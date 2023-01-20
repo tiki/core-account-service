@@ -32,13 +32,17 @@ public class AppInfoService {
         return toAO(repository.save(app));
     }
 
-    public AppInfoAO get(String apiId){
-        Optional<AppInfoDO> found = repository.findByAppId(UUID.fromString(apiId));
+    public AppInfoAO get(String appId){
+        Optional<AppInfoDO> found = repository.findByAppId(UUID.fromString(appId));
         return found.map(this::toAO).orElseGet(() -> {
                 AppInfoAO rsp = new AppInfoAO();
-                rsp.setSub(apiId);
+                rsp.setSub(appId);
                 return rsp;
         });
+    }
+
+    public Optional<AppInfoDO> getDO(String appId){
+        return repository.findByAppId(UUID.fromString(appId));
     }
 
     private AppInfoAO toAO(AppInfoDO src){

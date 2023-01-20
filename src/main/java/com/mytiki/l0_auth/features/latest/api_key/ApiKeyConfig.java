@@ -5,6 +5,8 @@
 
 package com.mytiki.l0_auth.features.latest.api_key;
 
+import com.mytiki.l0_auth.features.latest.app_info.AppInfoService;
+import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
 import com.mytiki.l0_auth.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -22,8 +24,11 @@ public class ApiKeyConfig {
     }
 
     @Bean
-    public ApiKeyService apiKeyService(@Autowired ApiKeyRepository repository){
-        return new ApiKeyService(repository);
+    public ApiKeyService apiKeyService(
+            @Autowired ApiKeyRepository repository,
+            @Autowired UserInfoService userInfoService,
+            @Autowired AppInfoService appInfoService){
+        return new ApiKeyService(repository, userInfoService, appInfoService);
     }
 
 }

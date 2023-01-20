@@ -30,16 +30,16 @@ public class ApiKeyController {
 
     @RequestMapping(method = RequestMethod.GET, path = PATH_APP_KEY)
     public List<ApiKeyAO> getAppKeys(Principal principal, @PathVariable String appId) {
-        return null;
+        return service.getByAppId(principal.getName(), appId);
     }
 
     @RequestMapping(method = RequestMethod.POST, path = PATH_APP_KEY)
     public ApiKeyAO createAppKey(Principal principal, @PathVariable String appId) {
-        return null;
+        return service.create(principal.getName(), appId);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, path = PATH_KEY)
-    public ApiKeyAO revoke(Principal principal, @PathVariable String keyId) {
-        return null;
+    public void revoke(Principal principal, @PathVariable String keyId) {
+        //TODO
     }
 }
