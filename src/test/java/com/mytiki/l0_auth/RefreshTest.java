@@ -59,7 +59,7 @@ public class RefreshTest {
 
     @Test
     public void Test_Token_Success() throws JOSEException {
-        String token = service.token(null, null);
+        String token = service.issue(null, null);
         assertNotNull(token);
 
         Jwt jwt = jwtDecoder.decode(token);
@@ -72,7 +72,7 @@ public class RefreshTest {
 
     @Test
     public void Test_Revoke_Success() throws JOSEException, ParseException {
-        String token = service.token(null, null);
+        String token = service.issue(null, null);
         service.revoke(token);
 
         Jwt jwt = jwtDecoder.decode(token);
@@ -82,7 +82,7 @@ public class RefreshTest {
 
     @Test
     public void Test_Revoke_Replay_Success() throws JOSEException, ParseException {
-        String token = service.token(null, null);
+        String token = service.issue(null, null);
         service.revoke(token);
         service.revoke(token);
 
@@ -93,7 +93,7 @@ public class RefreshTest {
 
     @Test
     public void Test_Authorize_Success() throws JOSEException, ParseException {
-        String token = service.token(null, null);
+        String token = service.issue(null, null);
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
         assertNotNull(rsp.getAccessToken().getTokenValue());
@@ -110,7 +110,7 @@ public class RefreshTest {
 
     @Test
     public void Test_Authorize_Revoked_Success() throws JOSEException {
-        String token = service.token(null, null);
+        String token = service.issue(null, null);
         service.revoke(token);
 
         OAuth2AuthorizationException ex = assertThrows(OAuth2AuthorizationException.class,
@@ -145,7 +145,7 @@ public class RefreshTest {
     @Test
     public void Test_Authorize_Audience_Success() throws JOSEException, ParseException {
         String audience = "storage.l0.mytiki.com";
-        String token = service.token(null, List.of(audience));
+        String token = service.issue(null, List.of(audience));
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
         Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());
@@ -155,7 +155,7 @@ public class RefreshTest {
     @Test
     public void Test_Authorize_Subject_Success() throws JOSEException, ParseException {
         String subject = UUID.randomUUID().toString();
-        String token = service.token(subject, null);
+        String token = service.issue(subject, null);
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
         Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());

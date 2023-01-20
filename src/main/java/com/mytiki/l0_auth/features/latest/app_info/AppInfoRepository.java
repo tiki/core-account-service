@@ -7,4 +7,9 @@ package com.mytiki.l0_auth.features.latest.app_info;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AppInfoRepository extends JpaRepository<AppInfoDO, Long> {}
+import java.util.Optional;
+import java.util.UUID;
+
+public interface AppInfoRepository extends JpaRepository<AppInfoDO, Long> {
+    Optional<AppInfoDO> findByAppId(UUID apiId);
+}

@@ -52,7 +52,7 @@ public class AppInfoDO implements Serializable {
         this.name = name;
     }
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "app_user",
             joinColumns = @JoinColumn(name = "app_info_id"),
@@ -73,6 +73,7 @@ public class AppInfoDO implements Serializable {
     public void setCreated(ZonedDateTime created) {
         this.created = created;
     }
+
     @Column(name = "modified_utc")
     public ZonedDateTime getModified() {
         return modified;

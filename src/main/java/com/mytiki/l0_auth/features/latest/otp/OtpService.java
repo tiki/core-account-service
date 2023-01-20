@@ -6,14 +6,16 @@
 package com.mytiki.l0_auth.features.latest.otp;
 
 import com.mytiki.l0_auth.features.latest.refresh.RefreshService;
-import com.mytiki.l0_auth.features.latest.user_info.UserInfoDO;
+import com.mytiki.l0_auth.features.latest.user_info.UserInfoAO;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
 import com.mytiki.l0_auth.utilities.Constants;
+import com.mytiki.l0_auth.utilities.JWSBuilder;
 import com.mytiki.l0_auth.utilities.Mustache;
 import com.mytiki.l0_auth.utilities.Sendgrid;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
-import com.nimbusds.jose.*;
-import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.JWSSigner;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -26,8 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.sql.Date;
-import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -100,8 +100,8 @@ public class OtpService {
         try {
             String subject = null;
             if(found.get().getEmail() != null) {
-                UserInfoDO userInfo = userInfoService.createIfNotExists(found.get().getEmail());
-                subject = userInfo.getUserId().toString();
+                UserInfoAO userInfo = userInfoService.createIfNotExists(found.get().getEmail());
+                subject = userInfo.getSub();
             }
 
             if(audience != null && audience.contains("storage.l0.mytiki.com") && subject == null)
@@ -109,12 +109,18 @@ public class OtpService {
                         OAuth2ErrorCodes.ACCESS_DENIED),
                         "storage.l0.mytiki.com does not support anonymous subjects");
 
+            JWSObject token = new JWSBuilder()
+                    .expIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
+                    .sub(subject)
+                    .aud(audience)
+                    .build(signer);
+
             return OAuth2AccessTokenResponse
-                    .withToken(token(Constants.TOKEN_EXPIRY_DURATION_SECONDS, subject, audience))
+                    .withToken(token.serialize())
                     .tokenType(OAuth2AccessToken.TokenType.BEARER)
                     .expiresIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     //.scopes()
-                    .refreshToken(refreshService.token(subject, audience))
+                    .refreshToken(refreshService.issue(subject, audience))
                     .build();
         } catch (JOSEException e) {
             throw new OAuth2AuthorizationException(new OAuth2Error(
@@ -181,26 +187,5 @@ public class OtpService {
                     .cause(e)
                     .build();
         }
-    }
-
-    private String token(long expiresIn, String sub, List<String> aud) throws JOSEException {
-        Instant iat = Instant.now();
-        JWSObject token = new JWSObject(
-                new JWSHeader
-                        .Builder(JWSAlgorithm.ES256)
-                        .type(JOSEObjectType.JWT)
-                        .build(),
-                new Payload(
-                        new JWTClaimsSet.Builder()
-                                .issuer(Constants.MODULE_DOT_PATH)
-                                .issueTime(Date.from(iat))
-                                .expirationTime(Date.from(iat.plusSeconds(expiresIn)))
-                                .subject(sub)
-                                .audience(aud)
-                                .build()
-                                .toJSONObject()
-                ));
-        token.sign(signer);
-        return token.serialize();
     }
 }

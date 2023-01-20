@@ -5,7 +5,7 @@
 
 package com.mytiki.l0_auth;
 
-import com.mytiki.l0_auth.features.latest.app_info.AppInfoDO;
+import com.mytiki.l0_auth.features.latest.app_info.AppInfoAO;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoRepository;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoService;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoDO;
@@ -48,21 +48,18 @@ public class AppInfoTest {
         String name = "testApp";
 
         UserInfoDO testUser = new UserInfoDO();
-        testUser.setEmail("test+" + UUID.randomUUID().toString() + "@test.com");
+        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
 
-        AppInfoDO app = service.create(name, testUser);
+        AppInfoAO app = service.create(name, testUser);
         assertEquals(name, app.getName());
-        assertNotNull(app.getId());
-        assertNotNull(app.getAppId());
-        assertNotNull(app.getCreated());
-        assertNotNull(app.getModified());
-        assertFalse(app.getUsers().isEmpty());
+        assertNotNull(app.getSub());
+        assertNotNull(app.getUpdatedAt());
         assertEquals(1, app.getUsers().size());
-        assertEquals(testUser.getId(), app.getUsers().stream().findFirst().get().getId());
+        assertTrue(app.getUsers().contains(testUser.getUserId().toString()));
     }
 
     @Test
@@ -70,7 +67,7 @@ public class AppInfoTest {
         String name = "testApp";
 
         UserInfoDO testUser = new UserInfoDO();
-        testUser.setEmail("test+" + UUID.randomUUID().toString() + "@test.com");
+        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
@@ -78,5 +75,37 @@ public class AppInfoTest {
         InvalidDataAccessApiUsageException ex = assertThrows(InvalidDataAccessApiUsageException.class,
                 () -> service.create(name, testUser));
         assertNotNull(ex);
+    }
+
+    @Test
+    public void Test_Get_Success() {
+        String name = "testApp";
+
+        UserInfoDO testUser = new UserInfoDO();
+        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
+        testUser.setUserId(UUID.randomUUID());
+        testUser.setCreated(ZonedDateTime.now());
+        testUser.setModified(ZonedDateTime.now());
+        testUser = userInfoRepository.save(testUser);
+
+        AppInfoAO app = service.create(name, testUser);
+        AppInfoAO found = service.get(app.getSub());
+
+        assertEquals(app.getSub(), found.getSub());
+        assertEquals(app.getName(), found.getName());
+        assertEquals(app.getUpdatedAt(), found.getUpdatedAt());
+        assertEquals(app.getUsers().size(), found.getUsers().size());
+        assertEquals(app.getUsers().stream().findFirst(), found.getUsers().stream().findFirst());
+    }
+
+    @Test
+    public void Test_Get_NoApp_Success() {
+        String appId = UUID.randomUUID().toString();
+        AppInfoAO found = service.get(appId);
+
+        assertEquals(appId, found.getSub());
+        assertNull(found.getName());
+        assertNull(found.getUpdatedAt());
+        assertNull(found.getUsers());
     }
 }

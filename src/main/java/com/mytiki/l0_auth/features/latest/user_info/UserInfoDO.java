@@ -52,7 +52,7 @@ public class UserInfoDO {
         this.email = email;
     }
 
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
     public Set<AppInfoDO> getApps() {
         return apps;
     }

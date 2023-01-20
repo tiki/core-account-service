@@ -20,4 +20,9 @@ public class AppInfoConfig {
     public AppInfoService appInfoService(@Autowired AppInfoRepository repository){
         return new AppInfoService(repository);
     }
+
+    @Bean
+    public AppInfoController appInfoController(@Autowired AppInfoService service){
+        return new AppInfoController(service);
+    }
 }

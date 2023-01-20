@@ -6,8 +6,10 @@
 package com.mytiki.l0_auth.features.latest.refresh;
 
 import com.mytiki.l0_auth.utilities.Constants;
-import com.nimbusds.jose.*;
-import com.nimbusds.jwt.JWTClaimsSet;
+import com.mytiki.l0_auth.utilities.JWSBuilder;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.JWSSigner;
 import jakarta.transaction.Transactional;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
@@ -18,8 +20,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 
-import java.sql.Date;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -36,34 +36,21 @@ public class RefreshService {
         this.jwtDecoder = jwtDecoder;
     }
 
-    public String token(String sub, List<String> aud) throws JOSEException {
+    public String issue(String sub, List<String> aud) throws JOSEException {
         RefreshDO refreshDO = new RefreshDO();
         ZonedDateTime now = ZonedDateTime.now();
-
         refreshDO.setJti(UUID.randomUUID());
         refreshDO.setIssued(now);
         refreshDO.setExpires(now.plusSeconds(Constants.REFRESH_EXPIRY_DURATION_SECONDS));
         repository.save(refreshDO);
-
-        JWSObject jwsObject = new JWSObject(
-                new JWSHeader
-                        .Builder(JWSAlgorithm.ES256)
-                        .type(JOSEObjectType.JWT)
-                        .build(),
-                new Payload(
-                        new JWTClaimsSet.Builder()
-                                .issuer(Constants.MODULE_DOT_PATH)
-                                .issueTime(Date.from(refreshDO.getIssued().toInstant()))
-                                .expirationTime(Date.from(refreshDO.getExpires().toInstant()))
-                                .subject(sub)
-                                .audience(aud)
-                                .jwtID(refreshDO.getJti().toString())
-                                .build()
-                                .toJSONObject()
-                ));
-
-        jwsObject.sign(jwtSigner);
-        return jwsObject.serialize();
+        return new JWSBuilder()
+                .iat(refreshDO.getIssued())
+                .exp(refreshDO.getExpires())
+                .sub(sub)
+                .aud(aud)
+                .jti(refreshDO.getJti().toString())
+                .build(jwtSigner)
+                .serialize();
     }
 
     public OAuth2AccessTokenResponse authorize(String token) {
@@ -72,28 +59,15 @@ public class RefreshService {
             Optional<RefreshDO> found = repository.findByJti(UUID.fromString(jwt.getId()));
             if (found.isPresent()) {
                 repository.delete(found.get());
-                Instant iat = Instant.now();
-                //TODO this should be in OtpService
-                JWSObject accessToken = new JWSObject(
-                        new JWSHeader
-                                .Builder(JWSAlgorithm.ES256)
-                                .type(JOSEObjectType.JWT)
-                                .build(),
-                        new Payload(
-                                new JWTClaimsSet.Builder()
-                                        .issuer(Constants.MODULE_DOT_PATH)
-                                        .issueTime(Date.from(iat))
-                                        .subject(jwt.getSubject())
-                                        .audience(jwt.getAudience())
-                                        .expirationTime(Date.from(iat.plusSeconds(Constants.TOKEN_EXPIRY_DURATION_SECONDS)))
-                                        .build()
-                                        .toJSONObject()
-                        ));
-                accessToken.sign(jwtSigner);
+                JWSObject newToken = new JWSBuilder()
+                        .sub(jwt.getSubject())
+                        .aud(jwt.getAudience())
+                        .expIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
+                        .build(jwtSigner);
                 return OAuth2AccessTokenResponse
-                        .withToken(accessToken.serialize())
+                        .withToken(newToken.serialize())
                         .tokenType(OAuth2AccessToken.TokenType.BEARER)
-                        .refreshToken(token(jwt.getSubject(), jwt.getAudience()))
+                        .refreshToken(issue(jwt.getSubject(), jwt.getAudience()))
                         .expiresIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                         .build();
             } else
