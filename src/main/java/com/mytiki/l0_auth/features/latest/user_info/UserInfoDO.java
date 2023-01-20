@@ -8,14 +8,14 @@ package com.mytiki.l0_auth.features.latest.user_info;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoDO;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Table(name = "user_info")
-public class UserInfoDO {
-
+public class UserInfoDO implements Serializable {
     private Long id;
     private UUID userId;
     private String email;

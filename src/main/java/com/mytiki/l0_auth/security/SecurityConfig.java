@@ -6,29 +6,37 @@
 package com.mytiki.l0_auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mytiki.l0_auth.features.latest.oauth.OauthController;
 import com.mytiki.l0_auth.features.latest.otp.OtpController;
+import com.mytiki.l0_auth.utilities.Constants;
 import com.mytiki.spring_rest_api.ApiConstants;
 import com.mytiki.spring_rest_api.SecurityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+@Import({
+        OauthConfig.class,
+        JWTConfig.class
+})
 @EnableWebSecurity
 public class SecurityConfig {
     private final AccessDeniedHandler accessDeniedHandler;
     private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final JwtDecoder jwtDecoder;
 
-    public SecurityConfig(@Autowired ObjectMapper objectMapper) {
+    public SecurityConfig(@Autowired ObjectMapper objectMapper, @Autowired JwtDecoder jwtDecoder) {
         this.accessDeniedHandler = new AccessDeniedHandler(objectMapper);
         this.authenticationEntryPoint = new AuthenticationEntryPoint(objectMapper);
+        this.jwtDecoder = jwtDecoder;
     }
 
     @Bean
@@ -55,16 +63,22 @@ public class SecurityConfig {
                 .cors().configurationSource(SecurityConstants.corsConfigurationSource()).and()
                 .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .ignoringRequestMatchers(
-                        new AntPathRequestMatcher(OauthController.PATH_CONTROLLER + "/**"),
-                        new AntPathRequestMatcher(OtpController.PATH_CONTROLLER + OtpController.PATH_ISSUE,
+                        new AntPathRequestMatcher(ApiConstants.API_LATEST_ROUTE + Constants.OAUTH_TOKEN_PATH,
+                                HttpMethod.POST.name()),
+                        new AntPathRequestMatcher(ApiConstants.API_LATEST_ROUTE + OtpController.PATH_ISSUE,
                                 HttpMethod.POST.name())
                 ).and()
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.GET, ApiConstants.HEALTH_ROUTE).permitAll()
-                .requestMatchers(HttpMethod.POST, OauthController.PATH_CONTROLLER + "/**").permitAll()
                 .requestMatchers(HttpMethod.POST,
-                        OtpController.PATH_CONTROLLER + OtpController.PATH_ISSUE).permitAll()
-                .anyRequest().authenticated();
+                        ApiConstants.API_LATEST_ROUTE + Constants.OAUTH_TOKEN_PATH,
+                        ApiConstants.API_LATEST_ROUTE + OtpController.PATH_ISSUE
+                ).permitAll()
+                .anyRequest().authenticated().and()
+                .oauth2ResourceServer()
+                .jwt().decoder(jwtDecoder).and()
+                .accessDeniedHandler(accessDeniedHandler)
+                .authenticationEntryPoint(authenticationEntryPoint);
         return http.build();
     }
 }

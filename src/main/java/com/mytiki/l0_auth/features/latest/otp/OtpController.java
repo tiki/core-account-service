@@ -8,29 +8,56 @@ package com.mytiki.l0_auth.features.latest.otp;
 import com.mytiki.l0_auth.utilities.Constants;
 import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "AUTH")
 @RestController
-@RequestMapping(value = OtpController.PATH_CONTROLLER)
+@RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
 public class OtpController {
-    public static final String PATH_CONTROLLER = ApiConstants.API_LATEST_ROUTE + "otp";
-    public static final String PATH_ISSUE = "/start";
+    public static final String PATH_ISSUE = "otp/start";
 
-    private final OtpService otpService;
+    private final OtpService service;
 
-    public OtpController(OtpService otpService) {
-        this.otpService = otpService;
+    public OtpController(OtpService service) {
+        this.service = service;
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-otp-start-post",
             summary = "Request OTP", description = "Start a new passwordless authorization flow")
     @RequestMapping(method = RequestMethod.POST, path = PATH_ISSUE)
     public OtpAOStartRsp issue(@RequestBody OtpAOStartReq body) {
-        return otpService.start(body);
+        return service.start(body);
+    }
+
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-oauth-token-post",
+            summary = "Token Grant", description = "Issue authorization token. Use password grant for OTP flow.")
+    @RequestMapping(
+            method = RequestMethod.POST,
+            path = Constants.OAUTH_TOKEN_PATH,
+            consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE},
+            params = {"username", "password"})
+    public OAuth2AccessTokenResponse grant(
+            @Parameter(
+                    schema = @Schema(type = "string"),
+                    description = "(password, refresh_token, urn:ietf:params:oauth:grant-type:jwt-bearer)")
+            @RequestParam(name = "grant_type") AuthorizationGrantType grantType,
+            @RequestParam(required = false) String scope,
+            @RequestParam(name = "username") String deviceId,
+            @RequestParam(name = "password") String code,
+            @RequestParam(required = false) List<String> audience) {
+        if (!grantType.equals(AuthorizationGrantType.PASSWORD))
+            throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.UNSUPPORTED_GRANT_TYPE));
+        return service.authorize(deviceId, code, audience);
     }
 }

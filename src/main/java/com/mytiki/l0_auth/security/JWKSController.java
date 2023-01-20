@@ -3,8 +3,9 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.l0_auth.utilities;
+package com.mytiki.l0_auth.security;
 
+import com.mytiki.l0_auth.utilities.Constants;
 import com.nimbusds.jose.jwk.JWKSet;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,10 +18,10 @@ import java.util.Map;
 @Tag(name = "AUTH")
 @RestController
 @RequestMapping(value = "/.well-known/jwks.json")
-public class JWKS {
+public class JWKSController {
     private final JWKSet jwkSet;
 
-    public JWKS(JWKSet jwkSet) {
+    public JWKSController(JWKSet jwkSet) {
         this.jwkSet = jwkSet;
     }
 

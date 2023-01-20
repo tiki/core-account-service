@@ -21,4 +21,9 @@ public interface Constants {
 
     Long TOKEN_EXPIRY_DURATION_SECONDS = 600L;
     Long REFRESH_EXPIRY_DURATION_SECONDS = 2592000L;
+
+    String OAUTH_PATH = "oauth";
+    String OAUTH_TOKEN_PATH = OAUTH_PATH + "/token";
+    String OAUTH_REVOKE_PATH = OAUTH_PATH + "/revoke";
+    String OAUTH_USERINFO_PATH = OAUTH_PATH + "/userinfo";
 }

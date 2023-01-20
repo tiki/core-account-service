@@ -25,4 +25,9 @@ public class RefreshConfig {
             @Autowired JwtDecoder jwtDecoder) {
         return new RefreshService(repository, jwsSigner, jwtDecoder);
     }
+
+    @Bean
+    public RefreshController refreshController(@Autowired RefreshService service){
+        return new RefreshController(service);
+    }
 }

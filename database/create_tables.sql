@@ -58,13 +58,11 @@ CREATE TABLE IF NOT EXISTS app_user(
 );
 
 -- -----------------------------------------------------------------------
--- API ID
+-- API KEY
 -- -----------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS api_id(
-    api_id UUID PRIMARY KEY,
-    user_id TEXT REFERENCES user_info(uid) NOT NULL,
-    is_valid BOOLEAN NOT NULL DEFAULT FALSE,
-    created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
-    modified_utc TIMESTAMP WITH TIME ZONE NOT NULL
-)
-
+CREATE TABLE IF NOT EXISTS api_key(
+    api_key_id UUID PRIMARY KEY,
+    secret_hash BYTEA,
+    app_info_id BIGINT REFERENCES app_info(app_info_id),
+    created_utc TIMESTAMP WITH TIME ZONE NOT NULL
+);
