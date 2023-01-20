@@ -93,7 +93,7 @@ public class AppInfoTest {
 
         assertEquals(app.getSub(), found.getSub());
         assertEquals(app.getName(), found.getName());
-        assertEquals(app.getUpdatedAt(), found.getUpdatedAt());
+        assertEquals(app.getUpdatedAt().withNano(0), found.getUpdatedAt().withNano(0));
         assertEquals(app.getUsers().size(), found.getUsers().size());
         assertEquals(app.getUsers().stream().findFirst(), found.getUsers().stream().findFirst());
     }

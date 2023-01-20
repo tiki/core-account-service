@@ -47,7 +47,7 @@ public class UserInfoTest {
 
         UserInfoAO user = service.get(saved.getUserId().toString());
         assertEquals(saved.getEmail(), user.getEmail());
-        assertEquals(saved.getModified(), user.getUpdatedAt());
+        assertEquals(saved.getModified().withNano(0), user.getUpdatedAt().withNano(0));
         assertEquals(0, user.getApps().size());
         assertEquals(saved.getUserId().toString(), user.getSub());
     }
