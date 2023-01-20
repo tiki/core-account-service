@@ -18,14 +18,14 @@ public class UserInfoConfig {
     public static final String PACKAGE_PATH = Constants.PACKAGE_FEATURES_LATEST_DOT_PATH + ".user_info";
 
     @Bean
-    public UserInfoController userInfoController(@Autowired UserInfoService service){
-        return new UserInfoController(service);
+    public UserInfoController userInfoController(
+            @Autowired UserInfoService service,
+            @Autowired JwtDecoder jwtDecoder){
+        return new UserInfoController(service, jwtDecoder);
     }
 
     @Bean
-    public UserInfoService userInfoService(
-            @Autowired UserInfoRepository repository,
-            @Autowired JwtDecoder jwtDecoder){
-        return new UserInfoService(repository, jwtDecoder);
+    public UserInfoService userInfoService(@Autowired UserInfoRepository repository){
+        return new UserInfoService(repository);
     }
 }

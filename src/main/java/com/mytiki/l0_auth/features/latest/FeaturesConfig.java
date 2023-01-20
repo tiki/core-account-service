@@ -5,6 +5,7 @@
 
 package com.mytiki.l0_auth.features.latest;
 
+import com.mytiki.l0_auth.features.latest.app_info.AppInfoConfig;
 import com.mytiki.l0_auth.features.latest.oauth.OauthConfig;
 import com.mytiki.l0_auth.features.latest.otp.OtpConfig;
 import com.mytiki.l0_auth.features.latest.refresh.RefreshConfig;
@@ -15,7 +16,8 @@ import org.springframework.context.annotation.Import;
         OauthConfig.class,
         OtpConfig.class,
         RefreshConfig.class,
-        UserInfoConfig.class
+        UserInfoConfig.class,
+        AppInfoConfig.class
 })
 public class FeaturesConfig {
 }
