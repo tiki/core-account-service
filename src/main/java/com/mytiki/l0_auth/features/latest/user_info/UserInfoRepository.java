@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserInfoRepository extends JpaRepository<UserInfoDO, UUID> {
-    Optional<UserInfoDO> findByUid(UUID uid);
+public interface UserInfoRepository extends JpaRepository<UserInfoDO, Long> {
+    Optional<UserInfoDO> findByUserId(UUID userId);
     Optional<UserInfoDO> findByEmail(String email);
 }

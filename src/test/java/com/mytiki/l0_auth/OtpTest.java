@@ -147,7 +147,8 @@ public class OtpTest {
         assertNotNull(token.getAccessToken().getExpiresAt());
         assertTrue(token.getAccessToken().getExpiresAt().isAfter(Instant.now()));
 
-        UserInfoAO userInfo = userInfoService.get(token.getAccessToken().getTokenValue());
+        Jwt jwt = jwtDecoder.decode(token.getAccessToken().getTokenValue());
+        UserInfoAO userInfo = userInfoService.get(jwt.getSubject());
         assertEquals(testEmail, userInfo.getEmail());
     }
 
@@ -169,7 +170,8 @@ public class OtpTest {
         code = param.getValue().substring(19, 25);
         token = service.authorize(rsp.getDeviceId(), code, null);
 
-        UserInfoAO userInfo = userInfoService.get(token.getAccessToken().getTokenValue());
+        Jwt jwt = jwtDecoder.decode(token.getAccessToken().getTokenValue());
+        UserInfoAO userInfo = userInfoService.get(jwt.getSubject());
         assertEquals(testEmail, userInfo.getEmail());
     }
 

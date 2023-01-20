@@ -3,18 +3,18 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.l0_auth.features.latest.user_info;
+package com.mytiki.l0_auth.features.latest.app_info;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.ZonedDateTime;
 import java.util.Set;
 
-public class UserInfoAO {
+public class AppInfoAO {
     private String sub;
-    private String email;
+    private String name;
+    private Set<String> users;
     private ZonedDateTime updatedAt;
-    private Set<String> apps;
 
     public String getSub() {
         return sub;
@@ -24,12 +24,20 @@ public class UserInfoAO {
         this.sub = sub;
     }
 
-    public String getEmail() {
-        return email;
+    public String getName() {
+        return name;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<String> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<String> users) {
+        this.users = users;
     }
 
     @JsonProperty("updated_at")
@@ -39,13 +47,5 @@ public class UserInfoAO {
 
     public void setUpdatedAt(ZonedDateTime updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public Set<String> getApps() {
-        return apps;
-    }
-
-    public void setApps(Set<String> apps) {
-        this.apps = apps;
     }
 }
