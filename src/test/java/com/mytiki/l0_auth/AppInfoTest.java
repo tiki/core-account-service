@@ -56,8 +56,9 @@ public class AppInfoTest {
 
         AppInfoAO app = service.create(name, testUser);
         assertEquals(name, app.getName());
-        assertNotNull(app.getSub());
-        assertNotNull(app.getUpdatedAt());
+        assertNotNull(app.getAppId());
+        assertNotNull(app.getModified());
+        assertNotNull(app.getCreated());
         assertEquals(1, app.getUsers().size());
         assertTrue(app.getUsers().contains(testUser.getUserId().toString()));
     }
@@ -89,11 +90,12 @@ public class AppInfoTest {
         testUser = userInfoRepository.save(testUser);
 
         AppInfoAO app = service.create(name, testUser);
-        AppInfoAO found = service.get(app.getSub());
+        AppInfoAO found = service.get(app.getAppId());
 
-        assertEquals(app.getSub(), found.getSub());
+        assertEquals(app.getAppId(), found.getAppId());
         assertEquals(app.getName(), found.getName());
-        assertEquals(app.getUpdatedAt().withNano(0), found.getUpdatedAt().withNano(0));
+        assertEquals(app.getModified().withNano(0), found.getModified().withNano(0));
+        assertEquals(app.getCreated().withNano(0), found.getCreated().withNano(0));
         assertEquals(app.getUsers().size(), found.getUsers().size());
         assertEquals(app.getUsers().stream().findFirst(), found.getUsers().stream().findFirst());
     }
@@ -103,9 +105,10 @@ public class AppInfoTest {
         String appId = UUID.randomUUID().toString();
         AppInfoAO found = service.get(appId);
 
-        assertEquals(appId, found.getSub());
+        assertEquals(appId, found.getAppId());
         assertNull(found.getName());
-        assertNull(found.getUpdatedAt());
+        assertNull(found.getModified());
+        assertNull(found.getCreated());
         assertNull(found.getUsers());
     }
 }

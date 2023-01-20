@@ -26,6 +26,7 @@ public class UserInfoService {
         return found.map(this::toAO).orElseGet(() -> {
             UserInfoAO rsp = new UserInfoAO();
             rsp.setSub(userId);
+            rsp.setUserId(userId);
             return rsp;
         });
     }
@@ -64,8 +65,10 @@ public class UserInfoService {
     private UserInfoAO toAO(UserInfoDO src){
         UserInfoAO rsp = new UserInfoAO();
         rsp.setSub(src.getUserId().toString());
+        rsp.setUserId(src.getUserId().toString());
         rsp.setEmail(src.getEmail());
-        rsp.setUpdatedAt(src.getModified());
+        rsp.setCreated(src.getCreated());
+        rsp.setModified(src.getModified());
         if(src.getApps() != null)
             rsp.setApps(src.getApps().stream().map(a -> a.getAppId().toString()).collect(Collectors.toSet()));
         return rsp;

@@ -48,7 +48,7 @@ public class ApiKeyService {
         repository.save(apiKey);
 
         ApiKeyAO rsp = new ApiKeyAO();
-        rsp.setId(apiKey.toString());
+        rsp.setId(apiKey.getId().toString());
         rsp.setCreated(apiKey.getCreated());
         //rsp.setSecret();
         return rsp;
@@ -76,7 +76,7 @@ public class ApiKeyService {
 
     private void guardAppUser(String userId, String appId){
         UserInfoAO user = userInfoService.get(userId);
-        if(!user.getApps().contains(appId))
+        if(user.getApps() == null || !user.getApps().contains(appId))
             throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
     }
 }

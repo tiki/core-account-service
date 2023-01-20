@@ -36,7 +36,7 @@ public class AppInfoService {
         Optional<AppInfoDO> found = repository.findByAppId(UUID.fromString(appId));
         return found.map(this::toAO).orElseGet(() -> {
                 AppInfoAO rsp = new AppInfoAO();
-                rsp.setSub(appId);
+                rsp.setAppId(appId);
                 return rsp;
         });
     }
@@ -47,9 +47,10 @@ public class AppInfoService {
 
     private AppInfoAO toAO(AppInfoDO src){
         AppInfoAO rsp = new AppInfoAO();
-        rsp.setSub(src.getAppId().toString());
+        rsp.setAppId(src.getAppId().toString());
         rsp.setName(src.getName());
-        rsp.setUpdatedAt(src.getModified());
+        rsp.setModified(src.getModified());
+        rsp.setCreated(src.getCreated());
         if(src.getUsers() != null)
             rsp.setUsers(src.getUsers().stream().map(u -> u.getUserId().toString()).collect(Collectors.toSet()));
         return rsp;
