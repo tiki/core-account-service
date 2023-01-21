@@ -30,5 +30,4 @@ public class ApiKeyConfig {
             @Autowired AppInfoService appInfoService){
         return new ApiKeyService(repository, userInfoService, appInfoService);
     }
-
 }

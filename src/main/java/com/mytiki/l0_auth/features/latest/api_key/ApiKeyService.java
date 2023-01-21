@@ -11,9 +11,13 @@ import com.mytiki.l0_auth.features.latest.user_info.UserInfoAO;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.time.ZonedDateTime;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +26,7 @@ public class ApiKeyService {
     private final ApiKeyRepository repository;
     private final UserInfoService userInfoService;
     private final AppInfoService appInfoService;
+    private final PasswordEncoder secretEncoder;
 
     public ApiKeyService(
             ApiKeyRepository repository,
@@ -30,9 +35,11 @@ public class ApiKeyService {
         this.repository = repository;
         this.userInfoService = userInfoService;
         this.appInfoService = appInfoService;
+        this.secretEncoder = new BCryptPasswordEncoder(12);
     }
 
-    public ApiKeyAO create(String userId, String appId){
+    public ApiKeyAOCreate create(String userId, String appId, boolean isPublic){
+        String secret = null;
         guardAppUser(userId, appId);
         Optional<AppInfoDO> app = appInfoService.getDO(appId);
         if(app.isEmpty())
@@ -45,12 +52,18 @@ public class ApiKeyService {
         apiKey.setId(UUID.randomUUID());
         apiKey.setApp(app.get());
         apiKey.setCreated(ZonedDateTime.now());
+
+        if(!isPublic) {
+            secret = generateSecret(32);
+            apiKey.setHashedSecret(secretEncoder.encode(secret));
+        }
+
         repository.save(apiKey);
 
-        ApiKeyAO rsp = new ApiKeyAO();
+        ApiKeyAOCreate rsp = new ApiKeyAOCreate();
         rsp.setId(apiKey.getId().toString());
         rsp.setCreated(apiKey.getCreated());
-        //rsp.setSecret();
+        rsp.setSecret(secret);
         return rsp;
     }
 
@@ -78,5 +91,12 @@ public class ApiKeyService {
         UserInfoAO user = userInfoService.get(userId);
         if(user.getApps() == null || !user.getApps().contains(appId))
             throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
+    }
+
+    private String generateSecret(int len){
+        byte[] secret = new byte[len];
+        SecureRandom secureRandom = new SecureRandom();
+        secureRandom.nextBytes(secret);
+        return Base64.getEncoder().withoutPadding().encodeToString(secret);
     }
 }

@@ -7,10 +7,7 @@ package com.mytiki.l0_auth.features.latest.api_key;
 
 import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -34,8 +31,11 @@ public class ApiKeyController {
     }
 
     @RequestMapping(method = RequestMethod.POST, path = PATH_APP_KEY)
-    public ApiKeyAO createAppKey(Principal principal, @PathVariable String appId) {
-        return service.create(principal.getName(), appId);
+    public ApiKeyAOCreate createAppKey(
+            Principal principal,
+            @PathVariable String appId,
+            @RequestParam(required = false) boolean isPublic) {
+        return service.create(principal.getName(), appId, isPublic);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, path = PATH_KEY)

@@ -5,10 +5,7 @@
 
 package com.mytiki.l0_auth;
 
-import com.mytiki.l0_auth.features.latest.api_key.ApiKeyAO;
-import com.mytiki.l0_auth.features.latest.api_key.ApiKeyDO;
-import com.mytiki.l0_auth.features.latest.api_key.ApiKeyRepository;
-import com.mytiki.l0_auth.features.latest.api_key.ApiKeyService;
+import com.mytiki.l0_auth.features.latest.api_key.*;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoAO;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoService;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoDO;
@@ -22,6 +19,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.ZonedDateTime;
@@ -62,9 +60,10 @@ public class AppKeyTest {
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser);
 
-        ApiKeyAO key = service.create(testUser.getUserId().toString(), app.getAppId());
+        ApiKeyAOCreate key = service.create(testUser.getUserId().toString(), app.getAppId(), true);
         assertNotNull(key.getId());
         assertNotNull(key.getCreated());
+        assertNull(key.getSecret());
     }
 
     @Test
@@ -78,7 +77,7 @@ public class AppKeyTest {
         userInfoRepository.save(testUser);
 
         ApiException ex = assertThrows(ApiException.class,
-                () -> service.create(userId.toString(), UUID.randomUUID().toString()));
+                () -> service.create(userId.toString(), UUID.randomUUID().toString(), true));
         assertEquals(HttpStatus.FORBIDDEN, ex.getHttpStatus());
     }
 
@@ -92,7 +91,7 @@ public class AppKeyTest {
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser);
 
-        ApiKeyAO created = service.create(testUser.getUserId().toString(), app.getAppId());
+        ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), true);
         List<ApiKeyAO> found = service.getByAppId(testUser.getUserId().toString(), app.getAppId());
 
         assertEquals(1, found.size());
@@ -110,7 +109,7 @@ public class AppKeyTest {
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser);
-        service.create(testUser.getUserId().toString(), app.getAppId());
+        service.create(testUser.getUserId().toString(), app.getAppId(), true);
 
         ApiException ex = assertThrows(ApiException.class,
                 () -> service.getByAppId(userId.toString(), UUID.randomUUID().toString()));
@@ -127,7 +126,7 @@ public class AppKeyTest {
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser);
 
-        ApiKeyAO key = service.create(testUser.getUserId().toString(), app.getAppId());
+        ApiKeyAOCreate key = service.create(testUser.getUserId().toString(), app.getAppId(), true);
         service.revoke(testUser.getUserId().toString(), key.getId());
 
         Optional<ApiKeyDO> found = repository.findById(UUID.fromString(key.getId()));
@@ -144,7 +143,7 @@ public class AppKeyTest {
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser);
 
-        ApiKeyAO key = service.create(testUser.getUserId().toString(), app.getAppId());
+        ApiKeyAOCreate key = service.create(testUser.getUserId().toString(), app.getAppId(), true);
         ApiException ex = assertThrows(ApiException.class,
                 () -> service.revoke(UUID.randomUUID().toString(), key.getId()));
         assertEquals(HttpStatus.FORBIDDEN, ex.getHttpStatus());
@@ -153,5 +152,27 @@ public class AppKeyTest {
     @Test
     public void Test_Revoke_NoKey_Success() {
         service.revoke(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    }
+
+    @Test
+    public void Test_Create_WithSecret_Success() {
+        UserInfoDO testUser = new UserInfoDO();
+        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
+        testUser.setUserId(UUID.randomUUID());
+        testUser.setCreated(ZonedDateTime.now());
+        testUser.setModified(ZonedDateTime.now());
+        testUser = userInfoRepository.save(testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser);
+
+        ApiKeyAOCreate key = service.create(testUser.getUserId().toString(), app.getAppId(), false);
+        assertNotNull(key.getId());
+        assertNotNull(key.getCreated());
+        assertNotNull(key.getSecret());
+
+        Optional<ApiKeyDO> found = repository.findById(UUID.fromString(key.getId()));
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        assertTrue(found.isPresent());
+        assertTrue(encoder.matches(key.getSecret(), found.get().getHashedSecret()));
     }
 }

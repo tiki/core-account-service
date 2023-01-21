@@ -9,7 +9,6 @@ import java.time.ZonedDateTime;
 
 public class ApiKeyAO {
     private String id;
-    private String secret;
     private ZonedDateTime created;
 
     public String getId() {
@@ -18,14 +17,6 @@ public class ApiKeyAO {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getSecret() {
-        return secret;
-    }
-
-    public void setSecret(String secret) {
-        this.secret = secret;
     }
 
     public ZonedDateTime getCreated() {
