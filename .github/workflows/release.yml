@@ -56,7 +56,7 @@ jobs:
         env:
           PGPASSWORD: pgtestpw
 
-      - name: Maven Package L0 Auth
+      - name: Maven Package
         run: doppler run -c tst -- mvn clean package
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_ST }}
@@ -112,7 +112,7 @@ jobs:
         env:
           PGPASSWORD: pgtestpw
 
-      - name: Maven Package L0 Auth
+      - name: Maven Package
         run: doppler run -c tst -- mvn clean package
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_ST }}
