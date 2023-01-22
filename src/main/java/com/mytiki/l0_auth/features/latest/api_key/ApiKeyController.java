@@ -5,8 +5,15 @@
 
 package com.mytiki.l0_auth.features.latest.api_key;
 
+import com.mytiki.l0_auth.utilities.Constants;
 import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -41,5 +48,20 @@ public class ApiKeyController {
     @RequestMapping(method = RequestMethod.DELETE, path = PATH_KEY)
     public void revoke(Principal principal, @PathVariable String keyId) {
         service.revoke(principal.getName(), keyId);
+    }
+
+    @RequestMapping(
+            method = RequestMethod.POST,
+            path = Constants.OAUTH_TOKEN_PATH,
+            consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE},
+            params = {"client_id", "client_secret"})
+    public OAuth2AccessTokenResponse grant(
+            @RequestParam(name = "grant_type") AuthorizationGrantType grantType,
+            @RequestParam(required = false) String scope,
+            @RequestParam(name = "client_id") String clientId,
+            @RequestParam(name = "client_secret") String clientSecret) {
+        if (!grantType.equals(AuthorizationGrantType.CLIENT_CREDENTIALS))
+            throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.UNSUPPORTED_GRANT_TYPE));
+        return service.authorize(clientId, clientSecret, scope);
     }
 }

@@ -20,6 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.ZonedDateTime;
@@ -36,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles(profiles = {"ci", "dev", "local"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AppKeyTest {
+public class ApiKeyTest {
 
     @Autowired
     private ApiKeyRepository repository;
@@ -49,6 +54,9 @@ public class AppKeyTest {
 
     @Autowired
     private AppInfoService appInfoService;
+
+    @Autowired
+    private JwtDecoder jwtDecoder;
 
     @Test
     public void Test_Create_Success() {
@@ -174,5 +182,92 @@ public class AppKeyTest {
 
         assertTrue(found.isPresent());
         assertTrue(encoder.matches(key.getSecret(), found.get().getHashedSecret()));
+    }
+
+    @Test
+    public void Test_Authorize_Success(){
+        UserInfoDO testUser = new UserInfoDO();
+        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
+        testUser.setUserId(UUID.randomUUID());
+        testUser.setCreated(ZonedDateTime.now());
+        testUser.setModified(ZonedDateTime.now());
+        testUser = userInfoRepository.save(testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser);
+        ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), true);
+
+        String scope = "storage";
+        OAuth2AccessTokenResponse rsp = service.authorize(created.getId(), created.getSecret(), scope);
+        Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());
+        assertNotNull(rsp.getAccessToken().getTokenValue());
+        assertEquals(app.getAppId(), jwt.getSubject());
+        assertTrue(rsp.getAccessToken().getScopes().contains(scope));
+    }
+
+    @Test
+    public void Test_Authorize_Secret_Success(){
+        UserInfoDO testUser = new UserInfoDO();
+        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
+        testUser.setUserId(UUID.randomUUID());
+        testUser.setCreated(ZonedDateTime.now());
+        testUser.setModified(ZonedDateTime.now());
+        testUser = userInfoRepository.save(testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser);
+        ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), false);
+
+        OAuth2AccessTokenResponse rsp = service.authorize(created.getId(), created.getSecret(), null);
+        Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());
+        assertNotNull(rsp.getAccessToken().getTokenValue());
+        assertEquals(app.getAppId(), jwt.getSubject());
+    }
+
+    @Test
+    public void Test_Authorize_Private_Success(){
+        UserInfoDO testUser = new UserInfoDO();
+        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
+        testUser.setUserId(UUID.randomUUID());
+        testUser.setCreated(ZonedDateTime.now());
+        testUser.setModified(ZonedDateTime.now());
+        testUser = userInfoRepository.save(testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser);
+        ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), true);
+
+        String scope = "auth";
+        OAuth2AccessTokenResponse rsp = service.authorize(created.getId(), created.getSecret(), scope);
+        Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());
+        assertNotNull(rsp.getAccessToken().getTokenValue());
+        assertEquals(app.getAppId(), jwt.getSubject());
+        assertFalse(rsp.getAccessToken().getScopes().contains(scope));
+    }
+
+    @Test
+    public void Test_Authorize_BadSecret_Failure(){
+        UserInfoDO testUser = new UserInfoDO();
+        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
+        testUser.setUserId(UUID.randomUUID());
+        testUser.setCreated(ZonedDateTime.now());
+        testUser.setModified(ZonedDateTime.now());
+        testUser = userInfoRepository.save(testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser);
+        ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), false);
+
+        OAuth2AuthorizationException ex = assertThrows(OAuth2AuthorizationException.class,
+                () -> service.authorize(created.getId(), UUID.randomUUID().toString(), null));
+        assertEquals(ex.getError().getErrorCode(), OAuth2ErrorCodes.ACCESS_DENIED);
+    }
+
+    @Test
+    public void Test_Authorize_BadId_Failure(){
+        UserInfoDO testUser = new UserInfoDO();
+        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
+        testUser.setUserId(UUID.randomUUID());
+        testUser.setCreated(ZonedDateTime.now());
+        testUser.setModified(ZonedDateTime.now());
+        testUser = userInfoRepository.save(testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser);
+        ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), false);
+
+        OAuth2AuthorizationException ex = assertThrows(OAuth2AuthorizationException.class,
+                () -> service.authorize(UUID.randomUUID().toString(), created.getId(), null));
+        assertEquals(ex.getError().getErrorCode(), OAuth2ErrorCodes.ACCESS_DENIED);
     }
 }

@@ -19,8 +19,6 @@ import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Tag(name = "AUTH")
 @RestController
 @RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
@@ -50,14 +48,13 @@ public class OtpController {
     public OAuth2AccessTokenResponse grant(
             @Parameter(
                     schema = @Schema(type = "string"),
-                    description = "(password, refresh_token, urn:ietf:params:oauth:grant-type:jwt-bearer)")
+                    description = "(password, refresh_token, client_credentials)") //, urn:ietf:params:oauth:grant-type:jwt-bearer
             @RequestParam(name = "grant_type") AuthorizationGrantType grantType,
             @RequestParam(required = false) String scope,
             @RequestParam(name = "username") String deviceId,
-            @RequestParam(name = "password") String code,
-            @RequestParam(required = false) List<String> audience) {
+            @RequestParam(name = "password") String code) {
         if (!grantType.equals(AuthorizationGrantType.PASSWORD))
             throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.UNSUPPORTED_GRANT_TYPE));
-        return service.authorize(deviceId, code, audience);
+        return service.authorize(deviceId, code, scope);
     }
 }

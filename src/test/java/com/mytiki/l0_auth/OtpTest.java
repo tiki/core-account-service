@@ -33,7 +33,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -183,27 +182,27 @@ public class OtpTest {
         OtpAOStartReq req = new OtpAOStartReq(testEmail, true);
         OtpAOStartRsp rsp = service.start(req);
 
-        String audience = "storage.l0.mytiki.com";
+        String scope = "storage";
         String code = param.getValue().substring(19, 25);
-        OAuth2AccessTokenResponse token = service.authorize(rsp.getDeviceId(), code, List.of(audience));
+        OAuth2AccessTokenResponse token = service.authorize(rsp.getDeviceId(), code, scope);
 
         Jwt jwt = jwtDecoder.decode(token.getAccessToken().getTokenValue());
-        assertTrue(jwt.getAudience().contains(audience));
+        assertTrue(jwt.getAudience().contains("storage.l0.mytiki.com"));
+        assertTrue(token.getAccessToken().getScopes().contains(scope));
     }
 
     @Test
-    public void Test_Authorize_Audience_Anonymous_Failure() {
+    public void Test_Authorize_Audience_Anonymous_Success() {
         ArgumentCaptor<String> param = ArgumentCaptor.forClass(String.class);
         Mockito.when(mockSendgrid.send(anyString(), anyString(), anyString(), param.capture())).thenReturn(true);
         String testEmail = UUID.randomUUID() + "@test.com";
         OtpAOStartReq req = new OtpAOStartReq(testEmail, false);
         OtpAOStartRsp rsp = service.start(req);
 
-        String audience = "storage.l0.mytiki.com";
+        String scope = "storage";
         String code = param.getValue().substring(19, 25);
 
-        OAuth2AuthorizationException ex = assertThrows(OAuth2AuthorizationException.class,
-                () -> service.authorize(rsp.getDeviceId(), code, List.of(audience)));
-        assertEquals(ex.getError().getErrorCode(), OAuth2ErrorCodes.ACCESS_DENIED);
+        OAuth2AccessTokenResponse token = service.authorize(rsp.getDeviceId(), code, scope);
+        assertFalse(token.getAccessToken().getScopes().contains(scope));
     }
 }

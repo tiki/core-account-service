@@ -5,8 +5,8 @@
 
 package com.mytiki.l0_auth.features.latest.refresh;
 
+import com.mytiki.l0_auth.security.JWSBuilder;
 import com.mytiki.l0_auth.utilities.Constants;
-import com.mytiki.l0_auth.utilities.JWSBuilder;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSSigner;
@@ -36,7 +36,7 @@ public class RefreshService {
         this.jwtDecoder = jwtDecoder;
     }
 
-    public String issue(String sub, List<String> aud) throws JOSEException {
+    public String issue(String sub, List<String> aud, List<String> scp) throws JOSEException {
         RefreshDO refreshDO = new RefreshDO();
         ZonedDateTime now = ZonedDateTime.now();
         refreshDO.setJti(UUID.randomUUID());
@@ -48,6 +48,7 @@ public class RefreshService {
                 .exp(refreshDO.getExpires())
                 .sub(sub)
                 .aud(aud)
+                .scp(scp)
                 .jti(refreshDO.getJti().toString())
                 .build(jwtSigner)
                 .serialize();
@@ -62,12 +63,13 @@ public class RefreshService {
                 JWSObject newToken = new JWSBuilder()
                         .sub(jwt.getSubject())
                         .aud(jwt.getAudience())
+                        .scp(jwt.getClaim("scp"))
                         .expIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                         .build(jwtSigner);
                 return OAuth2AccessTokenResponse
                         .withToken(newToken.serialize())
                         .tokenType(OAuth2AccessToken.TokenType.BEARER)
-                        .refreshToken(issue(jwt.getSubject(), jwt.getAudience()))
+                        .refreshToken(issue(jwt.getSubject(), jwt.getAudience(), jwt.getClaim("scp")))
                         .expiresIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                         .build();
             } else
