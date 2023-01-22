@@ -58,7 +58,7 @@ jobs:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_ST }}
 
       - name: Publish Results
-        uses: actions/upload-artifact@v2
+        uses: dorny/test-reporter@v1
         if: always()
         with:
           name: JUnit Tests
