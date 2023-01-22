@@ -49,7 +49,6 @@ public class UserInfoTest {
         assertEquals(saved.getModified().withNano(0), user.getModified().withNano(0));
         assertEquals(saved.getCreated().withNano(0), user.getCreated().withNano(0));
         assertEquals(0, user.getApps().size());
-        assertEquals(saved.getUserId().toString(), user.getSub());
         assertEquals(saved.getUserId().toString(), user.getUserId());
     }
 
@@ -61,7 +60,6 @@ public class UserInfoTest {
         assertNull(user.getModified());
         assertNull(user.getCreated());
         assertNull(user.getApps());
-        assertEquals(sub, user.getSub());
         assertEquals(sub, user.getUserId());
     }
 

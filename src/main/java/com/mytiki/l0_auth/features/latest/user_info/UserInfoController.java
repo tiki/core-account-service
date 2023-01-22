@@ -17,11 +17,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-
+@Tag(name = "ACCOUNT")
 @RestController
 @RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
 public class UserInfoController {
-    public static final String PATH_USER = "user/{userId}";
+    public static final String PATH_USER = "user";
 
     private final UserInfoService service;
 
@@ -29,12 +29,11 @@ public class UserInfoController {
         this.service = service;
     }
 
-    @Tag(name = "ACCOUNT")
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-post",
             summary = "Update a User",
             description = "Update the authorized user's profile",
             security = @SecurityRequirement(name = "jwt"))
-    @RequestMapping(method = RequestMethod.POST, path = PATH_USER)
+    @RequestMapping(method = RequestMethod.POST, path = PATH_USER + "/{userId}")
     public UserInfoAO update(
             Principal principal,
             @PathVariable String userId,
@@ -50,12 +49,11 @@ public class UserInfoController {
         return service.update(userId, body);
     }
 
-    @Tag(name = "AUTH")
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-oauth-userinfo-get",
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-get",
             summary = "Get User",
             description = "Get the authorized user's profile",
             security = @SecurityRequirement(name = "jwt"))
-    @RequestMapping(method = RequestMethod.GET, path = Constants.OAUTH_USERINFO_PATH)
+    @RequestMapping(method = RequestMethod.GET, path = PATH_USER )
     public UserInfoAO userinfo(Principal principal) {
         if(principal == null || principal.getName() == null)
             throw new ApiException(HttpStatus.FORBIDDEN);

@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS app_user(
 -- -----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS api_key(
     api_key_id UUID PRIMARY KEY,
-    secret_hash BYTEA,
+    secret_hash TEXT,
     app_info_id BIGINT REFERENCES app_info(app_info_id),
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );

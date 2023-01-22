@@ -8,8 +8,10 @@ package com.mytiki.l0_auth.features.latest.otp;
 import com.mytiki.l0_auth.features.latest.refresh.RefreshService;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoAO;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
+import com.mytiki.l0_auth.security.JWSBuilder;
+import com.mytiki.l0_auth.security.OauthScope;
+import com.mytiki.l0_auth.security.OauthScopes;
 import com.mytiki.l0_auth.utilities.Constants;
-import com.mytiki.l0_auth.utilities.JWSBuilder;
 import com.mytiki.l0_auth.utilities.Mustache;
 import com.mytiki.l0_auth.utilities.Sendgrid;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
@@ -40,6 +42,8 @@ public class OtpService {
     private final JWSSigner signer;
     private final RefreshService refreshService;
     private final UserInfoService userInfoService;
+    private final OauthScopes allowedScopes;
+    private final List<String> anonymousScopes;
 
     public OtpService(
             OtpRepository repository,
@@ -47,13 +51,17 @@ public class OtpService {
             Sendgrid sendgrid,
             JWSSigner signer,
             RefreshService refreshService,
-            UserInfoService userInfoService) {
+            UserInfoService userInfoService,
+            OauthScopes allowedScopes,
+            List<String> anonymousScopes) {
         this.repository = repository;
         this.templates = templates;
         this.sendgrid = sendgrid;
         this.signer = signer;
         this.refreshService = refreshService;
         this.userInfoService = userInfoService;
+        this.allowedScopes = allowedScopes;
+        this.anonymousScopes = anonymousScopes;
     }
 
     public OtpAOStartRsp start(OtpAOStartReq req) {
@@ -81,7 +89,7 @@ public class OtpService {
         }
     }
 
-    public OAuth2AccessTokenResponse authorize(String deviceId, String code, List<String> audience) {
+    public OAuth2AccessTokenResponse authorize(String deviceId, String code, String requestedScope) {
         String hashedOtp = hashedOtp(deviceId, code);
         Optional<OtpDO> found = repository.findByOtpHashed(hashedOtp);
         if (found.isEmpty())
@@ -99,28 +107,28 @@ public class OtpService {
             ));
         try {
             String subject = null;
+            Map<String, OauthScope> scopes = allowedScopes.parse(requestedScope);
             if(found.get().getEmail() != null) {
                 UserInfoAO userInfo = userInfoService.createIfNotExists(found.get().getEmail());
-                subject = userInfo.getSub();
+                subject = userInfo.getUserId();
+            }else{
+                scopes = allowedScopes.filter(scopes, anonymousScopes);
             }
 
-            if(audience != null && audience.contains("storage.l0.mytiki.com") && subject == null)
-                throw new OAuth2AuthorizationException(new OAuth2Error(
-                        OAuth2ErrorCodes.ACCESS_DENIED),
-                        "storage.l0.mytiki.com does not support anonymous subjects");
-
+            List<String>[] audAndScp = allowedScopes.getAudAndScp(scopes);
             JWSObject token = new JWSBuilder()
                     .expIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
-                    .aud(audience)
+                    .aud(audAndScp[0])
+                    .scp(audAndScp[1])
                     .build(signer);
 
             return OAuth2AccessTokenResponse
                     .withToken(token.serialize())
                     .tokenType(OAuth2AccessToken.TokenType.BEARER)
                     .expiresIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
-                    //.scopes()
-                    .refreshToken(refreshService.issue(subject, audience))
+                    .scopes(scopes.keySet())
+                    .refreshToken(refreshService.issue(subject, audAndScp[0], audAndScp[1]))
                     .build();
         } catch (JOSEException e) {
             throw new OAuth2AuthorizationException(new OAuth2Error(

@@ -16,7 +16,7 @@ import java.util.UUID;
 @Table(name = "api_key")
 public class ApiKeyDO implements Serializable {
     private UUID id;
-    private byte[] hashedSecret;
+    private String hashedSecret;
     private AppInfoDO app;
     private ZonedDateTime created;
 
@@ -31,11 +31,11 @@ public class ApiKeyDO implements Serializable {
     }
 
     @Column(name = "secret_hash")
-    public byte[] getHashedSecret() {
+    public String getHashedSecret() {
         return hashedSecret;
     }
 
-    public void setHashedSecret(byte[] hashedSecret) {
+    public void setHashedSecret(String hashedSecret) {
         this.hashedSecret = hashedSecret;
     }
 

@@ -9,19 +9,18 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 
 public class UserInfoAO {
-    private String sub;
     private String userId;
     private String email;
     private ZonedDateTime modified;
     private ZonedDateTime created;
     private Set<String> apps;
 
-    public String getSub() {
-        return sub;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setSub(String sub) {
-        this.sub = sub;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getEmail() {
@@ -30,14 +29,6 @@ public class UserInfoAO {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public ZonedDateTime getModified() {

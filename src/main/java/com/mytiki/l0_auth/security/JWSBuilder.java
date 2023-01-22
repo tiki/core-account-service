@@ -3,8 +3,9 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.l0_auth.utilities;
+package com.mytiki.l0_auth.security;
 
+import com.mytiki.l0_auth.utilities.Constants;
 import com.nimbusds.jose.*;
 import com.nimbusds.jwt.JWTClaimsSet;
 
@@ -20,6 +21,7 @@ public class JWSBuilder {
     private ZonedDateTime exp;
     private Long expIn;
     private ZonedDateTime iat;
+    private List<String> scp;
 
     public JWSBuilder iat(ZonedDateTime instant){
         this.iat = instant;
@@ -46,8 +48,15 @@ public class JWSBuilder {
         return this;
     }
 
+    public JWSBuilder scp(List<String> scp){
+        if(scp != null && !scp.isEmpty())
+            this.scp = scp;
+        return this;
+    }
+
     public JWSBuilder aud(List<String> audiences){
-        this.aud = audiences;
+        if(audiences != null && !audiences.isEmpty())
+            this.aud = audiences;
         return this;
     }
 
@@ -68,6 +77,7 @@ public class JWSBuilder {
                                 .subject(sub)
                                 .audience(aud)
                                 .jwtID(jti)
+                                .claim("scp", scp)
                                 .build()
                                 .toJSONObject()
                 ));

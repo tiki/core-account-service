@@ -25,5 +25,4 @@ public interface Constants {
     String OAUTH_PATH = "oauth";
     String OAUTH_TOKEN_PATH = OAUTH_PATH + "/token";
     String OAUTH_REVOKE_PATH = OAUTH_PATH + "/revoke";
-    String OAUTH_USERINFO_PATH = OAUTH_PATH + "/userinfo";
 }
