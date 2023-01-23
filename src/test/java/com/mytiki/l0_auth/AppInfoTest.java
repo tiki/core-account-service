@@ -11,13 +11,14 @@ import com.mytiki.l0_auth.features.latest.app_info.AppInfoService;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoDO;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoRepository;
 import com.mytiki.l0_auth.main.App;
+import com.mytiki.spring_rest_api.ApiException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.ZonedDateTime;
@@ -73,9 +74,10 @@ public class AppInfoTest {
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
 
-        InvalidDataAccessApiUsageException ex = assertThrows(InvalidDataAccessApiUsageException.class,
+        ApiException ex = assertThrows(ApiException.class,
                 () -> service.create(name, testUser.getUserId().toString()));
         assertNotNull(ex);
+        assertEquals(HttpStatus.FORBIDDEN, ex.getHttpStatus());
     }
 
     @Test

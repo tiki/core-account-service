@@ -66,7 +66,7 @@ public class ApiKeyTest {
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
-        AppInfoAO app = appInfoService.create("testApp", testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
         ApiKeyAOCreate key = service.create(testUser.getUserId().toString(), app.getAppId(), true);
         assertNotNull(key.getId());
@@ -97,7 +97,7 @@ public class ApiKeyTest {
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
-        AppInfoAO app = appInfoService.create("testApp", testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
         ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), true);
         List<ApiKeyAO> found = service.getByAppId(testUser.getUserId().toString(), app.getAppId());
@@ -116,7 +116,7 @@ public class ApiKeyTest {
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
-        AppInfoAO app = appInfoService.create("testApp", testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
         service.create(testUser.getUserId().toString(), app.getAppId(), true);
 
         ApiException ex = assertThrows(ApiException.class,
@@ -132,7 +132,7 @@ public class ApiKeyTest {
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
-        AppInfoAO app = appInfoService.create("testApp", testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
         ApiKeyAOCreate key = service.create(testUser.getUserId().toString(), app.getAppId(), true);
         service.revoke(testUser.getUserId().toString(), key.getId());
@@ -149,7 +149,7 @@ public class ApiKeyTest {
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
-        AppInfoAO app = appInfoService.create("testApp", testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
         ApiKeyAOCreate key = service.create(testUser.getUserId().toString(), app.getAppId(), true);
         ApiException ex = assertThrows(ApiException.class,
@@ -170,7 +170,7 @@ public class ApiKeyTest {
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
-        AppInfoAO app = appInfoService.create("testApp", testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
         ApiKeyAOCreate key = service.create(testUser.getUserId().toString(), app.getAppId(), false);
         assertNotNull(key.getId());
@@ -192,7 +192,7 @@ public class ApiKeyTest {
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
-        AppInfoAO app = appInfoService.create("testApp", testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
         ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), true);
 
         String scope = "storage";
@@ -211,7 +211,7 @@ public class ApiKeyTest {
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
-        AppInfoAO app = appInfoService.create("testApp", testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
         ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), false);
 
         OAuth2AccessTokenResponse rsp = service.authorize(created.getId(), created.getSecret(), null);
@@ -228,7 +228,7 @@ public class ApiKeyTest {
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
-        AppInfoAO app = appInfoService.create("testApp", testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
         ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), true);
 
         String scope = "auth";
@@ -247,7 +247,7 @@ public class ApiKeyTest {
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
-        AppInfoAO app = appInfoService.create("testApp", testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
         ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), false);
 
         OAuth2AuthorizationException ex = assertThrows(OAuth2AuthorizationException.class,
@@ -263,7 +263,7 @@ public class ApiKeyTest {
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
-        AppInfoAO app = appInfoService.create("testApp", testUser);
+        AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
         ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), false);
 
         OAuth2AuthorizationException ex = assertThrows(OAuth2AuthorizationException.class,
