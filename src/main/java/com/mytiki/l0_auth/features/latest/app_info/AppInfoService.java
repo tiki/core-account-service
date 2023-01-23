@@ -6,6 +6,9 @@
 package com.mytiki.l0_auth.features.latest.app_info;
 
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoDO;
+import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
+import com.mytiki.spring_rest_api.ApiExceptionBuilder;
+import org.springframework.http.HttpStatus;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -16,20 +19,27 @@ import java.util.stream.Collectors;
 public class AppInfoService {
 
     private final AppInfoRepository repository;
+    private final UserInfoService userInfoService;
 
-    public AppInfoService(AppInfoRepository repository) {
+    public AppInfoService(AppInfoRepository repository, UserInfoService userInfoService) {
         this.repository = repository;
+        this.userInfoService = userInfoService;
     }
 
-    public AppInfoAO create(String name, UserInfoDO user){
-        ZonedDateTime now = ZonedDateTime.now();
-        AppInfoDO app = new AppInfoDO();
-        app.setName(name);
-        app.setUsers(Set.of(user));
-        app.setAppId(UUID.randomUUID());
-        app.setCreated(now);
-        app.setModified(now);
-        return toAO(repository.save(app));
+    public AppInfoAO create(String name, String userId){
+       Optional<UserInfoDO> user =  userInfoService.getDO(userId);
+       if(user.isEmpty())
+           throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
+       else {
+           ZonedDateTime now = ZonedDateTime.now();
+           AppInfoDO app = new AppInfoDO();
+           app.setName(name);
+           app.setUsers(Set.of(user.get()));
+           app.setAppId(UUID.randomUUID());
+           app.setCreated(now);
+           app.setModified(now);
+           return toAO(repository.save(app));
+       }
     }
 
     public AppInfoAO get(String appId){

@@ -12,10 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -33,7 +30,7 @@ public class AppInfoController {
 
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-get",
-            summary = "Get an App",
+            summary = "Get App",
             description = "Get an app's profile",
             security = @SecurityRequirement(name = "jwt"))
     @RequestMapping(method = RequestMethod.GET, path = "/{appId}")
@@ -43,5 +40,14 @@ public class AppInfoController {
             return rsp;
         else
             throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
+    }
+
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-create",
+            summary = "Create App",
+            description = "Create a new App",
+            security = @SecurityRequirement(name = "jwt"))
+    @RequestMapping(method = RequestMethod.POST)
+    public AppInfoAO get(Principal principal, @RequestBody AppInfoAOCreate body) {
+        return service.create(body.getName(), principal.getName());
     }
 }

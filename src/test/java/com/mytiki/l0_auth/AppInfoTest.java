@@ -54,7 +54,7 @@ public class AppInfoTest {
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
 
-        AppInfoAO app = service.create(name, testUser);
+        AppInfoAO app = service.create(name, testUser.getUserId().toString());
         assertEquals(name, app.getName());
         assertNotNull(app.getAppId());
         assertNotNull(app.getModified());
@@ -74,7 +74,7 @@ public class AppInfoTest {
         testUser.setModified(ZonedDateTime.now());
 
         InvalidDataAccessApiUsageException ex = assertThrows(InvalidDataAccessApiUsageException.class,
-                () -> service.create(name, testUser));
+                () -> service.create(name, testUser.getUserId().toString()));
         assertNotNull(ex);
     }
 
@@ -89,7 +89,7 @@ public class AppInfoTest {
         testUser.setModified(ZonedDateTime.now());
         testUser = userInfoRepository.save(testUser);
 
-        AppInfoAO app = service.create(name, testUser);
+        AppInfoAO app = service.create(name, testUser.getUserId().toString());
         AppInfoAO found = service.get(app.getAppId());
 
         assertEquals(app.getAppId(), found.getAppId());
