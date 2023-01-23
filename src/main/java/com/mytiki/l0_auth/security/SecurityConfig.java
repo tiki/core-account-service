@@ -69,7 +69,11 @@ public class SecurityConfig {
                                 HttpMethod.POST.name())
                 ).and()
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.GET, ApiConstants.HEALTH_ROUTE, Constants.API_DOCS_PATH).permitAll()
+                .requestMatchers(HttpMethod.GET,
+                        ApiConstants.HEALTH_ROUTE,
+                        Constants.API_DOCS_PATH,
+                        JWKSController.PATH
+                ).permitAll()
                 .requestMatchers(HttpMethod.POST,
                         ApiConstants.API_LATEST_ROUTE + Constants.OAUTH_TOKEN_PATH,
                         ApiConstants.API_LATEST_ROUTE + OtpController.PATH_ISSUE
