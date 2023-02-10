@@ -5,7 +5,7 @@
 
 package com.mytiki.l0_auth.features.latest.app_info;
 
-public class AppInfoAOCreate {
+public class AppInfoAOReq {
     private String name;
 
     public String getName() {

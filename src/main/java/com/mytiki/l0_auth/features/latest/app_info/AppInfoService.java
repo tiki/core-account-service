@@ -9,6 +9,7 @@ import com.mytiki.l0_auth.features.latest.user_info.UserInfoDO;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -49,6 +50,39 @@ public class AppInfoService {
                 rsp.setAppId(appId);
                 return rsp;
         });
+    }
+
+    public AppInfoAO update(String userId, String appId, AppInfoAOReq req){
+        Optional<UserInfoDO> user =  userInfoService.getDO(userId);
+        if(user.isEmpty())
+            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
+
+        Optional<AppInfoDO> found = repository.findByAppId(UUID.fromString(appId));
+        if(found.isEmpty())
+            throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
+                    .detail("Invalid App ID")
+                    .build();
+
+        if(!found.get().getUsers().contains(user.get()))
+            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
+
+        AppInfoDO update = found.get();
+        update.setName(req.getName());
+        update = repository.save(update);
+        return toAO(update);
+    }
+
+    @Transactional
+    public void delete(String userId, String appId){
+        Optional<UserInfoDO> user =  userInfoService.getDO(userId);
+        if(user.isEmpty())
+            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
+        Optional<AppInfoDO> app = repository.findByAppId(UUID.fromString(appId));
+        if(app.isPresent()) {
+            if(!app.get().getUsers().contains(user.get()))
+                throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
+            repository.delete(app.get());
+        }
     }
 
     public Optional<AppInfoDO> getDO(String appId){

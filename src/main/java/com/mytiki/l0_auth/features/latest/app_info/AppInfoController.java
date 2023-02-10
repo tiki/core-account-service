@@ -47,7 +47,28 @@ public class AppInfoController {
             description = "Create a new App",
             security = @SecurityRequirement(name = "jwt"))
     @RequestMapping(method = RequestMethod.POST)
-    public AppInfoAO get(Principal principal, @RequestBody AppInfoAOCreate body) {
+    public AppInfoAO get(Principal principal, @RequestBody AppInfoAOReq body) {
         return service.create(body.getName(), principal.getName());
+    }
+
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-update",
+            summary = "Update App",
+            description = "Create a new App",
+            security = @SecurityRequirement(name = "jwt"))
+    @RequestMapping(method = RequestMethod.POST,  path = "/{appId}")
+    public AppInfoAO get(
+            Principal principal,
+            @PathVariable String appId,
+            @RequestBody AppInfoAOReq body) {
+        return service.update(principal.getName(), appId, body);
+    }
+
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-delete",
+            summary = "Delete App",
+            description = "Delete an App",
+            security = @SecurityRequirement(name = "jwt"))
+    @RequestMapping(method = RequestMethod.DELETE, path = "/{appId}")
+    public void delete(Principal principal, @PathVariable String appId) {
+        service.delete(principal.getName(), appId);
     }
 }

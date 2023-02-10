@@ -96,6 +96,7 @@ public class ApiKeyService {
             ApiKeyAO rsp = new ApiKeyAO();
             rsp.setId(key.getId().toString());
             rsp.setCreated(key.getCreated());
+            rsp.setPublic(key.getHashedSecret() == null);
             return rsp;
         }).toList();
     }
