@@ -31,15 +31,19 @@ public class OtpController {
         this.service = service;
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-otp-start-post",
-            summary = "Request OTP", description = "Start a new passwordless authorization flow")
+    @Operation(
+            operationId = Constants.PROJECT_DASH_PATH +  "-otp-start-post",
+            summary = "Request OTP",
+            description = "Start a new passwordless authorization flow")
     @RequestMapping(method = RequestMethod.POST, path = PATH_ISSUE)
     public OtpAOStartRsp issue(@RequestBody OtpAOStartReq body) {
         return service.start(body);
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-oauth-token-post",
-            summary = "Token Grant", description = "Issue authorization token. Use password grant for OTP flow.")
+    @Operation(
+            operationId = Constants.PROJECT_DASH_PATH +  "-oauth-token-post",
+            summary = "Token Grant",
+            description = "Issue authorization token. Use password grant for OTP flow.")
     @RequestMapping(
             method = RequestMethod.POST,
             path = Constants.OAUTH_TOKEN_PATH,

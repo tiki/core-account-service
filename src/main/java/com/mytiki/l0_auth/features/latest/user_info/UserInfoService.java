@@ -30,6 +30,10 @@ public class UserInfoService {
         });
     }
 
+    public Optional<UserInfoDO> getDO(String userId){
+        return repository.findByUserId(UUID.fromString(userId));
+    }
+
     public UserInfoAO createIfNotExists(String email) {
         Optional<UserInfoDO> found = repository.findByEmail(email);
         UserInfoDO userInfo;

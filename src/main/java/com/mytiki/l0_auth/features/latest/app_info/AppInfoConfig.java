@@ -5,6 +5,7 @@
 
 package com.mytiki.l0_auth.features.latest.app_info;
 
+import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
 import com.mytiki.l0_auth.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -17,8 +18,10 @@ public class AppInfoConfig {
     public static final String PACKAGE_PATH = Constants.PACKAGE_FEATURES_LATEST_DOT_PATH + ".app_info";
 
     @Bean
-    public AppInfoService appInfoService(@Autowired AppInfoRepository repository){
-        return new AppInfoService(repository);
+    public AppInfoService appInfoService(
+            @Autowired AppInfoRepository repository,
+            @Autowired UserInfoService userInfoService){
+        return new AppInfoService(repository, userInfoService);
     }
 
     @Bean

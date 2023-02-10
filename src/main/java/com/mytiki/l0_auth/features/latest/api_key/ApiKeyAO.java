@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 public class ApiKeyAO {
     private String id;
     private ZonedDateTime created;
+    public Boolean isPublic;
 
     public String getId() {
         return id;
@@ -25,5 +26,13 @@ public class ApiKeyAO {
 
     public void setCreated(ZonedDateTime created) {
         this.created = created;
+    }
+
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
     }
 }

@@ -17,8 +17,9 @@ import java.util.Map;
 
 @Tag(name = "AUTH")
 @RestController
-@RequestMapping(value = "/.well-known/jwks.json")
+@RequestMapping(value = JWKSController.PATH)
 public class JWKSController {
+    public static final String PATH = "/.well-known/jwks.json";
     private final JWKSet jwkSet;
 
     public JWKSController(JWKSet jwkSet) {

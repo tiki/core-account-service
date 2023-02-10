@@ -61,7 +61,8 @@ public class SecurityConfig {
                 .contentSecurityPolicy(SecurityConstants.CONTENT_SECURITY_POLICY).and().and()
                 .anonymous().and()
                 .cors().configurationSource(SecurityConstants.corsConfigurationSource()).and()
-                .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrf()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .ignoringRequestMatchers(
                         new AntPathRequestMatcher(ApiConstants.API_LATEST_ROUTE + Constants.OAUTH_TOKEN_PATH,
                                 HttpMethod.POST.name()),
@@ -69,7 +70,13 @@ public class SecurityConfig {
                                 HttpMethod.POST.name())
                 ).and()
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.GET, ApiConstants.HEALTH_ROUTE).permitAll()
+                .requestMatchers(HttpMethod.GET,
+                        ApiConstants.HEALTH_ROUTE,
+                        Constants.API_DOCS_PATH,
+                        JWKSController.PATH
+                ).permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**")
+                .permitAll()
                 .requestMatchers(HttpMethod.POST,
                         ApiConstants.API_LATEST_ROUTE + Constants.OAUTH_TOKEN_PATH,
                         ApiConstants.API_LATEST_ROUTE + OtpController.PATH_ISSUE
