@@ -5,41 +5,20 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/l0-auth/blob/main/LICENSE
-  version: 0.0.6
+  version: 0.2.0
 servers:
 - url: https://auth.l0.mytiki.com
 paths:
-  /api/latest/userinfo:
-    get:
-      tags:
-      - AUTH
-      summary: Get a User
-      description: Get the authorized user's profile
-      operationId: l0-auth-info-get
-      parameters:
-      - name: Authorization
-        in: header
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserInfoAO'
-      security:
-      - jwt: []
+  /api/latest/user/{userId}:
     post:
       tags:
-      - AUTH
+      - ACCOUNT
       summary: Update a User
       description: Update the authorized user's profile
-      operationId: l0-auth-info-post
+      operationId: l0-auth-user-post
       parameters:
-      - name: Authorization
-        in: header
+      - name: userId
+        in: path
         required: true
         schema:
           type: string
@@ -81,6 +60,7 @@ paths:
   /api/latest/oauth/token:
     post:
       tags:
+      - ACCOUNT
       - AUTH
       summary: Token Grant
       description: Issue authorization token. Use password grant for OTP flow.
@@ -88,7 +68,7 @@ paths:
       parameters:
       - name: grant_type
         in: query
-        description: "(password, refresh, urn:ietf:params:oauth:grant-type:jwt-bearer)"
+        description: "(password, refresh_token, client_credentials)"
         required: true
         schema:
           type: string
@@ -107,19 +87,17 @@ paths:
         required: true
         schema:
           type: string
-      - name: audience
-        in: query
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
       - name: refresh_token
         in: query
         required: true
         schema:
           type: string
-      - name: assertion
+      - name: client_id
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: client_secret
         in: query
         required: true
         schema:
@@ -136,7 +114,7 @@ paths:
       tags:
       - AUTH
       summary: Revoke Token
-      description: 'Revoke a refresh token. '
+      description: Revoke a refresh token.
       operationId: l0-auth-oauth-revoke-post
       parameters:
       - name: token
@@ -147,6 +125,146 @@ paths:
       responses:
         "200":
           description: OK
+      security:
+      - jwt: []
+  /api/latest/app:
+    post:
+      tags:
+      - ACCOUNT
+      summary: Create App
+      description: Create a new App
+      operationId: l0-auth-app-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppInfoAOReq'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppInfoAO'
+      security:
+      - jwt: []
+  /api/latest/app/{appId}:
+    get:
+      tags:
+      - ACCOUNT
+      summary: Get App
+      description: Get an app's profile
+      operationId: l0-auth-app-get
+      parameters:
+      - name: appId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppInfoAO'
+      security:
+      - jwt: []
+    post:
+      tags:
+      - ACCOUNT
+      summary: Update App
+      description: Create a new App
+      operationId: l0-auth-app-update
+      parameters:
+      - name: appId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppInfoAOReq'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppInfoAO'
+      security:
+      - jwt: []
+    delete:
+      tags:
+      - ACCOUNT
+      summary: Delete App
+      description: Delete an App
+      operationId: l0-auth-app-delete
+      parameters:
+      - name: appId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+      security:
+      - jwt: []
+  /api/latest/app/{appId}/key:
+    get:
+      tags:
+      - ACCOUNT
+      summary: Get Keys
+      description: Get the API Keys for the given App (appId)
+      operationId: l0-auth-api-keys-get
+      parameters:
+      - name: appId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApiKeyAO'
+      security:
+      - jwt: []
+    post:
+      tags:
+      - ACCOUNT
+      summary: Create Key
+      description: Create a new API Key for the given App (appId)
+      operationId: l0-auth-api-keys-create
+      parameters:
+      - name: appId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: isPublic
+        in: query
+        required: false
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyAOCreate'
+      security:
+      - jwt: []
   /health:
     get:
       tags:
@@ -163,6 +281,22 @@ paths:
                 $ref: '#/components/schemas/ApiError'
               example:
                 message: OK
+  /api/latest/user:
+    get:
+      tags:
+      - ACCOUNT
+      summary: Get User
+      description: Get the authorized user's profile
+      operationId: l0-auth-user-get
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoAO'
+      security:
+      - jwt: []
   /.well-known/jwks.json:
     get:
       tags:
@@ -179,6 +313,24 @@ paths:
                 type: object
                 additionalProperties:
                   type: object
+  /api/latest/key/{keyId}:
+    delete:
+      tags:
+      - ACCOUNT
+      summary: Delete Key
+      description: Revoke (permanent!) an API Key
+      operationId: l0-auth-api-keys-delete
+      parameters:
+      - name: keyId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+      security:
+      - jwt: []
 components:
   schemas:
     UserInfoAOUpdate:
@@ -189,13 +341,21 @@ components:
     UserInfoAO:
       type: object
       properties:
-        sub:
+        userId:
           type: string
         email:
           type: string
-        updated_at:
+        modified:
           type: string
           format: date-time
+        created:
+          type: string
+          format: date-time
+        apps:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
     OtpAOStartReq:
       type: object
       properties:
@@ -256,6 +416,43 @@ components:
       properties:
         value:
           type: string
+    AppInfoAOReq:
+      type: object
+      properties:
+        name:
+          type: string
+    AppInfoAO:
+      type: object
+      properties:
+        appId:
+          type: string
+        name:
+          type: string
+        users:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        modified:
+          type: string
+          format: date-time
+        created:
+          type: string
+          format: date-time
+    ApiKeyAOCreate:
+      type: object
+      properties:
+        id:
+          type: string
+        created:
+          type: string
+          format: date-time
+        isPublic:
+          type: boolean
+        secret:
+          type: string
+        public:
+          type: boolean
     ApiError:
       type: object
       properties:
@@ -271,6 +468,18 @@ components:
           type: object
           additionalProperties:
             type: string
+    ApiKeyAO:
+      type: object
+      properties:
+        id:
+          type: string
+        created:
+          type: string
+          format: date-time
+        isPublic:
+          type: boolean
+        public:
+          type: boolean
   securitySchemes:
     jwt:
       type: http
