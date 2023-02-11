@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-@Tag(name = "ACCOUNT")
+@Tag(name = "USER")
 @RestController
 @RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
 public class UserInfoController {

@@ -12,7 +12,7 @@ paths:
   /api/latest/user/{userId}:
     post:
       tags:
-      - ACCOUNT
+      - USER
       summary: Update a User
       description: Update the authorized user's profile
       operationId: l0-auth-user-post
@@ -60,7 +60,6 @@ paths:
   /api/latest/oauth/token:
     post:
       tags:
-      - ACCOUNT
       - AUTH
       summary: Token Grant
       description: Issue authorization token. Use password grant for OTP flow.
@@ -130,7 +129,7 @@ paths:
   /api/latest/app:
     post:
       tags:
-      - ACCOUNT
+      - APP
       summary: Create App
       description: Create a new App
       operationId: l0-auth-app-create
@@ -152,7 +151,7 @@ paths:
   /api/latest/app/{appId}:
     get:
       tags:
-      - ACCOUNT
+      - APP
       summary: Get App
       description: Get an app's profile
       operationId: l0-auth-app-get
@@ -173,7 +172,7 @@ paths:
       - jwt: []
     post:
       tags:
-      - ACCOUNT
+      - APP
       summary: Update App
       description: Create a new App
       operationId: l0-auth-app-update
@@ -200,7 +199,7 @@ paths:
       - jwt: []
     delete:
       tags:
-      - ACCOUNT
+      - APP
       summary: Delete App
       description: Delete an App
       operationId: l0-auth-app-delete
@@ -218,8 +217,8 @@ paths:
   /api/latest/app/{appId}/key:
     get:
       tags:
-      - ACCOUNT
-      summary: Get Keys
+      - KEYS
+      summary: Get App Keys
       description: Get the API Keys for the given App (appId)
       operationId: l0-auth-api-keys-get
       parameters:
@@ -241,8 +240,8 @@ paths:
       - jwt: []
     post:
       tags:
-      - ACCOUNT
-      summary: Create Key
+      - KEYS
+      summary: Create App Key
       description: Create a new API Key for the given App (appId)
       operationId: l0-auth-api-keys-create
       parameters:
@@ -284,7 +283,7 @@ paths:
   /api/latest/user:
     get:
       tags:
-      - ACCOUNT
+      - USER
       summary: Get User
       description: Get the authorized user's profile
       operationId: l0-auth-user-get
@@ -316,7 +315,7 @@ paths:
   /api/latest/key/{keyId}:
     delete:
       tags:
-      - ACCOUNT
+      - KEYS
       summary: Delete Key
       description: Revoke (permanent!) an API Key
       operationId: l0-auth-api-keys-delete

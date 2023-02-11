@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
-@Tag(name = "ACCOUNT")
+@Tag(name = "APP")
 @RestController
 @RequestMapping(value = AppInfoController.PATH_CONTROLLER)
 public class AppInfoController {
