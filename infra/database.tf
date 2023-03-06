@@ -4,7 +4,7 @@
 resource "digitalocean_database_cluster" "db-cluster-l0-auth" {
   name                 = "l0-auth-db-cluster-${local.region}"
   engine               = "pg"
-  version              = "14"
+  version              = "15"
   size                 = "db-s-1vcpu-1gb"
   region               = local.region
   node_count           = 1
