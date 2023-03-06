@@ -40,7 +40,7 @@ jobs:
           distribution: 'zulu'
 
       - name: Install CLI
-        uses: dopplerhq/cli-action@v1
+        uses: dopplerhq/cli-action@v2
 
       - name: Install PostgreSQL client
         run: |
