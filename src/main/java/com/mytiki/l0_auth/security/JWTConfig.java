@@ -40,6 +40,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 
 public class JWTConfig {
+    public static String KID;
+
     @Bean
     public JWKSController jwks(@Autowired JWKSet jwkSet) {
         return new JWKSController(jwkSet);
@@ -56,6 +58,7 @@ public class JWTConfig {
         keyBuilder.keyUse(KeyUse.SIGNATURE);
         keyBuilder.keyID(kid);
         keyBuilder.privateKey(privateKey);
+        keyBuilder.algorithm(JWSAlgorithm.ES256);
         return new JWKSet(keyBuilder.build());
     }
 
@@ -74,6 +77,11 @@ public class JWTConfig {
         jwtProcessor.setJWSKeySelector(
                 new JWSVerificationKeySelector<>(JWSAlgorithm.ES256, immutableJWKSet));
         return new NimbusJwtDecoder(jwtProcessor);
+    }
+
+    @Value("${com.mytiki.l0_auth.jwt.kid}")
+    public void setKID(String name){
+        JWTConfig.KID = name;
     }
 
     private ECPrivateKey privateKey(KeyFactory keyFactory, String pkcs8) throws InvalidKeySpecException {

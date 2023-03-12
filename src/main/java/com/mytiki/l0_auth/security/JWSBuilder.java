@@ -68,6 +68,7 @@ public class JWSBuilder {
                 new JWSHeader
                         .Builder(JWSAlgorithm.ES256)
                         .type(JOSEObjectType.JWT)
+                        .keyID(JWTConfig.KID)
                         .build(),
                 new Payload(
                         new JWTClaimsSet.Builder()
