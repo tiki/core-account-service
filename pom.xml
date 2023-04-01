@@ -16,7 +16,7 @@
     <packaging>jar</packaging>
 
     <name>L0 Auth</name>
-    <description>Authorization Microservice</description>
+    <description>Authorization Service</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -136,6 +136,10 @@
                 <configuration>
                     <wait>1000</wait>
                     <maxAttempts>360</maxAttempts>
+                    <profiles>
+                        <profile>ci</profile>
+                        <profile>dev</profile>
+                    </profiles>
                 </configuration>
                 <executions>
                     <execution>
@@ -167,7 +171,7 @@
                 <configuration>
                     <apiDocsUrl>http://localhost:10502/v3/api-docs.yaml</apiDocsUrl>
                     <outputFileName>openapi.yaml</outputFileName>
-                    <outputDir>${project.basedir}/docs</outputDir>
+                    <outputDir>${project.basedir}</outputDir>
                 </configuration>
             </plugin>
             <plugin>
