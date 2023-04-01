@@ -5,7 +5,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/l0-auth/blob/main/LICENSE
-  version: 1.0.1
+  version: 1.0.2
 servers:
 - url: https://auth.l0.mytiki.com
 paths:
@@ -289,22 +289,6 @@ paths:
       security:
       - oauth:
         - auth
-  /.well-known/jwks.json:
-    get:
-      tags:
-      - AUTH
-      summary: JWKS endpoint
-      description: JSON Web Keys for signature verification
-      operationId: l0-auth-jwks-get
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties:
-                  type: object
   /api/latest/key/{keyId}:
     delete:
       tags:
