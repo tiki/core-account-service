@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "AUTH")
+@Tag(name = "")
 @RestController
 @RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
 public class RefreshController {
@@ -36,7 +36,7 @@ public class RefreshController {
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-oauth-revoke-post",
             summary = "Revoke Token",
             description = "Revoke a refresh token.",
-            security = @SecurityRequirement(name = "jwt"))
+            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
     @ApiResponse(responseCode = "200")
     @RequestMapping(
             method = RequestMethod.POST,

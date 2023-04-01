@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-@Tag(name = "USER")
+@Tag(name = "")
 @RestController
 @RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
 public class UserInfoController {
@@ -32,7 +32,7 @@ public class UserInfoController {
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-post",
             summary = "Update a User",
             description = "Update the authorized user's profile",
-            security = @SecurityRequirement(name = "jwt"))
+            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
     @RequestMapping(method = RequestMethod.POST, path = PATH_USER + "/{userId}")
     public UserInfoAO update(
             Principal principal,
@@ -52,7 +52,7 @@ public class UserInfoController {
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-get",
             summary = "Get User",
             description = "Get the authorized user's profile",
-            security = @SecurityRequirement(name = "jwt"))
+            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
     @RequestMapping(method = RequestMethod.GET, path = PATH_USER )
     public UserInfoAO userinfo(Principal principal) {
         if(principal == null || principal.getName() == null)
