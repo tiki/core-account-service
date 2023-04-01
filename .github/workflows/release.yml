@@ -157,7 +157,7 @@ jobs:
       - name: OpenApi
         uses: readmeio/rdme@8.5.0
         with:
-          rdme: openapi docs/openapi.yaml --key=${{ secrets.README_API_KEY }} --id=63c6011fa9d9d30086fb6427
+          rdme: openapi openapi.yaml --key=${{ secrets.README_API_KEY }} --id=63c6011fa9d9d30086fb6427
 
       - name: Release
         uses: ncipollo/release-action@v1
