@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
-@Tag(name = "APP")
+@Tag(name = "")
 @RestController
 @RequestMapping(value = AppInfoController.PATH_CONTROLLER)
 public class AppInfoController {
@@ -32,7 +32,7 @@ public class AppInfoController {
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-get",
             summary = "Get App",
             description = "Get an app's profile",
-            security = @SecurityRequirement(name = "jwt"))
+            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
     @RequestMapping(method = RequestMethod.GET, path = "/{appId}")
     public AppInfoAO get(Principal principal, @PathVariable String appId) {
         AppInfoAO rsp = service.get(appId);
@@ -45,7 +45,7 @@ public class AppInfoController {
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-create",
             summary = "Create App",
             description = "Create a new App",
-            security = @SecurityRequirement(name = "jwt"))
+            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
     @RequestMapping(method = RequestMethod.POST)
     public AppInfoAO get(Principal principal, @RequestBody AppInfoAOReq body) {
         return service.create(body.getName(), principal.getName());
@@ -54,7 +54,7 @@ public class AppInfoController {
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-update",
             summary = "Update App",
             description = "Create a new App",
-            security = @SecurityRequirement(name = "jwt"))
+            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
     @RequestMapping(method = RequestMethod.POST,  path = "/{appId}")
     public AppInfoAO get(
             Principal principal,
@@ -66,7 +66,7 @@ public class AppInfoController {
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-delete",
             summary = "Delete App",
             description = "Delete an App",
-            security = @SecurityRequirement(name = "jwt"))
+            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
     @RequestMapping(method = RequestMethod.DELETE, path = "/{appId}")
     public void delete(Principal principal, @PathVariable String appId) {
         service.delete(principal.getName(), appId);

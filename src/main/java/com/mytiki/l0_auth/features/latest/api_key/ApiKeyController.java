@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
+@Tag(name = "")
 @RestController
 @RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
 public class ApiKeyController {
@@ -33,20 +34,19 @@ public class ApiKeyController {
         this.service = service;
     }
 
-    @Tag(name = "KEYS")
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-api-keys-get",
             summary = "Get App Keys",
             description = "Get the API Keys for the given App (appId)",
-            security = @SecurityRequirement(name = "jwt"))
+            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
     @RequestMapping(method = RequestMethod.GET, path = PATH_APP_KEY)
     public List<ApiKeyAO> getAppKeys(Principal principal, @PathVariable String appId) {
         return service.getByAppId(principal.getName(), appId);
     }
-    @Tag(name = "KEYS")
+
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-api-keys-create",
             summary = "Create App Key",
             description = "Create a new API Key for the given App (appId)",
-            security = @SecurityRequirement(name = "jwt"))
+            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
     @RequestMapping(method = RequestMethod.POST, path = PATH_APP_KEY)
     public ApiKeyAOCreate createAppKey(
             Principal principal,
@@ -54,17 +54,16 @@ public class ApiKeyController {
             @RequestParam(required = false) boolean isPublic) {
         return service.create(principal.getName(), appId, isPublic);
     }
-    @Tag(name = "KEYS")
+
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-api-keys-delete",
             summary = "Delete Key",
             description = "Revoke (permanent!) an API Key",
-            security = @SecurityRequirement(name = "jwt"))
+            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
     @RequestMapping(method = RequestMethod.DELETE, path = PATH_KEY)
     public void revoke(Principal principal, @PathVariable String keyId) {
         service.revoke(principal.getName(), keyId);
     }
 
-    @Tag(name = "AUTH")
     @RequestMapping(
             method = RequestMethod.POST,
             path = Constants.OAUTH_TOKEN_PATH,

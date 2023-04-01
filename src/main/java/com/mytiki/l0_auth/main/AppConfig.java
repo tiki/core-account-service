@@ -14,6 +14,9 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.OAuthFlow;
+import io.swagger.v3.oas.models.security.OAuthFlows;
+import io.swagger.v3.oas.models.security.Scopes;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import jakarta.annotation.PostConstruct;
@@ -44,7 +47,7 @@ public class AppConfig {
     }
 
     @Bean
-    public OpenAPI oenAPI(@Value("${springdoc.version}") String appVersion) {
+    public OpenAPI openAPI(@Value("${springdoc.version}") String appVersion) {
         return new OpenAPI()
                 .info(new Info()
                         .title("L0 Auth")
@@ -53,14 +56,15 @@ public class AppConfig {
                         .license(new License()
                                 .name("MIT")
                                 .url("https://github.com/tiki/l0-auth/blob/main/LICENSE")))
-                .servers(Collections.singletonList(
-                        new Server()
-                                .url("https://auth.l0.mytiki.com")))
+                .servers(Collections.singletonList(new Server()
+                        .url("https://auth.l0.mytiki.com")))
                 .components(new Components()
-                        .addSecuritySchemes("jwt",
-                                new SecurityScheme()
-                                        .type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")));
+                        .addSecuritySchemes("oauth", new SecurityScheme()
+                                .type(SecurityScheme.Type.OAUTH2)
+                                .flows(new OAuthFlows()
+                                        .password(new OAuthFlow()
+                                                .tokenUrl("https://auth.l0.mytiki.com/api/latest/oauth/token")
+                                                .refreshUrl("https://auth.l0.mytiki.com/api/latest/oauth/token")
+                                                .scopes(new Scopes().addString("auth","this service"))))));
     }
 }

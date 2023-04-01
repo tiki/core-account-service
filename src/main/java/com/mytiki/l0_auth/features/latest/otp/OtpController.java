@@ -19,7 +19,7 @@ import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "AUTH")
+@Tag(name = "")
 @RestController
 @RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
 public class OtpController {
