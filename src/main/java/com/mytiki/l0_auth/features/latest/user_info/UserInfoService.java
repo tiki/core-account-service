@@ -5,7 +5,6 @@
 
 package com.mytiki.l0_auth.features.latest.user_info;
 
-import com.mytiki.l0_auth.features.latest.org_info.OrgInfoDO;
 import com.mytiki.l0_auth.features.latest.org_info.OrgInfoService;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import org.springframework.http.HttpStatus;
@@ -37,16 +36,20 @@ public class UserInfoService {
         return repository.findByUserId(UUID.fromString(userId));
     }
 
-    public UserInfoDO addToOrg(String email, OrgInfoDO org){
-        Optional<UserInfoDO> found = repository.findByEmail(email);
+    public UserInfoDO addToOrg(String userId, String orgId, String emailToAdd){
+        Optional<UserInfoDO> user = getDO(userId);
+        if(user.isEmpty() || !user.get().getOrg().getOrgId().toString().equals(orgId))
+            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
+
+        Optional<UserInfoDO> found = repository.findByEmail(emailToAdd);
         if(found.isEmpty()) {
             throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
                     .message("User does not exist")
-                    .properties("email", email)
+                    .properties("email", emailToAdd)
                     .build();
         }else {
             UserInfoDO updated = found.get();
-            updated.setOrg(org);
+            updated.setOrg(user.get().getOrg());
             updated.setModified(ZonedDateTime.now());
             return repository.save(updated);
         }

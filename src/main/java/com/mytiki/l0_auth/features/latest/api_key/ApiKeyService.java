@@ -8,7 +8,7 @@ package com.mytiki.l0_auth.features.latest.api_key;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoDO;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoService;
 import com.mytiki.l0_auth.features.latest.refresh.RefreshService;
-import com.mytiki.l0_auth.features.latest.user_info.UserInfoAO;
+import com.mytiki.l0_auth.features.latest.user_info.UserInfoDO;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
 import com.mytiki.l0_auth.security.JWSBuilder;
 import com.mytiki.l0_auth.security.OauthScope;
@@ -60,6 +60,7 @@ public class ApiKeyService {
         this.publicScopes = publicScopes;
     }
 
+    @Transactional
     public ApiKeyAOCreate create(String userId, String appId, boolean isPublic){
         String secret = null;
         guardAppUser(userId, appId);
@@ -89,6 +90,7 @@ public class ApiKeyService {
         return rsp;
     }
 
+    @Transactional
     public List<ApiKeyAO> getByAppId(String userId, String appId){
         guardAppUser(userId, appId);
         List<ApiKeyDO> keys = repository.findAllByAppAppId(UUID.fromString(appId));
@@ -159,8 +161,14 @@ public class ApiKeyService {
     }
 
     private void guardAppUser(String userId, String appId){
-        UserInfoAO user = userInfoService.get(userId);
-        if(user.getApps() == null || !user.getApps().contains(appId))
+        Optional<UserInfoDO> user = userInfoService.getDO(userId);
+        if(user.isEmpty())
+            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
+        List<String> allowedApps = user.get().getOrg().getApps()
+                .stream()
+                .map(app -> app.getAppId().toString())
+                .toList();
+        if(!allowedApps.contains(appId))
             throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
     }
 

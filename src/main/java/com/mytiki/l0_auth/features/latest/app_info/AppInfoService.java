@@ -26,7 +26,6 @@ public class AppInfoService {
         this.userInfoService = userInfoService;
     }
 
-    @Transactional
     public AppInfoAO create(String name, String userId){
        Optional<UserInfoDO> user =  userInfoService.getDO(userId);
        if(user.isEmpty())
@@ -61,7 +60,6 @@ public class AppInfoService {
         }
     }
 
-    @Transactional
     public AppInfoAO update(String userId, String appId, AppInfoAOReq req){
         Optional<UserInfoDO> user =  userInfoService.getDO(userId);
         if(user.isEmpty())

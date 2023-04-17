@@ -5,6 +5,7 @@
 
 package com.mytiki.l0_auth.features.latest.org_info;
 
+import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
 import com.mytiki.l0_auth.utilities.Constants;
 import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,9 +23,11 @@ public class OrgInfoController {
     public static final String PATH_CONTROLLER = ApiConstants.API_LATEST_ROUTE + "org";
 
     private final OrgInfoService service;
+    private final UserInfoService userInfoService;
 
-    public OrgInfoController(OrgInfoService service) {
+    public OrgInfoController(OrgInfoService service, UserInfoService userInfoService) {
         this.service = service;
+        this.userInfoService = userInfoService;
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-org-get",
@@ -43,7 +46,7 @@ public class OrgInfoController {
     @RequestMapping(method = RequestMethod.POST, path = "/{orgId}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void addToOrg(Principal principal, @PathVariable String orgId, @RequestBody OrgInfoAOReq body) {
-        service.addUser(principal.getName(), orgId, body);
+        userInfoService.addToOrg(principal.getName(), orgId, body.getEmail());
     }
 
     //route to update billing.

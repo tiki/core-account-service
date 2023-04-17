@@ -8,6 +8,7 @@ package com.mytiki.l0_auth;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoAO;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoRepository;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoService;
+import com.mytiki.l0_auth.features.latest.org_info.OrgInfoService;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoDO;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoRepository;
 import com.mytiki.l0_auth.main.App;
@@ -44,6 +45,9 @@ public class AppInfoTest {
     @Autowired
     private AppInfoService service;
 
+    @Autowired
+    private OrgInfoService orgInfoService;
+
     @Test
     public void Test_Create_Success() {
         String name = "testApp";
@@ -53,6 +57,7 @@ public class AppInfoTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
 
         AppInfoAO app = service.create(name, testUser.getUserId().toString());
@@ -60,8 +65,7 @@ public class AppInfoTest {
         assertNotNull(app.getAppId());
         assertNotNull(app.getModified());
         assertNotNull(app.getCreated());
-        assertEquals(1, app.getUsers().size());
-        assertTrue(app.getUsers().contains(testUser.getUserId().toString()));
+        assertEquals(app.getOrgId(), testUser.getOrg().getOrgId().toString());
     }
 
     @Test
@@ -89,28 +93,28 @@ public class AppInfoTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
 
         AppInfoAO app = service.create(name, testUser.getUserId().toString());
-        AppInfoAO found = service.get(app.getAppId());
+        AppInfoAO found = service.get(testUser.getUserId().toString(), app.getAppId());
 
         assertEquals(app.getAppId(), found.getAppId());
         assertEquals(app.getName(), found.getName());
         assertEquals(app.getModified().withNano(0), found.getModified().withNano(0));
         assertEquals(app.getCreated().withNano(0), found.getCreated().withNano(0));
-        assertEquals(app.getUsers().size(), found.getUsers().size());
-        assertEquals(app.getUsers().stream().findFirst(), found.getUsers().stream().findFirst());
+        assertEquals(app.getOrgId(), found.getOrgId());
     }
 
     @Test
     public void Test_Get_NoApp_Success() {
         String appId = UUID.randomUUID().toString();
-        AppInfoAO found = service.get(appId);
+        AppInfoAO found = service.get(UUID.randomUUID().toString(), appId);
 
         assertEquals(appId, found.getAppId());
         assertNull(found.getName());
         assertNull(found.getModified());
         assertNull(found.getCreated());
-        assertNull(found.getUsers());
+        assertNull(found.getOrgId());
     }
 }

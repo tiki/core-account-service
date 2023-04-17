@@ -18,13 +18,13 @@ public class OrgInfoConfig {
     public static final String PACKAGE_PATH = Constants.PACKAGE_FEATURES_LATEST_DOT_PATH + ".org_info";
 
     @Bean
-    public OrgInfoService orgInfoService(@Autowired OrgInfoRepository repository,
-                                         @Autowired UserInfoService userInfoService){
-        return new OrgInfoService(repository, userInfoService);
+    public OrgInfoService orgInfoService(@Autowired OrgInfoRepository repository){
+        return new OrgInfoService(repository);
     }
 
     @Bean
-    public OrgInfoController orgInfoController(@Autowired OrgInfoService service){
-        return new OrgInfoController(service);
+    public OrgInfoController orgInfoController(@Autowired OrgInfoService service,
+                                               @Autowired UserInfoService userInfoService){
+        return new OrgInfoController(service, userInfoService);
     }
 }

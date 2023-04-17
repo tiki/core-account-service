@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS refresh(
 CREATE TABLE IF NOT EXISTS org_info(
     org_info_id BIGSERIAL PRIMARY KEY,
     org_id UUID NOT NULL UNIQUE,
-    billing_id TEXT NOT NULL,
+    billing_id TEXT,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
     modified_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );

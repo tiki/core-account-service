@@ -5,8 +5,6 @@
 
 package com.mytiki.l0_auth.features.latest.org_info;
 
-import com.mytiki.l0_auth.features.latest.user_info.UserInfoDO;
-import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +18,9 @@ import java.util.stream.Collectors;
 public class OrgInfoService {
 
     private final OrgInfoRepository repository;
-    private final UserInfoService userInfoService;
 
-    public OrgInfoService(OrgInfoRepository repository, UserInfoService userInfoService) {
+    public OrgInfoService(OrgInfoRepository repository) {
         this.repository = repository;
-        this.userInfoService = userInfoService;
     }
 
     public OrgInfoDO create(){
@@ -34,13 +30,6 @@ public class OrgInfoService {
         org.setCreated(now);
         org.setModified(now);
         return repository.save(org);
-    }
-
-    public void addUser(String userId, String orgId, OrgInfoAOReq req){
-        Optional<UserInfoDO> user = userInfoService.getDO(userId);
-        if(user.isEmpty() || !user.get().getOrg().getOrgId().toString().equals(orgId))
-            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
-        userInfoService.addToOrg(req.getEmail(), user.get().getOrg());
     }
 
     @Transactional

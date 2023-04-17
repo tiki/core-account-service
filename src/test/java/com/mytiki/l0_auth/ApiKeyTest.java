@@ -8,6 +8,7 @@ package com.mytiki.l0_auth;
 import com.mytiki.l0_auth.features.latest.api_key.*;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoAO;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoService;
+import com.mytiki.l0_auth.features.latest.org_info.OrgInfoService;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoDO;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoRepository;
 import com.mytiki.l0_auth.main.App;
@@ -58,6 +59,9 @@ public class ApiKeyTest {
     @Autowired
     private JwtDecoder jwtDecoder;
 
+    @Autowired
+    private OrgInfoService orgInfoService;
+
     @Test
     public void Test_Create_Success() {
         UserInfoDO testUser = new UserInfoDO();
@@ -65,6 +69,7 @@ public class ApiKeyTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
@@ -82,6 +87,7 @@ public class ApiKeyTest {
         testUser.setUserId(userId);
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         userInfoRepository.save(testUser);
 
         ApiException ex = assertThrows(ApiException.class,
@@ -96,6 +102,7 @@ public class ApiKeyTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
@@ -115,6 +122,7 @@ public class ApiKeyTest {
         testUser.setUserId(userId);
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
         service.create(testUser.getUserId().toString(), app.getAppId(), true);
@@ -131,6 +139,7 @@ public class ApiKeyTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
@@ -148,6 +157,7 @@ public class ApiKeyTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
@@ -169,6 +179,7 @@ public class ApiKeyTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
@@ -191,6 +202,7 @@ public class ApiKeyTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
         ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), true);
@@ -210,6 +222,7 @@ public class ApiKeyTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
         ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), false);
@@ -227,6 +240,7 @@ public class ApiKeyTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
         ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), true);
@@ -246,6 +260,7 @@ public class ApiKeyTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
         ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), false);
@@ -262,6 +277,7 @@ public class ApiKeyTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
+        testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
         ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), false);
