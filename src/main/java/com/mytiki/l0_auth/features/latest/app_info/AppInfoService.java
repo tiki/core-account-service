@@ -12,10 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class AppInfoService {
 
@@ -27,6 +26,7 @@ public class AppInfoService {
         this.userInfoService = userInfoService;
     }
 
+    @Transactional
     public AppInfoAO create(String name, String userId){
        Optional<UserInfoDO> user =  userInfoService.getDO(userId);
        if(user.isEmpty())
@@ -35,7 +35,7 @@ public class AppInfoService {
            ZonedDateTime now = ZonedDateTime.now();
            AppInfoDO app = new AppInfoDO();
            app.setName(name);
-           app.setUsers(Set.of(user.get()));
+           app.setOrg(user.get().getOrg());
            app.setAppId(UUID.randomUUID());
            app.setCreated(now);
            app.setModified(now);
@@ -43,15 +43,25 @@ public class AppInfoService {
        }
     }
 
-    public AppInfoAO get(String appId){
+    @Transactional
+    public AppInfoAO get(String userId, String appId){
         Optional<AppInfoDO> found = repository.findByAppId(UUID.fromString(appId));
-        return found.map(this::toAO).orElseGet(() -> {
-                AppInfoAO rsp = new AppInfoAO();
-                rsp.setAppId(appId);
-                return rsp;
-        });
+        if(found.isPresent()){
+            List<String> allowedUserIds = found.get().getOrg().getUsers()
+                    .stream()
+                    .map(user -> user.getUserId().toString())
+                    .toList();
+            if(!allowedUserIds.contains(userId))
+                throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
+            return toAO(found.get());
+        }else{
+            AppInfoAO rsp = new AppInfoAO();
+            rsp.setAppId(appId);
+            return rsp;
+        }
     }
 
+    @Transactional
     public AppInfoAO update(String userId, String appId, AppInfoAOReq req){
         Optional<UserInfoDO> user =  userInfoService.getDO(userId);
         if(user.isEmpty())
@@ -63,7 +73,7 @@ public class AppInfoService {
                     .detail("Invalid App ID")
                     .build();
 
-        if(!found.get().getUsers().contains(user.get()))
+        if(!found.get().getOrg().getUsers().contains(user.get()))
             throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
 
         AppInfoDO update = found.get();
@@ -79,7 +89,7 @@ public class AppInfoService {
             throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
         Optional<AppInfoDO> app = repository.findByAppId(UUID.fromString(appId));
         if(app.isPresent()) {
-            if(!app.get().getUsers().contains(user.get()))
+            if(!app.get().getOrg().getUsers().contains(user.get()))
                 throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
             repository.delete(app.get());
         }
@@ -95,8 +105,7 @@ public class AppInfoService {
         rsp.setName(src.getName());
         rsp.setModified(src.getModified());
         rsp.setCreated(src.getCreated());
-        if(src.getUsers() != null)
-            rsp.setUsers(src.getUsers().stream().map(u -> u.getUserId().toString()).collect(Collectors.toSet()));
+        rsp.setOrgId(src.getOrg().getOrgId().toString());
         return rsp;
     }
 }

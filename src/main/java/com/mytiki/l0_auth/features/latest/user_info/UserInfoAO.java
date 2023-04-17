@@ -6,14 +6,13 @@
 package com.mytiki.l0_auth.features.latest.user_info;
 
 import java.time.ZonedDateTime;
-import java.util.Set;
 
 public class UserInfoAO {
     private String userId;
     private String email;
+    private String orgId;
     private ZonedDateTime modified;
     private ZonedDateTime created;
-    private Set<String> apps;
 
     public String getUserId() {
         return userId;
@@ -31,6 +30,14 @@ public class UserInfoAO {
         this.email = email;
     }
 
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
+    }
+
     public ZonedDateTime getModified() {
         return modified;
     }
@@ -45,13 +52,5 @@ public class UserInfoAO {
 
     public void setCreated(ZonedDateTime created) {
         this.created = created;
-    }
-
-    public Set<String> getApps() {
-        return apps;
-    }
-
-    public void setApps(Set<String> apps) {
-        this.apps = apps;
     }
 }
