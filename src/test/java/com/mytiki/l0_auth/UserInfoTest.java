@@ -5,6 +5,7 @@
 
 package com.mytiki.l0_auth;
 
+import com.mytiki.l0_auth.features.latest.org_info.OrgInfoService;
 import com.mytiki.l0_auth.features.latest.user_info.*;
 import com.mytiki.l0_auth.main.App;
 import org.junit.jupiter.api.MethodOrderer;
@@ -35,6 +36,9 @@ public class UserInfoTest {
     @Autowired
     private UserInfoService service;
 
+    @Autowired
+    private OrgInfoService orgInfoService;
+
     @Test
     public void Test_Get_Success() {
         UserInfoDO saved = new UserInfoDO();
@@ -42,13 +46,14 @@ public class UserInfoTest {
         saved.setUserId(UUID.randomUUID());
         saved.setCreated(ZonedDateTime.now());
         saved.setModified(ZonedDateTime.now());
+        saved.setOrg(orgInfoService.create());
         saved = repository.save(saved);
 
         UserInfoAO user = service.get(saved.getUserId().toString());
         assertEquals(saved.getEmail(), user.getEmail());
         assertEquals(saved.getModified().withNano(0), user.getModified().withNano(0));
         assertEquals(saved.getCreated().withNano(0), user.getCreated().withNano(0));
-        assertEquals(0, user.getApps().size());
+        assertNotNull(user.getOrgId());
         assertEquals(saved.getUserId().toString(), user.getUserId());
     }
 
@@ -59,7 +64,7 @@ public class UserInfoTest {
         assertNull(user.getEmail());
         assertNull(user.getModified());
         assertNull(user.getCreated());
-        assertNull(user.getApps());
+        assertNull(user.getOrgId());
         assertEquals(sub, user.getUserId());
     }
 
@@ -70,6 +75,7 @@ public class UserInfoTest {
         saved.setUserId(UUID.randomUUID());
         saved.setCreated(ZonedDateTime.now());
         saved.setModified(ZonedDateTime.now());
+        saved.setOrg(orgInfoService.create());
         saved = repository.save(saved);
 
         UserInfoAOUpdate update = new UserInfoAOUpdate();

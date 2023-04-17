@@ -5,12 +5,11 @@
 
 package com.mytiki.l0_auth.features.latest.user_info;
 
-import com.mytiki.l0_auth.features.latest.app_info.AppInfoDO;
+import com.mytiki.l0_auth.features.latest.org_info.OrgInfoDO;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -19,7 +18,7 @@ public class UserInfoDO implements Serializable {
     private Long id;
     private UUID userId;
     private String email;
-    private Set<AppInfoDO> apps;
+    private OrgInfoDO org;
     private ZonedDateTime created;
     private ZonedDateTime modified;
 
@@ -52,13 +51,14 @@ public class UserInfoDO implements Serializable {
         this.email = email;
     }
 
-    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
-    public Set<AppInfoDO> getApps() {
-        return apps;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "org_info_id")
+    public OrgInfoDO getOrg() {
+        return org;
     }
 
-    public void setApps(Set<AppInfoDO> apps) {
-        this.apps = apps;
+    public void setOrg(OrgInfoDO org) {
+        this.org = org;
     }
 
     @Column(name = "created_utc")

@@ -5,6 +5,7 @@
 
 package com.mytiki.l0_auth.features.latest.user_info;
 
+import com.mytiki.l0_auth.features.latest.org_info.OrgInfoService;
 import com.mytiki.l0_auth.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -22,7 +23,8 @@ public class UserInfoConfig {
     }
 
     @Bean
-    public UserInfoService userInfoService(@Autowired UserInfoRepository repository){
-        return new UserInfoService(repository);
+    public UserInfoService userInfoService(@Autowired UserInfoRepository repository,
+                                           @Autowired OrgInfoService orgInfoService){
+        return new UserInfoService(repository, orgInfoService);
     }
 }

@@ -5,20 +5,22 @@
 
 package com.mytiki.l0_auth.features.latest.user_info;
 
+import com.mytiki.l0_auth.features.latest.org_info.OrgInfoService;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import org.springframework.http.HttpStatus;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class UserInfoService {
 
     private final UserInfoRepository repository;
+    private final OrgInfoService orgInfoService;
 
-    public UserInfoService(UserInfoRepository repository) {
+    public UserInfoService(UserInfoRepository repository, OrgInfoService orgInfoService) {
         this.repository = repository;
+        this.orgInfoService = orgInfoService;
     }
 
     public UserInfoAO get(String userId){
@@ -34,6 +36,25 @@ public class UserInfoService {
         return repository.findByUserId(UUID.fromString(userId));
     }
 
+    public UserInfoDO addToOrg(String userId, String orgId, String emailToAdd){
+        Optional<UserInfoDO> user = getDO(userId);
+        if(user.isEmpty() || !user.get().getOrg().getOrgId().toString().equals(orgId))
+            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
+
+        Optional<UserInfoDO> found = repository.findByEmail(emailToAdd);
+        if(found.isEmpty()) {
+            throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
+                    .message("User does not exist")
+                    .properties("email", emailToAdd)
+                    .build();
+        }else {
+            UserInfoDO updated = found.get();
+            updated.setOrg(user.get().getOrg());
+            updated.setModified(ZonedDateTime.now());
+            return repository.save(updated);
+        }
+    }
+
     public UserInfoAO createIfNotExists(String email) {
         Optional<UserInfoDO> found = repository.findByEmail(email);
         UserInfoDO userInfo;
@@ -41,6 +62,7 @@ public class UserInfoService {
             UserInfoDO newUser = new UserInfoDO();
             newUser.setUserId(UUID.randomUUID());
             newUser.setEmail(email);
+            newUser.setOrg(orgInfoService.create());
             ZonedDateTime now = ZonedDateTime.now();
             newUser.setCreated(now);
             newUser.setModified(now);
@@ -71,8 +93,7 @@ public class UserInfoService {
         rsp.setEmail(src.getEmail());
         rsp.setCreated(src.getCreated());
         rsp.setModified(src.getModified());
-        if(src.getApps() != null)
-            rsp.setApps(src.getApps().stream().map(a -> a.getAppId().toString()).collect(Collectors.toSet()));
+        rsp.setOrgId(src.getOrg().getOrgId().toString());
         return rsp;
     }
 }
