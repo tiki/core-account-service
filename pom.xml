@@ -12,7 +12,7 @@
 
     <groupId>com.mytiki</groupId>
     <artifactId>l0_auth</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>jar</packaging>
 
     <name>L0 Auth</name>
