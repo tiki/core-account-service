@@ -10,6 +10,7 @@ import com.mytiki.l0_auth.features.latest.app_info.AppInfoConfig;
 import com.mytiki.l0_auth.features.latest.org_info.OrgInfoConfig;
 import com.mytiki.l0_auth.features.latest.otp.OtpConfig;
 import com.mytiki.l0_auth.features.latest.refresh.RefreshConfig;
+import com.mytiki.l0_auth.features.latest.stripe.StripeConfig;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoConfig;
 import org.springframework.context.annotation.Import;
 
@@ -19,7 +20,8 @@ import org.springframework.context.annotation.Import;
         UserInfoConfig.class,
         AppInfoConfig.class,
         ApiKeyConfig.class,
-        OrgInfoConfig.class
+        OrgInfoConfig.class,
+        StripeConfig.class
 })
 public class FeaturesConfig {
 }

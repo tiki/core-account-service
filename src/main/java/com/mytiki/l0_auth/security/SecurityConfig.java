@@ -7,6 +7,7 @@ package com.mytiki.l0_auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.l0_auth.features.latest.otp.OtpController;
+import com.mytiki.l0_auth.features.latest.stripe.StripeController;
 import com.mytiki.l0_auth.utilities.Constants;
 import com.mytiki.spring_rest_api.ApiConstants;
 import com.mytiki.spring_rest_api.SecurityConstants;
@@ -67,6 +68,8 @@ public class SecurityConfig {
                         new AntPathRequestMatcher(ApiConstants.API_LATEST_ROUTE + Constants.OAUTH_TOKEN_PATH,
                                 HttpMethod.POST.name()),
                         new AntPathRequestMatcher(ApiConstants.API_LATEST_ROUTE + OtpController.PATH_ISSUE,
+                                HttpMethod.POST.name()),
+                        new AntPathRequestMatcher(StripeController.PATH_CONTROLLER + "/*",
                                 HttpMethod.POST.name())
                 ).and()
                 .authorizeHttpRequests()
@@ -76,6 +79,8 @@ public class SecurityConfig {
                         JWKSController.PATH
                 ).permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**")
+                .permitAll()
+                .requestMatchers(HttpMethod.POST, StripeController.PATH_CONTROLLER + "/*")
                 .permitAll()
                 .requestMatchers(HttpMethod.POST,
                         ApiConstants.API_LATEST_ROUTE + Constants.OAUTH_TOKEN_PATH,

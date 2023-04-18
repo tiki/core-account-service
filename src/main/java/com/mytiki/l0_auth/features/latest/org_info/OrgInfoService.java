@@ -16,7 +16,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class OrgInfoService {
-
     private final OrgInfoRepository repository;
 
     public OrgInfoService(OrgInfoRepository repository) {
@@ -50,9 +49,20 @@ public class OrgInfoService {
         }
     }
 
-//    public OrgInfoDO setBilling(String orgId, String billingId){
-//
-//    }
+    public OrgInfoDO setBilling(String orgId, String billingId){
+        Optional<OrgInfoDO> found = repository.findByOrgId(UUID.fromString(orgId));
+        if(found.isPresent()){
+            OrgInfoDO updated = found.get();
+            updated.setBillingId(billingId);
+            updated.setModified(ZonedDateTime.now());
+            return repository.save(updated);
+        }else{
+            throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
+                    .message("Invalid orgId")
+                    .properties("orgId", orgId)
+                    .build();
+        }
+    }
 
     private OrgInfoAO toAO(OrgInfoDO src){
         OrgInfoAO rsp = new OrgInfoAO();
