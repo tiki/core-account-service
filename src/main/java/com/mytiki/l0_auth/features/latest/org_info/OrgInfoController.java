@@ -39,7 +39,7 @@ public class OrgInfoController {
         return service.get(principal.getName(), orgId);
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-org-get",
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-org-post-user",
             summary = "Add to Org",
             description = "Add a user to an org",
             security = @SecurityRequirement(name = "oauth", scopes = "auth"))
@@ -48,6 +48,4 @@ public class OrgInfoController {
     public void addToOrg(Principal principal, @PathVariable String orgId, @RequestBody OrgInfoAOReq body) {
         userInfoService.addToOrg(principal.getName(), orgId, body.getEmail());
     }
-
-    //route to update billing.
 }
