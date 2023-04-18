@@ -5,7 +5,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/l0-auth/blob/main/LICENSE
-  version: 1.0.2
+  version: 2.0.0
 servers:
 - url: https://auth.l0.mytiki.com
 paths:
@@ -58,6 +58,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OtpAOStartRsp'
+  /api/latest/org/{orgId}:
+    get:
+      tags:
+      - ""
+      summary: Get Org
+      description: Get an org's profile
+      operationId: l0-auth-org-get
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgInfoAO'
+      security:
+      - oauth:
+        - auth
+    post:
+      tags:
+      - ""
+      summary: Add to Org
+      description: Add a user to an org
+      operationId: l0-auth-org-post-user
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrgInfoAOReq'
+        required: true
+      responses:
+        "204":
+          description: No Content
+      security:
+      - oauth:
+        - auth
   /api/latest/oauth/token:
     post:
       tags:
@@ -322,17 +369,14 @@ components:
           type: string
         email:
           type: string
+        orgId:
+          type: string
         modified:
           type: string
           format: date-time
         created:
           type: string
           format: date-time
-        apps:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
     OtpAOStartReq:
       type: object
       properties:
@@ -348,6 +392,11 @@ components:
         expires:
           type: string
           format: date-time
+    OrgInfoAOReq:
+      type: object
+      properties:
+        email:
+          type: string
     OAuth2AccessToken:
       type: object
       properties:
@@ -405,11 +454,8 @@ components:
           type: string
         name:
           type: string
-        users:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
+        orgId:
+          type: string
         modified:
           type: string
           format: date-time
@@ -430,6 +476,29 @@ components:
           type: string
         public:
           type: boolean
+    OrgInfoAO:
+      type: object
+      properties:
+        orgId:
+          type: string
+        billingId:
+          type: string
+        users:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        apps:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        modified:
+          type: string
+          format: date-time
+        created:
+          type: string
+          format: date-time
     ApiKeyAO:
       type: object
       properties:
