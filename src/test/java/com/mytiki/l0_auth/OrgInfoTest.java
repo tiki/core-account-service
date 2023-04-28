@@ -5,6 +5,8 @@
 
 package com.mytiki.l0_auth;
 
+import com.mytiki.l0_auth.features.latest.app_info.AppInfoAO;
+import com.mytiki.l0_auth.features.latest.app_info.AppInfoService;
 import com.mytiki.l0_auth.features.latest.org_info.OrgInfoAO;
 import com.mytiki.l0_auth.features.latest.org_info.OrgInfoDO;
 import com.mytiki.l0_auth.features.latest.org_info.OrgInfoRepository;
@@ -42,6 +44,9 @@ public class OrgInfoTest {
     @Autowired
     private UserInfoService userInfoService;
 
+    @Autowired
+    private AppInfoService appInfoService;
+
     @Test
     public void Test_Create_Success() {
         OrgInfoDO created = service.create();
@@ -76,5 +81,18 @@ public class OrgInfoTest {
         assertNull(org.getBillingId());
         assertNull(org.getCreated());
         assertNull(org.getModified());
+    }
+
+    @Test
+    public void Test_GetByApp_Success() {
+        UserInfoAO user = userInfoService.createIfNotExists(UUID.randomUUID() + "@test.com");
+        AppInfoAO app = appInfoService.create(UUID.randomUUID().toString(), user.getUserId());
+        OrgInfoAO org = service.getByApp(app.getAppId());
+
+        assertTrue(org.getUsers().contains(user.getUserId()));
+        assertEquals(user.getOrgId(), org.getOrgId());
+        assertNull(org.getBillingId());
+        assertNotNull(org.getModified());
+        assertNotNull(org.getCreated());
     }
 }

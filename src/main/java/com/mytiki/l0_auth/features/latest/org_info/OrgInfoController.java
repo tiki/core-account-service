@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -37,6 +38,12 @@ public class OrgInfoController {
     @RequestMapping(method = RequestMethod.GET, path = "/{orgId}")
     public OrgInfoAO get(Principal principal, @PathVariable String orgId) {
         return service.get(principal.getName(), orgId);
+    }
+
+    @Secured("SCOPE_internal:org")
+    @RequestMapping(method = RequestMethod.GET)
+    public OrgInfoAO getByApp(Principal principal, @RequestParam(value = "app-id") String appId) {
+        return service.getByApp(appId);
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-org-post-user",

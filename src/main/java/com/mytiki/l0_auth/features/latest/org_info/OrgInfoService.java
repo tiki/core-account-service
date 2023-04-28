@@ -49,6 +49,12 @@ public class OrgInfoService {
         }
     }
 
+    @Transactional
+    public OrgInfoAO getByApp(String appId){
+        Optional<OrgInfoDO> found = repository.findByApp(UUID.fromString(appId));
+        return found.map(this::toAO).orElse(null);
+    }
+
     public OrgInfoDO setBilling(String orgId, String billingId){
         Optional<OrgInfoDO> found = repository.findByOrgId(UUID.fromString(orgId));
         if(found.isPresent()){
