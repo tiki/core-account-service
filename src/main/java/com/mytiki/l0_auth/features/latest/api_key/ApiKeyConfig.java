@@ -8,6 +8,7 @@ package com.mytiki.l0_auth.features.latest.api_key;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoService;
 import com.mytiki.l0_auth.features.latest.refresh.RefreshService;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
+import com.mytiki.l0_auth.security.OauthInternal;
 import com.mytiki.l0_auth.security.OauthScopes;
 import com.mytiki.l0_auth.utilities.Constants;
 import com.nimbusds.jose.JWSSigner;
@@ -37,8 +38,9 @@ public class ApiKeyConfig {
             @Autowired RefreshService refreshService,
             @Autowired JWSSigner signer,
             @Autowired OauthScopes allowedScopes,
-            @Value("${com.mytiki.l0_auth.oauth.client_credentials.public_scopes}") List<String> publicScopes){
+            @Value("${com.mytiki.l0_auth.oauth.client_credentials.public.scopes}") List<String> publicScopes,
+            @Autowired OauthInternal oauthInternal){
         return new ApiKeyService(repository, userInfoService, appInfoService, refreshService, signer,
-                allowedScopes, publicScopes);
+                allowedScopes, publicScopes, oauthInternal);
     }
 }

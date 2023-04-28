@@ -27,11 +27,15 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 @Order(value = Integer.MIN_VALUE)
-@Import(OauthScopes.class)
+@Import({
+        OauthScopes.class,
+        OauthInternal.class
+})
 @ControllerAdvice
 public class OauthConfig {
     protected static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private List<OauthScope> scopes;
+    private OauthInternal internalKeys;
 
     @Bean
     public List<OauthScope> getScopes() {
