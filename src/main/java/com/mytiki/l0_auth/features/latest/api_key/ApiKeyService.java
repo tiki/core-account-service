@@ -11,6 +11,7 @@ import com.mytiki.l0_auth.features.latest.refresh.RefreshService;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoDO;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
 import com.mytiki.l0_auth.security.JWSBuilder;
+import com.mytiki.l0_auth.security.OauthInternal;
 import com.mytiki.l0_auth.security.OauthScope;
 import com.mytiki.l0_auth.security.OauthScopes;
 import com.mytiki.l0_auth.utilities.Constants;
@@ -41,6 +42,7 @@ public class ApiKeyService {
     private final PasswordEncoder secretEncoder;
     private final OauthScopes allowedScopes;
     private final List<String> publicScopes;
+    private final OauthInternal oauthInternal;
 
     public ApiKeyService(
             ApiKeyRepository repository,
@@ -49,7 +51,8 @@ public class ApiKeyService {
             RefreshService refreshService,
             JWSSigner signer,
             OauthScopes allowedScopes,
-            List<String> publicScopes) {
+            List<String> publicScopes,
+            OauthInternal oauthInternal) {
         this.repository = repository;
         this.userInfoService = userInfoService;
         this.appInfoService = appInfoService;
@@ -58,6 +61,7 @@ public class ApiKeyService {
         this.secretEncoder = new BCryptPasswordEncoder(12);
         this.allowedScopes = allowedScopes;
         this.publicScopes = publicScopes;
+        this.oauthInternal = oauthInternal;
     }
 
     @Transactional
@@ -113,37 +117,57 @@ public class ApiKeyService {
     }
 
     public OAuth2AccessTokenResponse authorize(String clientId, String clientSecret, String requestScopes){
-        Optional<ApiKeyDO> found = repository.findById(UUID.fromString(clientId));
-        if (found.isEmpty())
-            throw new OAuth2AuthorizationException(new OAuth2Error(
-                    OAuth2ErrorCodes.ACCESS_DENIED,
-                    "client_id and/or client_secret are invalid",
-                    null
-            ));
-        try {
-            Map<String, OauthScope> scopes = allowedScopes.parse(requestScopes);
-            if(found.get().getHashedSecret() == null && clientSecret == null){
+        String subject = null;
+        Map<String, OauthScope> scopes = allowedScopes.parse(requestScopes);
+        Map<String, OauthScope> internal = allowedScopes.filter(scopes, oauthInternal.getScopes());
+
+        if(!internal.isEmpty()){
+            String hashedSecret = oauthInternal.getKeys().get(clientId);
+            if(!secretEncoder.matches(clientSecret, hashedSecret))
+                throw new OAuth2AuthorizationException(new OAuth2Error(
+                        OAuth2ErrorCodes.ACCESS_DENIED),
+                        "client_id and/or client_secret are invalid");
+            subject = clientId;
+        }else {
+            UUID clientUUID;
+            try {
+                 clientUUID = UUID.fromString(clientId);
+            }catch (IllegalArgumentException ex){
+                throw new OAuth2AuthorizationException(new OAuth2Error(
+                        OAuth2ErrorCodes.ACCESS_DENIED,
+                        "client_id and/or client_secret are invalid",
+                        null
+                ));
+            }
+            Optional<ApiKeyDO> found = repository.findById(clientUUID);
+            if (found.isEmpty())
+                throw new OAuth2AuthorizationException(new OAuth2Error(
+                        OAuth2ErrorCodes.ACCESS_DENIED,
+                        "client_id and/or client_secret are invalid",
+                        null
+                ));
+            if (found.get().getHashedSecret() == null && clientSecret == null) {
                 scopes = allowedScopes.filter(scopes, publicScopes);
-            }else{
-                if(!secretEncoder.matches(clientSecret, found.get().getHashedSecret())){
+            } else {
+                if (!secretEncoder.matches(clientSecret, found.get().getHashedSecret())) {
                     throw new OAuth2AuthorizationException(new OAuth2Error(
                             OAuth2ErrorCodes.ACCESS_DENIED),
                             "client_id and/or client_secret are invalid");
                 }
             }
-            String subject = null;
             AppInfoDO app = found.get().getApp();
-            if(app != null)
+            if (app != null)
                 subject = app.getAppId().toString();
+        }
+        List<String>[] audAndScp = allowedScopes.getAudAndScp(scopes);
 
-            List<String>[] audAndScp = allowedScopes.getAudAndScp(scopes);
+        try{
             JWSObject token = new JWSBuilder()
                     .expIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
                     .aud(audAndScp[0])
                     .scp(audAndScp[1])
                     .build(signer);
-
             return OAuth2AccessTokenResponse
                     .withToken(token.serialize())
                     .tokenType(OAuth2AccessToken.TokenType.BEARER)

@@ -38,7 +38,7 @@ public class OtpConfig {
             @Autowired RefreshService refreshService,
             @Autowired UserInfoService userInfoService,
             @Autowired OauthScopes allowedScopes,
-            @Value("${com.mytiki.l0_auth.oauth.password.anonymous_scopes}") List<String> anonymousScopes) {
+            @Value("${com.mytiki.l0_auth.oauth.password.anonymous.scopes}") List<String> anonymousScopes) {
         return new OtpService(otpRepository, templates, sendgrid, jwsSigner, refreshService, userInfoService,
                 allowedScopes, anonymousScopes);
     }

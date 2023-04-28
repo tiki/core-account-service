@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,15 +27,18 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Import({
         OauthConfig.class,
-        JWTConfig.class
+        JWTConfig.class,
 })
 @EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
     private final AccessDeniedHandler accessDeniedHandler;
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final JwtDecoder jwtDecoder;
 
-    public SecurityConfig(@Autowired ObjectMapper objectMapper, @Autowired JwtDecoder jwtDecoder) {
+    public SecurityConfig(
+            @Autowired ObjectMapper objectMapper,
+            @Autowired JwtDecoder jwtDecoder) {
         this.accessDeniedHandler = new AccessDeniedHandler(objectMapper);
         this.authenticationEntryPoint = new AuthenticationEntryPoint(objectMapper);
         this.jwtDecoder = jwtDecoder;
