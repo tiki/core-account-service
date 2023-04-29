@@ -12,6 +12,7 @@ import com.mytiki.l0_auth.features.latest.otp.OtpService;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoAO;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
 import com.mytiki.l0_auth.main.App;
+import com.mytiki.l0_auth.mocks.JwtMock;
 import com.mytiki.l0_auth.utilities.Sendgrid;
 import com.mytiki.spring_rest_api.ApiException;
 import org.junit.jupiter.api.MethodOrderer;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -40,7 +42,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = {App.class}
+        classes = {App.class, JwtMock.class}
 )
 @ActiveProfiles(profiles = {"ci", "dev", "local"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -59,7 +61,9 @@ public class OtpTest {
     @Autowired
     private UserInfoService userInfoService;
 
+
     @Autowired
+    @Qualifier("mockJwtDecoder")
     private JwtDecoder jwtDecoder;
 
     @Test

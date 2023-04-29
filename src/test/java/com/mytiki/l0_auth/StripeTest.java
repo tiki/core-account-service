@@ -11,6 +11,7 @@ import com.mytiki.l0_auth.features.latest.stripe.StripeService;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoAO;
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
 import com.mytiki.l0_auth.main.App;
+import com.mytiki.l0_auth.mocks.StripeMock;
 import com.mytiki.spring_rest_api.ApiException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;

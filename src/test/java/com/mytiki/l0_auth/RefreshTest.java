@@ -9,6 +9,7 @@ import com.mytiki.l0_auth.features.latest.refresh.RefreshDO;
 import com.mytiki.l0_auth.features.latest.refresh.RefreshRepository;
 import com.mytiki.l0_auth.features.latest.refresh.RefreshService;
 import com.mytiki.l0_auth.main.App;
+import com.mytiki.l0_auth.mocks.JwtMock;
 import com.mytiki.l0_auth.utilities.Constants;
 import com.nimbusds.jose.*;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
@@ -38,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = {App.class}
+        classes = {App.class, JwtMock.class}
 )
 @ActiveProfiles(profiles = {"ci", "dev", "local"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -55,6 +57,7 @@ public class RefreshTest {
     private JWSSigner signer;
 
     @Autowired
+    @Qualifier("mockJwtDecoder")
     private JwtDecoder jwtDecoder;
 
     @Test
