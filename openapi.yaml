@@ -336,24 +336,6 @@ paths:
       security:
       - oauth:
         - auth
-  /api/latest/org:
-    get:
-      tags:
-      - ""
-      operationId: getByApp
-      parameters:
-      - name: app-id
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrgInfoAO'
   /api/latest/key/{keyId}:
     delete:
       tags:
