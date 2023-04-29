@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.l0_auth;
+package com.mytiki.l0_auth.mocks;
 
 import com.stripe.net.Webhook;
 

@@ -14,14 +14,15 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 @Tag(name = "")
 @RestController
-@RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
+@RequestMapping(value = UserInfoController.PATH_CONTROLLER)
 public class UserInfoController {
-    public static final String PATH_USER = "user";
+    public static final String PATH_CONTROLLER = ApiConstants.API_LATEST_ROUTE + "user";
 
     private final UserInfoService service;
 
@@ -33,7 +34,7 @@ public class UserInfoController {
             summary = "Update a User",
             description = "Update the authorized user's profile",
             security = @SecurityRequirement(name = "oauth", scopes = "auth"))
-    @RequestMapping(method = RequestMethod.POST, path = PATH_USER + "/{userId}")
+    @RequestMapping(method = RequestMethod.POST, path =  "/{userId}")
     public UserInfoAO update(
             Principal principal,
             @PathVariable String userId,
@@ -53,10 +54,17 @@ public class UserInfoController {
             summary = "Get User",
             description = "Get the authorized user's profile",
             security = @SecurityRequirement(name = "oauth", scopes = "auth"))
-    @RequestMapping(method = RequestMethod.GET, path = PATH_USER )
-    public UserInfoAO userinfo(Principal principal) {
+    @RequestMapping(method = RequestMethod.GET)
+    public UserInfoAO get(Principal principal) {
         if(principal == null || principal.getName() == null)
             throw new ApiException(HttpStatus.FORBIDDEN);
         return service.get(principal.getName());
+    }
+
+    @Operation(hidden = true)
+    @Secured("SCOPE_internal:read")
+    @RequestMapping(method = RequestMethod.GET, path =  "/{userId}")
+    public UserInfoAO getById(@PathVariable String userId) {
+        return service.get(userId);
     }
 }

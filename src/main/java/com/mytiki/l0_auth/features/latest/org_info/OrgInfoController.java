@@ -6,13 +6,14 @@
 package com.mytiki.l0_auth.features.latest.org_info;
 
 import com.mytiki.l0_auth.features.latest.user_info.UserInfoService;
+import com.mytiki.l0_auth.security.OauthScopes;
 import com.mytiki.l0_auth.utilities.Constants;
 import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -36,14 +37,10 @@ public class OrgInfoController {
             description = "Get an org's profile",
             security = @SecurityRequirement(name = "oauth", scopes = "auth"))
     @RequestMapping(method = RequestMethod.GET, path = "/{orgId}")
-    public OrgInfoAO get(Principal principal, @PathVariable String orgId) {
-        return service.get(principal.getName(), orgId);
-    }
-
-    @Secured("SCOPE_internal:org")
-    @RequestMapping(method = RequestMethod.GET)
-    public OrgInfoAO getByApp(Principal principal, @RequestParam(value = "app-id") String appId) {
-        return service.getByApp(appId);
+    public OrgInfoAO get(JwtAuthenticationToken token, @PathVariable String orgId) {
+        if(OauthScopes.hasScope(token, "internal:read"))
+            return service.get(orgId);
+        else return service.getForUser(token.getName(), orgId);
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-org-post-user",

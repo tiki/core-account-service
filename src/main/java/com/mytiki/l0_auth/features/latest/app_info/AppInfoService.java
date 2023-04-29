@@ -43,7 +43,7 @@ public class AppInfoService {
     }
 
     @Transactional
-    public AppInfoAO get(String userId, String appId){
+    public AppInfoAO getForUser(String userId, String appId){
         Optional<AppInfoDO> found = repository.findByAppId(UUID.fromString(appId));
         if(found.isPresent()){
             List<String> allowedUserIds = found.get().getOrg().getUsers()
@@ -58,6 +58,11 @@ public class AppInfoService {
             rsp.setAppId(appId);
             return rsp;
         }
+    }
+
+    public AppInfoAO get(String appId){
+        Optional<AppInfoDO> found = repository.findByAppId(UUID.fromString(appId));
+        return found.map(this::toAO).orElse(null);
     }
 
     public AppInfoAO update(String userId, String appId, AppInfoAOReq req){
