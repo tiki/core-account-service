@@ -26,8 +26,9 @@ import org.bouncycastle.math.ec.ECPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.*;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -37,7 +38,8 @@ import java.security.spec.ECPublicKeySpec;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
+import java.util.*;
+import java.util.function.Predicate;
 
 public class JWTConfig {
     public static String KID;
@@ -71,12 +73,25 @@ public class JWTConfig {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(@Autowired JWKSet jwkSet) {
+    public JwtDecoder jwtDecoder(
+            @Autowired JWKSet jwkSet,
+            @Value("${spring.security.oauth2.resourceserver.jwt.audiences}") List<String> audiences,
+            @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String issuer
+    ) {
         DefaultJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
         ImmutableJWKSet<SecurityContext> immutableJWKSet = new ImmutableJWKSet<>(jwkSet);
         jwtProcessor.setJWSKeySelector(
                 new JWSVerificationKeySelector<>(JWSAlgorithm.ES256, immutableJWKSet));
-        return new NimbusJwtDecoder(jwtProcessor);
+        NimbusJwtDecoder decoder = new NimbusJwtDecoder(jwtProcessor);
+        List<OAuth2TokenValidator<Jwt>> validators = new ArrayList<>();
+        validators.add(new JwtTimestampValidator());
+        validators.add(new JwtIssuerValidator(issuer));
+        validators.add(new JwtClaimValidator<>(JwtClaimNames.IAT, Objects::nonNull));
+        Predicate<List<String>> audienceTest = (audience) -> (audience != null)
+                && new HashSet<>(audience).containsAll(audiences);
+        validators.add(new JwtClaimValidator<>(JwtClaimNames.AUD, audienceTest));
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(validators));
+        return decoder;
     }
 
     @Value("${com.mytiki.l0_auth.jwt.kid}")

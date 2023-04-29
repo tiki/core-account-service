@@ -5,7 +5,6 @@
 
 package com.mytiki.l0_auth;
 
-import com.mytiki.l0_auth.features.latest.app_info.AppInfoAO;
 import com.mytiki.l0_auth.features.latest.app_info.AppInfoService;
 import com.mytiki.l0_auth.features.latest.org_info.OrgInfoAO;
 import com.mytiki.l0_auth.features.latest.org_info.OrgInfoDO;
@@ -61,7 +60,7 @@ public class OrgInfoTest {
     @Test
     public void Test_Get_Success() {
         UserInfoAO user = userInfoService.createIfNotExists(UUID.randomUUID() + "@test.com");
-        OrgInfoAO org = service.get(user.getUserId(), user.getOrgId());
+        OrgInfoAO org = service.getForUser(user.getUserId(), user.getOrgId());
 
         assertTrue(org.getUsers().contains(user.getUserId()));
         assertEquals(user.getOrgId(), org.getOrgId());
@@ -73,7 +72,7 @@ public class OrgInfoTest {
     @Test
     public void Test_Get_None_Success() {
         String orgId = UUID.randomUUID().toString();
-        OrgInfoAO org = service.get(UUID.randomUUID().toString(), orgId);
+        OrgInfoAO org = service.getForUser(UUID.randomUUID().toString(), orgId);
 
         assertEquals(orgId, org.getOrgId());
         assertNull(org.getApps());
@@ -81,18 +80,5 @@ public class OrgInfoTest {
         assertNull(org.getBillingId());
         assertNull(org.getCreated());
         assertNull(org.getModified());
-    }
-
-    @Test
-    public void Test_GetByApp_Success() {
-        UserInfoAO user = userInfoService.createIfNotExists(UUID.randomUUID() + "@test.com");
-        AppInfoAO app = appInfoService.create(UUID.randomUUID().toString(), user.getUserId());
-        OrgInfoAO org = service.getByApp(app.getAppId());
-
-        assertTrue(org.getUsers().contains(user.getUserId()));
-        assertEquals(user.getOrgId(), org.getOrgId());
-        assertNull(org.getBillingId());
-        assertNotNull(org.getModified());
-        assertNotNull(org.getCreated());
     }
 }

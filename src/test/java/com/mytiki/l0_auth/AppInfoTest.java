@@ -97,7 +97,7 @@ public class AppInfoTest {
         testUser = userInfoRepository.save(testUser);
 
         AppInfoAO app = service.create(name, testUser.getUserId().toString());
-        AppInfoAO found = service.get(testUser.getUserId().toString(), app.getAppId());
+        AppInfoAO found = service.getForUser(testUser.getUserId().toString(), app.getAppId());
 
         assertEquals(app.getAppId(), found.getAppId());
         assertEquals(app.getName(), found.getName());
@@ -109,7 +109,7 @@ public class AppInfoTest {
     @Test
     public void Test_Get_NoApp_Success() {
         String appId = UUID.randomUUID().toString();
-        AppInfoAO found = service.get(UUID.randomUUID().toString(), appId);
+        AppInfoAO found = service.getForUser(UUID.randomUUID().toString(), appId);
 
         assertEquals(appId, found.getAppId());
         assertNull(found.getName());

@@ -60,7 +60,7 @@ public class StripeTest {
         String signature = StripeMock.generateSignature(stripeSecret, payload);
         service.updateBilling(payload, signature);
 
-        OrgInfoAO org = orgInfoService.get(user.getUserId(), user.getOrgId());
+        OrgInfoAO org = orgInfoService.getForUser(user.getUserId(), user.getOrgId());
         assertEquals(stripeId, org.getBillingId());
     }
 

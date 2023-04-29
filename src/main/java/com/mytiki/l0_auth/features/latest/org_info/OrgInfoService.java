@@ -32,7 +32,7 @@ public class OrgInfoService {
     }
 
     @Transactional
-    public OrgInfoAO get(String userId, String orgId){
+    public OrgInfoAO getForUser(String userId, String orgId){
         Optional<OrgInfoDO> found = repository.findByOrgId(UUID.fromString(orgId));
         if(found.isPresent()){
             List<String> allowedUserIds = found.get().getUsers()
@@ -49,9 +49,8 @@ public class OrgInfoService {
         }
     }
 
-    @Transactional
-    public OrgInfoAO getByApp(String appId){
-        Optional<OrgInfoDO> found = repository.findByApp(UUID.fromString(appId));
+    public OrgInfoAO get(String orgId){
+        Optional<OrgInfoDO> found = repository.findByOrgId(UUID.fromString(orgId));
         return found.map(this::toAO).orElse(null);
     }
 

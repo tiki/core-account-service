@@ -7,6 +7,8 @@ package com.mytiki.l0_auth.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,5 +54,9 @@ public class OauthScopes {
         rsp[0] = aud.stream().toList();
         rsp[1] = scp.stream().toList();
         return rsp;
+    }
+
+    public static boolean hasScope(JwtAuthenticationToken token, String scope){
+        return token.getAuthorities().contains(new SimpleGrantedAuthority("SCOPE_" + scope));
     }
 }
