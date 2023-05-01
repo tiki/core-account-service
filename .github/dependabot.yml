@@ -6,6 +6,8 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "mvn"
+    labels:
+      - "chore"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -13,6 +15,8 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "gh-action"
+    labels:
+      - "chore"
 
   - package-ecosystem: "docker"
     directory: "/"
@@ -20,3 +24,14 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "docker"
+    labels:
+      - "chore"
+
+  - package-ecosystem: "terraform"
+    directory: "/infra"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "terraform"
+    labels:
+      - "chore"
