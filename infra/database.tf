@@ -23,6 +23,11 @@ resource "digitalocean_database_firewall" "db-cluster-l0-auth-fw" {
     type  = "app"
     value = digitalocean_app.l0-auth-app.id
   }
+
+  rule {
+    type  = "ip_addr"
+    value = "52.4.198.118"
+  }
 }
 
 resource "digitalocean_database_user" "db-user-l0-auth" {
