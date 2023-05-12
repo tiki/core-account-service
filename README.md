@@ -51,3 +51,14 @@ basic protection. Email delivery (used in passwordless login) is handled by
 
 Configuration TF scripts are located in the project root under `/infra`. Deployment
 driven by GitHub Actions (see `.github/workflows/`) with [Terraform Cloud](https://www.terraform.io).
+
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
