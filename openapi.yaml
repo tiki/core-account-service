@@ -5,7 +5,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/l0-auth/blob/main/LICENSE
-  version: 2.2.0
+  version: 2.2.1
 servers:
 - url: https://auth.l0.mytiki.com
 paths:
