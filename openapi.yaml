@@ -5,7 +5,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/l0-auth/blob/main/LICENSE
-  version: 2.1.0
+  version: 2.2.0
 servers:
 - url: https://auth.l0.mytiki.com
 paths:
@@ -111,7 +111,7 @@ paths:
       - ""
       summary: Token Grant
       description: Issue authorization token. Use password grant for OTP flow.
-      operationId: l0-auth-oauth-token-post_1_1
+      operationId: l0-auth-oauth-token-post_1_1_1
       parameters:
       - name: grant_type
         in: query
@@ -134,12 +134,22 @@ paths:
         required: true
         schema:
           type: string
-      - name: refresh_token
+      - name: client_id
         in: query
         required: true
         schema:
           type: string
-      - name: client_id
+      - name: subject_token
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: subject_token_type
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: refresh_token
         in: query
         required: true
         schema:
