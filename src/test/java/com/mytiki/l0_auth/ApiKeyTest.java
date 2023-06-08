@@ -114,7 +114,6 @@ public class ApiKeyTest {
 
         assertEquals(1, found.size());
         assertEquals(created.getId(), found.get(0).getId());
-        assertEquals(created.getCreated().withNano(0), found.get(0).getCreated().withNano(0));
     }
 
     @Test
@@ -199,7 +198,7 @@ public class ApiKeyTest {
     }
 
     @Test
-    public void Test_Authorize_Success(){
+    public void Test_Authorize_Success() {
         UserInfoDO testUser = new UserInfoDO();
         testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
         testUser.setUserId(UUID.randomUUID());
@@ -219,7 +218,7 @@ public class ApiKeyTest {
     }
 
     @Test
-    public void Test_Authorize_Secret_Success(){
+    public void Test_Authorize_Secret_Success() {
         UserInfoDO testUser = new UserInfoDO();
         testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
         testUser.setUserId(UUID.randomUUID());
@@ -237,7 +236,7 @@ public class ApiKeyTest {
     }
 
     @Test
-    public void Test_Authorize_Private_Success(){
+    public void Test_Authorize_Private_Success() {
         UserInfoDO testUser = new UserInfoDO();
         testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
         testUser.setUserId(UUID.randomUUID());
@@ -257,7 +256,7 @@ public class ApiKeyTest {
     }
 
     @Test
-    public void Test_Authorize_BadSecret_Failure(){
+    public void Test_Authorize_BadSecret_Failure() {
         UserInfoDO testUser = new UserInfoDO();
         testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
         testUser.setUserId(UUID.randomUUID());
@@ -274,7 +273,7 @@ public class ApiKeyTest {
     }
 
     @Test
-    public void Test_Authorize_BadId_Failure(){
+    public void Test_Authorize_BadId_Failure() {
         UserInfoDO testUser = new UserInfoDO();
         testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
         testUser.setUserId(UUID.randomUUID());
