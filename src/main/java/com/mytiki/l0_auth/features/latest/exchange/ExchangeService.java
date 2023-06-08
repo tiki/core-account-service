@@ -47,7 +47,7 @@ public class ExchangeService {
             String requestedScope, String clientId, String subjectToken, String subjectTokenType) {
         String email = validate(clientId, subjectToken, subjectTokenType);
         UserInfoAO userInfo = userInfoService.createIfNotExists(email);
-        String subject = userInfo.getEmail();
+        String subject = userInfo.getUserId();
         Map<String, OauthScope> scopes = allowedScopes.parse(requestedScope);
         List<String>[] audAndScp = allowedScopes.getAudAndScp(scopes);
         try {
