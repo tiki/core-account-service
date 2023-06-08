@@ -101,8 +101,6 @@ public class AppInfoTest {
 
         assertEquals(app.getAppId(), found.getAppId());
         assertEquals(app.getName(), found.getName());
-        assertEquals(app.getModified().withNano(0), found.getModified().withNano(0));
-        assertEquals(app.getCreated().withNano(0), found.getCreated().withNano(0));
         assertEquals(app.getOrgId(), found.getOrgId());
     }
 

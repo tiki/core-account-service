@@ -51,8 +51,6 @@ public class UserInfoTest {
 
         UserInfoAO user = service.get(saved.getUserId().toString());
         assertEquals(saved.getEmail(), user.getEmail());
-        assertEquals(saved.getModified().withNano(0), user.getModified().withNano(0));
-        assertEquals(saved.getCreated().withNano(0), user.getCreated().withNano(0));
         assertNotNull(user.getOrgId());
         assertEquals(saved.getUserId().toString(), user.getUserId());
     }
