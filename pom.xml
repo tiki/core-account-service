@@ -113,7 +113,7 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-spring-boot-starter</artifactId>
-            <version>6.21.0</version>
+            <version>6.23.0</version>
         </dependency>
         <dependency>
             <groupId>io.sentry</groupId>
