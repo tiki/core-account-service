@@ -12,7 +12,7 @@
 
     <groupId>com.mytiki</groupId>
     <artifactId>l0_auth</artifactId>
-    <version>2.2.1</version>
+    <version>2.2.2</version>
     <packaging>jar</packaging>
 
     <name>L0 Auth</name>
@@ -113,18 +113,18 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-spring-boot-starter</artifactId>
-            <version>6.21.0</version>
+            <version>6.23.0</version>
         </dependency>
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-logback</artifactId>
-            <version>6.21.0</version>
+            <version>6.23.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.stripe</groupId>
             <artifactId>stripe-java</artifactId>
-            <version>22.22.0</version>
+            <version>22.23.1</version>
         </dependency>
 
         <dependency>
@@ -175,7 +175,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <apiDocsUrl>http://localhost:10502/v3/api-docs.yaml</apiDocsUrl>
+                    <apiDocsUrl>http://localhost:10502/v3/api-docs.yaml
+                    </apiDocsUrl>
                     <outputFileName>openapi.yaml</outputFileName>
                     <outputDir>${project.basedir}</outputDir>
                 </configuration>
@@ -188,7 +189,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
-                <version>2.15.0</version>
+                <version>2.16.0</version>
             </plugin>
         </plugins>
     </build>
