@@ -4,3 +4,6 @@
 [submodule "refresh"]
 	path = refresh
 	url = https://github.com/tiki/tiki-account-refresh
+[submodule "idp"]
+	path = idp
+	url = https://github.com/tiki/tiki-account-idp
