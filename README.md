@@ -1,61 +1,30 @@
-###  [🍍 Console](https://console.mytiki.com) &nbsp; ⏐ &nbsp; [📚 Docs](https://docs.mytiki.com)
+# TIKI Account
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)<!-- ALL-CONTRIBUTORS-BADGE:END --> <a href="https://mytiki.com/reference"><img alt="API Reference" src="https://img.shields.io/badge/-API_Reference-white?style=flat-square&logo=ReadMe&logoColor=white&labelColor=018EF5&color=018EF5"></a>
 
-# Layer 0 Authorization Service
 
-An Oauth2 style authorization microservice, used to gate access to TIKI's various Layer 0 services.
+TIKI's account management service —configure and provision access to the data platform. Access security is fundamentally based on the OAuth2 standard utilizing JWTs to gate access for users, customers, and services.
 
-For new projects, we recommend signing up at [console.mytiki.com](https://console.mytiki.com) and utilizing one of our
-platform-specific SDKs which handle any required L0 auth API calls.
+The service itself is stateless (horizontal-scaling) Java (spring-boot) Miniservice with a REST API and a PostgreSQL database. Client libraries and UI can be found as submodules.
 
-- **🤖 Android: [tiki-sdk-android](https://github.com/tiki/tiki-sdk-android)**
-- **🍎 iOS: [tiki-sdk-ios](https://github.com/tiki/tiki-sdk-ios)**
-- **🦋 Flutter: [tiki-sdk-flutter](https://github.com/tiki/tiki-sdk-flutter)**
+## Project Structure
 
-### [🎬 API Reference ➝](https://docs.mytiki.com/reference/l0-auth-info-get)
+- `/src`: The source code for the Miniservice
+- `/database`: Database SQL scripts
+- `/infra`: Terraform deployment scripts
+- `/console`: Frontend UI for account management
+- `/refresh`: Serverless worker for silent token refresh
+- `/idp`: Library for clapplications
 
-### Basic Architecture
+## Contributing
 
-Supports `jwt-bearer`, `refresh`, and `password` grants. `jwt-bearer` used during social login (Google/GitHub/etc.) to
-swap a 3rd-party token for a TIKI L0 service token. `password` grants are used **only** for a passwordless login using
-one-time passwords (OTPs) delivered by email.
+- Use [GitHub Issues](https://github.com/tiki/tiki-account/issues) to report any bugs you find or to request enhancements.
+- If you'd like to get in touch with our team or other active contributors, pop in our 👾 [Discord](https://discord.gg/tiki).
+- Please use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) if you intend to add code to this project.
 
-Tokens are signed [JWTs](https://jwt.io) with `iss`, `exp`, and `iat` claims. `jti`, `sub`, and `aud` claims may be
-added depending on the requested authorization. Bearer tokens have a 10-minute expiration with 30 days for refresh
-tokens.
 
-The service defaults to anonymous, with no user identification persisted or created. Some L0 Services may require
-non-anonymous developer/business accounts (typically for billing) —set `nonAnonymous:true` in request body during signup.
-
-#### Service
-
-A [Spring Boot](https://github.com/spring-projects/spring-boot) microservice
-using [Spring Security](https://github.com/spring-projects/spring-security) for token issuance and signing. With common
-oauth endpoints (token, revoke, userinfo, and jwks.json) configured as Rest Controllers.
-
-Code follows TIKI's [vertical slice](https://jimmybogard.com/vertical-slice-architecture/) architecture and
-nomenclature. For example, business logic to prevent refresh token replays can be found
-in `RefreshService.java`
-
-#### Database
-[PostgresSQL](https://www.postgresql.org) is used for persistence of user profiles and temporary storage of one-time
-passwords and refresh tokens. See `/database` at the project root for database configuration scripts.
-
-#### Infrastructure
-As a microservice we utilize a 1 service - 1 database pattern, without state management. Services are containerized
-using [Docker](https://www.docker.com) images to scale horizontally based on demand. Images are deployed simply behind
-an application load balancer (no k8 needed) to
-[Digital Ocean's App Platform](https://docs.digitalocean.com/products/app-platform/). The load balancer sits behind
-Cloudflare [Proxied DNS](https://developers.cloudflare.com/fundamentals/get-started/concepts/how-cloudflare-works/) for
-basic protection. Email delivery (used in passwordless login) is handled by
-[SendGrid's Email API](https://sendgrid.com/solutions/email-api/smtp-service/) service.
-
-Configuration TF scripts are located in the project root under `/infra`. Deployment
-driven by GitHub Actions (see `.github/workflows/`) with [Terraform Cloud](https://www.terraform.io).
-
-## Contributors
+### Contributors ✨
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
@@ -70,13 +39,6 @@ driven by GitHub Actions (see `.github/workflows/`) with [Terraform Cloud](https
     </tr>
   </tbody>
 </table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
