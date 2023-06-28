@@ -1,0 +1,31 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "mike-audi",
+      "name": "Mike Audi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3769672?v=4",
+      "profile": "http://mytiki.com",
+      "contributions": [
+        "code",
+        "review",
+        "infra",
+        "maintenance",
+        "doc",
+        "test"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "tiki-account",
+  "projectOwner": "tiki"
+}
