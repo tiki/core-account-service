@@ -1,7 +1,8 @@
 # TIKI Account
 
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)<!-- ALL-CONTRIBUTORS-BADGE:END --> <a href="https://mytiki.com/reference"><img alt="API Reference" src="https://img.shields.io/badge/-API_Reference-white?style=flat-square&logo=ReadMe&logoColor=white&labelColor=018EF5&color=018EF5"></a>
+<img alt="API Reference" src="https://img.shields.io/badge/-API_Reference-white?style=flat&logo=ReadMe&logoColor=white&labelColor=018EF5&color=018EF5"></a><!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END --> <a href="https://mytiki.com/reference">
 
 
 TIKI's account management service —configure and provision access to the data platform. Access security is fundamentally based on the OAuth2 standard utilizing JWTs to gate access for users, customers, and services.
