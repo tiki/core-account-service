@@ -1,0 +1,59 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "mike-audi",
+      "name": "Mike Audi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3769672?v=4",
+      "profile": "http://mytiki.com",
+      "contributions": [
+        "code",
+        "review",
+        "infra",
+        "maintenance",
+        "doc",
+        "test"
+      ]
+    },
+	{
+      "login": "timoguin",
+      "name": "Tim O'Guin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/671968?v=4",
+      "profile": "https://github.com/timoguin",
+      "contributions": [
+        "infra",
+        "security"
+      ]
+    },
+	{
+      "login": "wsb1994",
+      "name": "Will B.",
+      "avatar_url": "https://avatars.githubusercontent.com/u/36477199?v=4",
+      "profile": "https://github.com/wsb1994",
+      "contributions": [
+        "infra"
+      ]
+    },
+	{
+      "login": "tedmarov",
+      "name": "Ted Marov",
+      "avatar_url": "https://avatars.githubusercontent.com/u/68402820?v=4",
+      "profile": "http://tedmarov.github.io",
+      "contributions": [
+        "infra"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "tiki-account",
+  "projectOwner": "tiki"
+}
