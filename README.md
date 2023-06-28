@@ -1,4 +1,7 @@
 ###  [🍍 Console](https://console.mytiki.com) &nbsp; ⏐ &nbsp; [📚 Docs](https://docs.mytiki.com)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Layer 0 Authorization Service
 
@@ -55,6 +58,20 @@ driven by GitHub Actions (see `.github/workflows/`) with [Terraform Cloud](https
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="http://mytiki.com"><img src="https://avatars.githubusercontent.com/u/3769672?v=4?s=100" width="100px;" alt="Mike Audi"/><br /><sub><b>Mike Audi</b></sub></a><br /><a href="https://github.com/tiki/tiki-account/commits?author=mike-audi" title="Code">💻</a> <a href="https://github.com/tiki/tiki-account/pulls?q=is%3Apr+reviewed-by%3Amike-audi" title="Reviewed Pull Requests">👀</a> <a href="#infra-mike-audi" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-mike-audi" title="Maintenance">🚧</a> <a href="https://github.com/tiki/tiki-account/commits?author=mike-audi" title="Documentation">📖</a> <a href="https://github.com/tiki/tiki-account/commits?author=mike-audi" title="Tests">⚠️</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 
