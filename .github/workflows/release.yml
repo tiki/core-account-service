@@ -73,7 +73,7 @@ jobs:
       - name: Registry login
         run: doctl registry login --expiry-seconds 600
 
-      - name: Mvn project version
+      - name: Maven project version
         id: version
         run: echo "version=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
 
@@ -81,7 +81,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: prod.dockerfile
+          target: production
           push: true
           tags: |
             registry.digitalocean.com/tiki/l0-auth:${{ steps.version.outputs.version }}
