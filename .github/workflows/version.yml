@@ -20,7 +20,7 @@ jobs:
         env:
           POSTGRES_USER: tester
           POSTGRES_PASSWORD: pgtestpw
-          POSTGRES_DB: l0_auth
+          POSTGRES_DB: account_service
           POSTGRES_PORT: 5432
         ports:
           - 5432:5432
@@ -75,7 +75,7 @@ jobs:
           sudo apt-get install --yes postgresql-client
 
       - name: Create Tables
-        run: psql -h localhost -d l0_auth -U tester -f database/create_tables.sql
+        run: psql -h localhost -d account_service -U tester -f database/create_tables.sql
         env:
           PGPASSWORD: pgtestpw
 
