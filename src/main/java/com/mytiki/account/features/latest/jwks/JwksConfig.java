@@ -30,20 +30,21 @@ import java.security.spec.PKCS8EncodedKeySpec;
 
 public class JwksConfig {
     public static String keyId;
-    public static JWSAlgorithm ALGORITHM;
+    public static JWSAlgorithm algorithm = JWSAlgorithm.ES256;
 
     @Bean
     public JWKSet jwkSet(
+            @Value("${com.mytiki.account.jwt.kid}") String kid,
             @Value("${com.mytiki.account.jwt.private_key}") String pkcs8)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         KeyFactory keyFactory = KeyFactory.getInstance("EC");
         ECPrivateKey privateKey = privateKey(keyFactory, pkcs8);
-        JwksConfig.ALGORITHM = JWSAlgorithm.parse(privateKey.getAlgorithm());
+        JwksConfig.keyId = kid;
         ECKey.Builder keyBuilder = new ECKey.Builder(Curve.P_256, publicKey(keyFactory, privateKey));
         keyBuilder.keyUse(KeyUse.SIGNATURE);
-        keyBuilder.keyID(JwksConfig.keyId);
+        keyBuilder.keyID(kid);
         keyBuilder.privateKey(privateKey);
-        keyBuilder.algorithm(JwksConfig.ALGORITHM);
+        keyBuilder.algorithm(JwksConfig.algorithm);
         return new JWKSet(keyBuilder.build());
     }
 
@@ -53,11 +54,6 @@ public class JwksConfig {
             @Value("${com.mytiki.account.jwt.kid}") String kid)
             throws JOSEException {
         return new ECDSASigner(jwkSet.getKeyByKeyId(kid).toECKey().toECPrivateKey(), Curve.P_256);
-    }
-
-    @Value("${com.mytiki.account.jwt.kid}")
-    public void setKeyId(String name){
-        JwksConfig.keyId = name;
     }
 
     private ECPrivateKey privateKey(KeyFactory keyFactory, String pkcs8) throws InvalidKeySpecException {

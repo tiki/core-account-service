@@ -1,7 +1,7 @@
 package com.mytiki.account.utilities.builder;
 
 import com.mytiki.account.features.latest.jwks.JwksConfig;
-import com.mytiki.account.security.oauth.OauthConfig;
+import com.mytiki.account.security.oauth.OauthDecoder;
 import com.nimbusds.jose.*;
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -155,12 +155,12 @@ public class JwtBuilder {
         if(iat == null) iat = Date.from(now.toInstant());
         jws = new JWSObject(
                 new JWSHeader
-                        .Builder(JwksConfig.ALGORITHM)
+                        .Builder(JwksConfig.algorithm)
                         .type(JOSEObjectType.JWT)
                         .keyID(JwksConfig.keyId)
                         .build(),
                 new Payload( new JWTClaimsSet.Builder()
-                        .issuer(OauthConfig.issuer)
+                        .issuer(OauthDecoder.issuer)
                         .issueTime(iat)
                         .subject(sub)
                         .expirationTime(exp)

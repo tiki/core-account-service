@@ -5,7 +5,6 @@
 
 package com.mytiki.account.security.oauth;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
@@ -25,13 +24,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 })
 @ControllerAdvice
 public class OauthConfig {
-    public static String issuer;
-
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    public void setIssuer(String issuer){
-        OauthConfig.issuer = issuer;
-    }
-
     @Bean
     public HttpMessageConverter<OAuth2AccessTokenResponse> oAuth2AccessTokenResponseHttpMessageConverter() {
         return new OAuth2AccessTokenResponseHttpMessageConverter();
