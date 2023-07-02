@@ -4,7 +4,6 @@ services:
   api:
     build:
       context: .
-      dockerfile: dev.dockerfile
       target: development
       args:
         - JAR_FILE=target/*.jar

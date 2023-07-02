@@ -41,6 +41,9 @@ CREATE TABLE IF NOT EXISTS app_info(
     app_id UUID NOT NULL UNIQUE,
     app_name TEXT NOT NULL,
     org_info_id BIGINT REFERENCES org_info(org_info_id) NOT NULL,
+    jwks_endpoint TEXT,
+    jwks_verify_sub BOOLEAN,
+    sign_key BYTEA NOT NULL UNIQUE,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
     modified_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );
@@ -57,6 +60,7 @@ CREATE TABLE IF NOT EXISTS user_info(
     modified_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
+
 -- -----------------------------------------------------------------------
 -- API KEY
 -- -----------------------------------------------------------------------
@@ -66,3 +70,17 @@ CREATE TABLE IF NOT EXISTS api_key(
     app_info_id BIGINT REFERENCES app_info(app_info_id) ON DELETE CASCADE,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );
+
+-- -----------------------------------------------------------------------
+-- ADDRESS REGISTRATION
+-- -----------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS addr_reg(
+    addr_reg_id BIGSERIAL PRIMARY KEY,
+    address bytea NOT NULL,
+    custom_id TEXT NOT NULL,
+    public_key BYTEA NOT NULL UNIQUE,
+    app_info_id BIGINT REFERENCES app_info(app_info_id) NOT NULL,
+    created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
+    UNIQUE (app_info_id, address)
+);
+CREATE INDEX ON addr_reg (app_info_id, custom_id);

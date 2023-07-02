@@ -13,7 +13,7 @@ terraform {
     organization = "tiki"
 
     workspaces {
-      name = "l0-auth"
+      name = "account"
     }
   }
 }

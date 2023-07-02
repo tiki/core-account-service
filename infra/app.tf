@@ -1,18 +1,18 @@
 # Copyright (c) TIKI Inc.
 # MIT license. See LICENSE file in root directory.
 
-resource "digitalocean_app" "l0-auth-app" {
+resource "digitalocean_app" "account-app" {
   spec {
-    name   = "l0-auth"
+    name   = "account"
     region = local.region
 
     domain {
-      name = "auth.l0.mytiki.com"
+      name = "account.mytiki.com"
       type = "PRIMARY"
     }
 
     service {
-      name               = "l0-auth-service"
+      name               = "account-service"
       instance_count     = 2
       instance_size_slug = "professional-xs"
       http_port          = local.port
@@ -20,7 +20,7 @@ resource "digitalocean_app" "l0-auth-app" {
       image {
         registry_type = "DOCR"
         registry      = "tiki"
-        repository    = "l0-auth"
+        repository    = "account"
         tag           = var.sem_ver
       }
 

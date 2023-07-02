@@ -25,7 +25,7 @@
     </parent>
 
     <properties>
-        <start-class>com.mytiki.l0_auth.main.App</start-class>
+        <start-class>com.mytiki.account.main.App</start-class>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>19</java.version>
     </properties>
