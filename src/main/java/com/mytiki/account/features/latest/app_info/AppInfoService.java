@@ -111,4 +111,20 @@ public class AppInfoService {
         rsp.setOrgId(src.getOrg().getOrgId().toString());
         return rsp;
     }
+
+    public void guardUser(String appId, String userId) {
+        Optional<UserInfoDO> user = userInfoService.getDO(userId);
+        if (user.isEmpty())
+            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
+                    .detail("Invalid user")
+                    .build();
+        Optional<AppInfoDO> app = repository.findByAppId(UUID.fromString(appId));
+        if (app.isPresent()) {
+            if (!app.get().getOrg().getUsers().contains(user.get()))
+                throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
+                        .detail("User does not have permission")
+                        .help("User must belong to App's Org")
+                        .build();
+        }
+    }
 }

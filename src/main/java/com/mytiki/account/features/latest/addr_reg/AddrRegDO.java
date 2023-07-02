@@ -12,6 +12,7 @@ public class AddrRegDO implements Serializable {
     private Long id;
     private byte[] address;
     private String cid;
+    private byte[] pubKey;
     private AppInfoDO app;
     private ZonedDateTime created;
 
@@ -42,6 +43,15 @@ public class AddrRegDO implements Serializable {
 
     public void setCid(String cid) {
         this.cid = cid;
+    }
+
+    @Column(name = "public_key")
+    public byte[] getPubKey() {
+        return pubKey;
+    }
+
+    public void setPubKey(byte[] pubKey) {
+        this.pubKey = pubKey;
     }
 
     @ManyToOne
