@@ -10,14 +10,14 @@ import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.JWSBuilder;
-import com.mytiki.account.security.OauthInternal;
-import com.mytiki.account.security.OauthScope;
-import com.mytiki.account.security.OauthScopes;
+import com.mytiki.account.security.oauth.OauthInternal;
+import com.mytiki.account.security.oauth.OauthScope;
+import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.utilities.Constants;
+import com.mytiki.account.utilities.builder.JwtBuilder;
+import com.mytiki.account.utilities.facade.B64F;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,7 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public class ApiKeyService {
     private final ApiKeyRepository repository;
@@ -162,14 +165,16 @@ public class ApiKeyService {
         List<String>[] audAndScp = allowedScopes.getAudAndScp(scopes);
 
         try{
-            JWSObject token = new JWSBuilder()
-                    .expIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
+            String token = new JwtBuilder()
+                    .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
                     .aud(audAndScp[0])
                     .scp(audAndScp[1])
-                    .build(signer);
+                    .build()
+                    .sign(signer)
+                    .toToken();
             return OAuth2AccessTokenResponse
-                    .withToken(token.serialize())
+                    .withToken(token)
                     .tokenType(OAuth2AccessToken.TokenType.BEARER)
                     .expiresIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .scopes(scopes.keySet())
@@ -200,6 +205,6 @@ public class ApiKeyService {
         byte[] secret = new byte[len];
         SecureRandom secureRandom = new SecureRandom();
         secureRandom.nextBytes(secret);
-        return Base64.getEncoder().withoutPadding().encodeToString(secret);
+        return B64F.encode(secret);
     }
 }

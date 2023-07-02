@@ -5,16 +5,15 @@
 
 package com.mytiki.account.features.latest.exchange;
 
-import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.exchange.shopify.ShopifyClient;
+import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.JWSBuilder;
-import com.mytiki.account.security.OauthScope;
-import com.mytiki.account.security.OauthScopes;
+import com.mytiki.account.security.oauth.OauthScope;
+import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.utilities.Constants;
+import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
@@ -51,14 +50,16 @@ public class ExchangeService {
         Map<String, OauthScope> scopes = allowedScopes.parse(requestedScope);
         List<String>[] audAndScp = allowedScopes.getAudAndScp(scopes);
         try {
-            JWSObject token = new JWSBuilder()
-                    .expIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
+            String token = new JwtBuilder()
+                    .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
                     .aud(audAndScp[0])
                     .scp(audAndScp[1])
-                    .build(signer);
+                    .build()
+                    .sign(signer)
+                    .toToken();
             return OAuth2AccessTokenResponse
-                    .withToken(token.serialize())
+                    .withToken(token)
                     .tokenType(OAuth2AccessToken.TokenType.BEARER)
                     .expiresIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .scopes(scopes.keySet())

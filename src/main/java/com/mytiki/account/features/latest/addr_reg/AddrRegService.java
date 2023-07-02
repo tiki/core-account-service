@@ -2,9 +2,9 @@ package com.mytiki.account.features.latest.addr_reg;
 
 import com.mytiki.account.features.latest.app_info.AppInfoDO;
 import com.mytiki.account.features.latest.app_info.AppInfoService;
-import com.mytiki.account.utilities.B64Url;
-import com.mytiki.account.utilities.RSAFacade;
-import com.mytiki.account.utilities.SHA3Facade;
+import com.mytiki.account.utilities.facade.B64F;
+import com.mytiki.account.utilities.facade.RsaF;
+import com.mytiki.account.utilities.facade.Sha3F;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,7 +14,6 @@ import org.springframework.security.crypto.codec.Utf8;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZonedDateTime;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,9 +43,9 @@ public class AddrRegService {
 
         AddrRegDO reg = new AddrRegDO();
         reg.setCid(req.getId());
-        reg.setAddress(B64Url.decode(req.getAddress()));
+        reg.setAddress(B64F.decode(req.getAddress(), true));
         reg.setApp(app.get());
-        reg.setPubKey(Base64.getDecoder().decode(req.getPubKey()));
+        reg.setPubKey(B64F.decode(req.getPubKey()));
         reg.setCreated(ZonedDateTime.now());
 
         try {
@@ -61,7 +60,7 @@ public class AddrRegService {
     }
 
     public AddrRegAORsp get(String appId, String address){
-        byte[] addr = B64Url.decode(address);
+        byte[] addr = B64F.decode(address, true);
         UUID app = UUID.fromString(appId);
         Optional<AddrRegDO> found = repository.findByAppAppIdAndAddress(app, addr);
         return found.map(this::toRsp).orElse(new AddrRegAORsp());
@@ -75,7 +74,7 @@ public class AddrRegService {
 
     public void delete(String appId, String address){
         UUID app = UUID.fromString(appId);
-        byte[] addr = B64Url.decode(address);
+        byte[] addr = B64F.decode(address, true);
         repository.deleteByAppAppIdAndAddress(app, addr);
     }
 
@@ -87,10 +86,10 @@ public class AddrRegService {
     private void guardSignature(AddrRegAOReq req) {
         try {
             byte[] message = Utf8.encode(req.getId() + "." + req.getAddress());
-            byte[] pubKey = Base64.getDecoder().decode(req.getPubKey());
-            byte[] signature = Base64.getDecoder().decode(req.getSignature());
+            byte[] pubKey = B64F.decode(req.getPubKey());
+            byte[] signature = B64F.decode(req.getSignature());
 
-            String address = B64Url.encode(SHA3Facade.sha256(pubKey));
+            String address = B64F.encode(Sha3F.h256(pubKey), true);
             if(!address.equals(req.getAddress()))
                 throw new ApiExceptionBuilder(HttpStatus.UNAUTHORIZED)
                         .message("Failed to validate signature")
@@ -98,8 +97,8 @@ public class AddrRegService {
                         .help("B64Url(SHA3_256(pubkey)) should equal address")
                         .build();
 
-            RSAPublicKey rsaKey = RSAFacade.decodePublicKey(pubKey);
-            boolean isValid = RSAFacade.verify(rsaKey, message, signature);
+            RSAPublicKey rsaKey = RsaF.decodePublicKey(pubKey);
+            boolean isValid = RsaF.verify(rsaKey, message, signature);
             if(!isValid)
                 throw new ApiExceptionBuilder(HttpStatus.UNAUTHORIZED)
                         .message("Failed to validate signature")
@@ -130,8 +129,8 @@ public class AddrRegService {
     private AddrRegAORsp toRsp(AddrRegDO reg){
         AddrRegAORsp rsp = new AddrRegAORsp();
         rsp.setId(reg.getCid());
-        rsp.setAddress(B64Url.encode(reg.getAddress()));
-        rsp.setPubKey(Base64.getEncoder().encodeToString(reg.getPubKey()));
+        rsp.setAddress(B64F.encode(reg.getAddress(), true));
+        rsp.setPubKey(B64F.encode(reg.getPubKey()));
         rsp.setCreated(reg.getCreated());
         return rsp;
     }

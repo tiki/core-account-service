@@ -5,10 +5,9 @@
 
 package com.mytiki.account.features.latest.refresh;
 
-import com.mytiki.account.security.JWSBuilder;
 import com.mytiki.account.utilities.Constants;
+import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSSigner;
 import jakarta.transaction.Transactional;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -43,15 +42,16 @@ public class RefreshService {
         refreshDO.setIssued(now);
         refreshDO.setExpires(now.plusSeconds(Constants.REFRESH_EXPIRY_DURATION_SECONDS));
         repository.save(refreshDO);
-        return new JWSBuilder()
+        return new JwtBuilder()
                 .iat(refreshDO.getIssued())
                 .exp(refreshDO.getExpires())
                 .sub(sub)
                 .aud(aud)
                 .scp(scp)
                 .jti(refreshDO.getJti().toString())
-                .build(jwtSigner)
-                .serialize();
+                .build()
+                .sign(jwtSigner)
+                .toToken();
     }
 
     public OAuth2AccessTokenResponse authorize(String token) {
@@ -60,14 +60,16 @@ public class RefreshService {
             Optional<RefreshDO> found = repository.findByJti(UUID.fromString(jwt.getId()));
             if (found.isPresent()) {
                 repository.delete(found.get());
-                JWSObject newToken = new JWSBuilder()
+                String newToken = new JwtBuilder()
                         .sub(jwt.getSubject())
                         .aud(jwt.getAudience())
                         .scp(jwt.getClaim("scp"))
-                        .expIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
-                        .build(jwtSigner);
+                        .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
+                        .build()
+                        .sign(jwtSigner)
+                        .toToken();
                 return OAuth2AccessTokenResponse
-                        .withToken(newToken.serialize())
+                        .withToken(newToken)
                         .tokenType(OAuth2AccessToken.TokenType.BEARER)
                         .refreshToken(issue(jwt.getSubject(), jwt.getAudience(), jwt.getClaim("scp")))
                         .expiresIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)

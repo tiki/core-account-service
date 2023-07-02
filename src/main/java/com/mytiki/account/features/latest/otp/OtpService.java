@@ -8,15 +8,15 @@ package com.mytiki.account.features.latest.otp;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.JWSBuilder;
-import com.mytiki.account.security.OauthScope;
-import com.mytiki.account.security.OauthScopes;
+import com.mytiki.account.security.oauth.OauthScope;
+import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.utilities.Constants;
-import com.mytiki.account.utilities.Mustache;
-import com.mytiki.account.utilities.Sendgrid;
+import com.mytiki.account.utilities.builder.JwtBuilder;
+import com.mytiki.account.utilities.facade.B64F;
+import com.mytiki.account.utilities.facade.MustacheF;
+import com.mytiki.account.utilities.facade.SendgridF;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSSigner;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
@@ -37,8 +37,8 @@ import java.util.*;
 public class OtpService {
     private static final Long CODE_EXPIRY_DURATION_MINUTES = 30L;
     private final OtpRepository repository;
-    private final Mustache templates;
-    private final Sendgrid sendgrid;
+    private final MustacheF templates;
+    private final SendgridF sendgrid;
     private final JWSSigner signer;
     private final RefreshService refreshService;
     private final UserInfoService userInfoService;
@@ -47,8 +47,8 @@ public class OtpService {
 
     public OtpService(
             OtpRepository repository,
-            Mustache templates,
-            Sendgrid sendgrid,
+            MustacheF templates,
+            SendgridF sendgrid,
             JWSSigner signer,
             RefreshService refreshService,
             UserInfoService userInfoService,
@@ -116,15 +116,17 @@ public class OtpService {
             }
 
             List<String>[] audAndScp = allowedScopes.getAudAndScp(scopes);
-            JWSObject token = new JWSBuilder()
-                    .expIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
+            String token = new JwtBuilder()
+                    .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
                     .aud(audAndScp[0])
                     .scp(audAndScp[1])
-                    .build(signer);
+                    .build()
+                    .sign(signer)
+                    .toToken();
 
             return OAuth2AccessTokenResponse
-                    .withToken(token.serialize())
+                    .withToken(token)
                     .tokenType(OAuth2AccessToken.TokenType.BEARER)
                     .expiresIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .scopes(scopes.keySet())
@@ -158,7 +160,7 @@ public class OtpService {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(code.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(md.digest(deviceId.getBytes(StandardCharsets.UTF_8)));
+            return B64F.encode(md.digest(deviceId.getBytes(StandardCharsets.UTF_8)));
         } catch (NoSuchAlgorithmException e) {
             throw new ApiExceptionBuilder(HttpStatus.EXPECTATION_FAILED)
                     .message("One-time Password (OTP) failed")
@@ -172,7 +174,7 @@ public class OtpService {
         try {
             byte[] bytes = new byte[len];
             SecureRandom.getInstanceStrong().nextBytes(bytes);
-            return Base64.getEncoder().encodeToString(bytes);
+            return B64F.encode(bytes);
         } catch (NoSuchAlgorithmException e) {
             throw new ApiExceptionBuilder(HttpStatus.EXPECTATION_FAILED)
                     .message("One-time Password (OTP) failed")

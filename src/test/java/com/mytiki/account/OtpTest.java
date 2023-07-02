@@ -13,7 +13,7 @@ import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.main.App;
 import com.mytiki.account.mocks.JwtMock;
-import com.mytiki.account.utilities.Sendgrid;
+import com.mytiki.account.utilities.facade.SendgridF;
 import com.mytiki.spring_rest_api.ApiException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 public class OtpTest {
 
     @MockBean
-    private Sendgrid mockSendgrid;
+    private SendgridF mockSendgrid;
 
     @Autowired
     private OtpService service;
