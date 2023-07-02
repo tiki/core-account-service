@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest;
 
+import com.mytiki.account.features.latest.addr_reg.AddrRegConfig;
 import com.mytiki.account.features.latest.app_info.AppInfoConfig;
 import com.mytiki.account.features.latest.exchange.ExchangeConfig;
 import com.mytiki.account.features.latest.org_info.OrgInfoConfig;
@@ -23,7 +24,8 @@ import org.springframework.context.annotation.Import;
         ApiKeyConfig.class,
         OrgInfoConfig.class,
         StripeConfig.class,
-        ExchangeConfig.class
+        ExchangeConfig.class,
+        AddrRegConfig.class
 })
 public class FeaturesConfig {
 }
