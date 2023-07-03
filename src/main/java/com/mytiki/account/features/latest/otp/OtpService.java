@@ -115,6 +115,7 @@ public class OtpService {
                     .sub(subject)
                     .aud(scopes.getAud())
                     .scp(scopes.getScp())
+                    .roles("user")
                     .build()
                     .refresh(refreshService.issue(subject, scopes.getAud(), scopes.getScp()))
                     .sign(signer)

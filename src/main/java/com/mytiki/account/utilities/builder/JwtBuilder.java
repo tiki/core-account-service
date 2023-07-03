@@ -2,6 +2,7 @@ package com.mytiki.account.utilities.builder;
 
 import com.mytiki.account.features.latest.jwks.JwksConfig;
 import com.mytiki.account.security.oauth.OauthDecoder;
+import com.mytiki.account.security.oauth.OauthSub;
 import com.nimbusds.jose.*;
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -19,8 +20,6 @@ public class JwtBuilder {
     private Date iat;
     private Date nbf;
     private List<String> scp;
-    private List<String> roles;
-    private List<String> groups;
     private Map<String, String> custom;
     private JWSObject jws;
     private String refresh;
@@ -55,6 +54,16 @@ public class JwtBuilder {
         return this;
     }
 
+    public JwtBuilder sub(OauthSub subject){
+        sub = subject.toString();
+        return this;
+    }
+
+    public JwtBuilder sub(String namespace, String id){
+        sub = new OauthSub(namespace, id).toString();
+        return this;
+    }
+
     public JwtBuilder scp(List<String> scopes){
         if(scopes != null && !scopes.isEmpty())
             scp = scopes;
@@ -85,54 +94,6 @@ public class JwtBuilder {
         return this;
     }
 
-    public JwtBuilder roles(List<String> roles){
-        if(roles != null && !roles.isEmpty()) {
-            if(this.roles == null) this.roles = roles;
-            else {
-                List<String> list = new ArrayList<>(this.roles);
-                list.addAll(roles);
-                this.roles = list;
-            }
-        }
-        return this;
-    }
-
-    public JwtBuilder roles(String role){
-        if(role != null) {
-            if(this.roles == null) this.roles = List.of(role);
-            else {
-                List<String> list = new ArrayList<>(this.roles);
-                list.add(role);
-                this.roles = list;
-            }
-        }
-        return this;
-    }
-
-    public JwtBuilder groups(List<String> groups){
-        if(groups != null && !groups.isEmpty()) {
-            if(this.groups == null) this.groups = groups;
-            else {
-                List<String> list = new ArrayList<>(this.groups);
-                list.addAll(groups);
-                this.groups = list;
-            }
-        }
-        return this;
-    }
-
-    public JwtBuilder groups(String group){
-        if(group != null) {
-            if(this.groups == null) this.groups = List.of(group);
-            else {
-                List<String> list = new ArrayList<>(this.groups);
-                list.add(group);
-                this.groups = list;
-            }
-        }
-        return this;
-    }
-
     public JwtBuilder refresh(String token){
         refresh = token;
         return this;
@@ -153,23 +114,23 @@ public class JwtBuilder {
     public JwtBuilder build() {
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
         if(iat == null) iat = Date.from(now.toInstant());
+        JWTClaimsSet.Builder payload = new JWTClaimsSet.Builder()
+                .issuer(OauthDecoder.issuer)
+                .issueTime(iat)
+                .subject(sub)
+                .expirationTime(exp)
+                .jwtID(jti)
+                .audience(aud)
+                .notBeforeTime(nbf)
+                .claim("scp", scp);
+        if(!custom.isEmpty()) custom.forEach(payload::claim);
         jws = new JWSObject(
                 new JWSHeader
                         .Builder(JwksConfig.algorithm)
                         .type(JOSEObjectType.JWT)
                         .keyID(JwksConfig.keyId)
                         .build(),
-                new Payload( new JWTClaimsSet.Builder()
-                        .issuer(OauthDecoder.issuer)
-                        .issueTime(iat)
-                        .subject(sub)
-                        .expirationTime(exp)
-                        .jwtID(jti)
-                        .audience(aud)
-                        .notBeforeTime(nbf)
-                        .claim("roles", roles)
-                        .claim("groups", groups)
-                        .claim("scp", scp)
+                new Payload(payload
                         .build()
                         .toJSONObject()));
         return this;

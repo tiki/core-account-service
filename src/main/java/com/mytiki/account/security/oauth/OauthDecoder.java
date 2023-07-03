@@ -1,9 +1,5 @@
 package com.mytiki.account.security.oauth;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -14,13 +10,14 @@ import com.nimbusds.jwt.proc.JWTProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public class OauthDecoder{
@@ -51,24 +48,5 @@ public class OauthDecoder{
         validators.add(new JwtClaimValidator<>(JwtClaimNames.AUD, audienceTest));
         decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(validators));
         return decoder;
-    }
-
-    public static void guardGroups(JwtAuthenticationToken token, String... expected){
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            TypeReference<Set<String>> typeReference = new TypeReference<>(){};
-            Set<String> claim = objectMapper.readValue(
-                    token.getTokenAttributes().get("groups").toString(), typeReference);
-            if(!claim.containsAll(Set.of(expected))){
-                throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
-                        .detail("Invalid groups claim")
-                        .help("User does not belong to the group(s)")
-                        .build();
-            }
-        } catch (JsonProcessingException e) {
-            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
-                    .detail("Invalid groups claim")
-                    .build();
-        }
     }
 }

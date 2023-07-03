@@ -1,6 +1,5 @@
 package com.mytiki.account.features.latest.addr_reg;
 
-import com.mytiki.account.security.oauth.OauthDecoder;
 import com.mytiki.account.utilities.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -35,7 +34,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             AddrRegAOReq body) {
-        OauthDecoder.guardGroups(token, appId);
+        //OauthDecoder.guardGroups(token, appId);
         return service.register(appId, body);
     }
 
@@ -49,7 +48,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             @PathVariable(name = "address") String address) {
-        OauthDecoder.guardGroups(token, appId);
+        //OauthDecoder.guardGroups(token, appId);
         return service.get(appId, address);
     }
 
@@ -63,7 +62,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             @RequestParam(name = "id") String id) {
-        OauthDecoder.guardGroups(token, appId);
+        //OauthDecoder.guardGroups(token, appId);
         return service.getAll(appId, id);
     }
 
@@ -78,7 +77,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             @PathVariable(name = "address") String address) {
-        OauthDecoder.guardGroups(token, appId);
+        //OauthDecoder.guardGroups(token, appId);
         service.delete(appId, address);
     }
 
@@ -93,7 +92,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             @RequestParam(name = "id") String id) {
-        OauthDecoder.guardGroups(token, appId);
+        //OauthDecoder.guardGroups(token, appId);
         service.deleteAll(appId, id);
     }
 }
