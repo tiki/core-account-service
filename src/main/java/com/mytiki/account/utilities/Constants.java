@@ -5,8 +5,6 @@
 
 package com.mytiki.account.utilities;
 
-import com.mytiki.spring_rest_api.ApiConstants;
-
 public interface Constants {
     String MODULE_DOT_PATH = "com.mytiki.account";
     String MODULE_SLASH_PATH = "com/mytiki/account";
@@ -27,6 +25,4 @@ public interface Constants {
     String OAUTH_PATH = "oauth";
     String OAUTH_TOKEN_PATH = OAUTH_PATH + "/token";
     String OAUTH_REVOKE_PATH = OAUTH_PATH + "/revoke";
-
-    String BASE_ROUTE = ApiConstants.API_LATEST_ROUTE + "account/";
 }
