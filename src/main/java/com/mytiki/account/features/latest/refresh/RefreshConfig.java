@@ -6,13 +6,9 @@
 package com.mytiki.account.features.latest.refresh;
 
 import com.mytiki.account.utilities.Constants;
-import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSSigner;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
-import com.nimbusds.jwt.proc.DefaultJWTProcessor;
+import com.nimbusds.jwt.proc.JWTProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -27,14 +23,10 @@ public class RefreshConfig {
     @Bean
     public RefreshService refreshService(
             @Autowired RefreshRepository repository,
-            @Autowired JWSSigner jwsSigner,
-            @Autowired JWKSet jwkSet) {
-        DefaultJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
-        ImmutableJWKSet<SecurityContext> immutableJWKSet = new ImmutableJWKSet<>(jwkSet);
-        jwtProcessor.setJWSKeySelector(
-                new JWSVerificationKeySelector<>(JWSAlgorithm.ES256, immutableJWKSet));
-        NimbusJwtDecoder decoder = new NimbusJwtDecoder(jwtProcessor);
-        return new RefreshService(repository, jwsSigner, decoder);
+            @Autowired JWSSigner signer,
+            @Autowired JWTProcessor<SecurityContext> jwtProcessor) {
+        return new RefreshService(
+                repository, signer, new NimbusJwtDecoder(jwtProcessor));
     }
 
     @Bean

@@ -10,6 +10,8 @@ import com.mytiki.account.features.latest.refresh.RefreshRepository;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.main.App;
 import com.mytiki.account.mocks.JwtMock;
+import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.security.oauth.OauthSubNamespace;
 import com.mytiki.account.utilities.Constants;
 import com.nimbusds.jose.*;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -157,12 +159,12 @@ public class RefreshTest {
 
     @Test
     public void Test_Authorize_Subject_Success() throws JOSEException {
-        String subject = UUID.randomUUID().toString();
+        OauthSub subject = new OauthSub(OauthSubNamespace.USER, UUID.randomUUID().toString());
         String token = service.issue(subject, null, null);
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
         Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());
-        assertEquals(subject, jwt.getSubject());
+        assertEquals(subject.toString(), jwt.getSubject());
     }
 
     @Test

@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.security;
+package com.mytiki.account.security.oauth;
 
 import java.util.List;
 

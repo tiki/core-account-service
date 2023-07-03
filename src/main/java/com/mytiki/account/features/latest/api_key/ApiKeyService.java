@@ -10,19 +10,19 @@ import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.JWSBuilder;
-import com.mytiki.account.security.OauthInternal;
-import com.mytiki.account.security.OauthScope;
-import com.mytiki.account.security.OauthScopes;
+import com.mytiki.account.security.oauth.OauthInternal;
+import com.mytiki.account.security.oauth.OauthScopes;
+import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.security.oauth.OauthSubNamespace;
 import com.mytiki.account.utilities.Constants;
+import com.mytiki.account.utilities.builder.JwtBuilder;
+import com.mytiki.account.utilities.facade.B64F;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
@@ -31,7 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class ApiKeyService {
     private final ApiKeyRepository repository;
@@ -117,17 +119,17 @@ public class ApiKeyService {
     }
 
     public OAuth2AccessTokenResponse authorize(String clientId, String clientSecret, String requestScopes){
-        String subject = null;
-        Map<String, OauthScope> scopes = allowedScopes.parse(requestScopes);
-        Map<String, OauthScope> internal = allowedScopes.filter(scopes, oauthInternal.getScopes());
+        OauthSub subject = new OauthSub();
+        OauthScopes scopes = allowedScopes.filter(requestScopes);
+        OauthScopes internal = scopes.filter(oauthInternal.getScopes());
 
-        if(!internal.isEmpty()){
+        if(!internal.getScopes().isEmpty()){
             String hashedSecret = oauthInternal.getKeys().get(clientId);
             if(!secretEncoder.matches(clientSecret, hashedSecret))
                 throw new OAuth2AuthorizationException(new OAuth2Error(
                         OAuth2ErrorCodes.ACCESS_DENIED),
                         "client_id and/or client_secret are invalid");
-            subject = clientId;
+            subject = new OauthSub(OauthSubNamespace.APP, clientId);
         }else {
             UUID clientUUID;
             try {
@@ -147,7 +149,7 @@ public class ApiKeyService {
                         null
                 ));
             if (found.get().getHashedSecret() == null && clientSecret == null) {
-                scopes = allowedScopes.filter(scopes, publicScopes);
+                scopes = scopes.filter(publicScopes);
             } else {
                 if (!secretEncoder.matches(clientSecret, found.get().getHashedSecret())) {
                     throw new OAuth2AuthorizationException(new OAuth2Error(
@@ -157,24 +159,18 @@ public class ApiKeyService {
             }
             AppInfoDO app = found.get().getApp();
             if (app != null)
-                subject = app.getAppId().toString();
+                subject = new OauthSub(OauthSubNamespace.APP, app.getAppId().toString());
         }
-        List<String>[] audAndScp = allowedScopes.getAudAndScp(scopes);
-
         try{
-            JWSObject token = new JWSBuilder()
-                    .expIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
+            return new JwtBuilder()
+                    .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
-                    .aud(audAndScp[0])
-                    .scp(audAndScp[1])
-                    .build(signer);
-            return OAuth2AccessTokenResponse
-                    .withToken(token.serialize())
-                    .tokenType(OAuth2AccessToken.TokenType.BEARER)
-                    .expiresIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
-                    .scopes(scopes.keySet())
-                    .refreshToken(refreshService.issue(subject, audAndScp[0], audAndScp[1]))
-                    .build();
+                    .aud(scopes.getAud())
+                    .scp(scopes.getScp())
+                    .refresh(refreshService.issue(subject, scopes.getAud(), scopes.getScp()))
+                    .build()
+                    .sign(signer)
+                    .toResponse();
         } catch (JOSEException e) {
             throw new OAuth2AuthorizationException(new OAuth2Error(
                     OAuth2ErrorCodes.SERVER_ERROR,
@@ -200,6 +196,6 @@ public class ApiKeyService {
         byte[] secret = new byte[len];
         SecureRandom secureRandom = new SecureRandom();
         secureRandom.nextBytes(secret);
-        return Base64.getEncoder().withoutPadding().encodeToString(secret);
+        return B64F.encode(secret);
     }
 }

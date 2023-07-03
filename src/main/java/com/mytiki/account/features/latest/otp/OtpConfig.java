@@ -7,10 +7,10 @@ package com.mytiki.account.features.latest.otp;
 
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.OauthScopes;
+import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.utilities.Constants;
-import com.mytiki.account.utilities.Mustache;
-import com.mytiki.account.utilities.Sendgrid;
+import com.mytiki.account.utilities.facade.MustacheF;
+import com.mytiki.account.utilities.facade.SendgridF;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,14 +32,14 @@ public class OtpConfig {
     @Bean
     public OtpService otpService(
             @Autowired OtpRepository otpRepository,
-            @Autowired @Qualifier("otpMustache") Mustache templates,
-            @Autowired Sendgrid sendgrid,
-            @Autowired JWSSigner jwsSigner,
+            @Autowired @Qualifier("otpMustache") MustacheF templates,
+            @Autowired SendgridF sendgrid,
+            @Autowired JWSSigner signer,
             @Autowired RefreshService refreshService,
             @Autowired UserInfoService userInfoService,
             @Autowired OauthScopes allowedScopes,
             @Value("${com.mytiki.account.oauth.password.anonymous.scopes}") List<String> anonymousScopes) {
-        return new OtpService(otpRepository, templates, sendgrid, jwsSigner, refreshService, userInfoService,
+        return new OtpService(otpRepository, templates, sendgrid, signer, refreshService, userInfoService,
                 allowedScopes, anonymousScopes);
     }
 
@@ -49,8 +49,8 @@ public class OtpConfig {
     }
 
     @Bean(name = "otpMustache")
-    public Mustache otpMustache() {
-        Mustache mustache = new Mustache();
+    public MustacheF otpMustache() {
+        MustacheF mustache = new MustacheF();
         mustache.load("templates", TEMPLATE_BODY_HTML, TEMPLATE_BODY_TXT, TEMPLATE_SUBJECT);
         return mustache;
     }

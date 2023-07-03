@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.utilities;
+package com.mytiki.account.utilities.facade;
 
 import com.sendgrid.Method;
 import com.sendgrid.Request;
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
-public class Sendgrid {
+public class SendgridF {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String FROM_ADDRESS = "no-reply@mytiki.com";
     private static final String FROM_NAME = "TIKI";
@@ -28,7 +28,7 @@ public class Sendgrid {
     private static final String ENDPOINT_MAIL_SEND = "mail/send";
     private final SendGrid sendGrid;
 
-    public Sendgrid(String apiKey) {
+    public SendgridF(String apiKey) {
         this.sendGrid = new SendGrid(apiKey);
     }
 

@@ -5,25 +5,21 @@
 
 package com.mytiki.account.features.latest.exchange;
 
-import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.exchange.shopify.ShopifyClient;
+import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.JWSBuilder;
-import com.mytiki.account.security.OauthScope;
-import com.mytiki.account.security.OauthScopes;
+import com.mytiki.account.security.oauth.OauthScopes;
+import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.security.oauth.OauthSubNamespace;
 import com.mytiki.account.utilities.Constants;
+import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSSigner;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
-
-import java.util.List;
-import java.util.Map;
 
 public class ExchangeService {
 
@@ -47,23 +43,18 @@ public class ExchangeService {
             String requestedScope, String clientId, String subjectToken, String subjectTokenType) {
         String email = validate(clientId, subjectToken, subjectTokenType);
         UserInfoAO userInfo = userInfoService.createIfNotExists(email);
-        String subject = userInfo.getUserId();
-        Map<String, OauthScope> scopes = allowedScopes.parse(requestedScope);
-        List<String>[] audAndScp = allowedScopes.getAudAndScp(scopes);
+        OauthSub subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId());
+        OauthScopes scopes = allowedScopes.filter(requestedScope);
         try {
-            JWSObject token = new JWSBuilder()
-                    .expIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
+            return new JwtBuilder()
+                    .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
-                    .aud(audAndScp[0])
-                    .scp(audAndScp[1])
-                    .build(signer);
-            return OAuth2AccessTokenResponse
-                    .withToken(token.serialize())
-                    .tokenType(OAuth2AccessToken.TokenType.BEARER)
-                    .expiresIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
-                    .scopes(scopes.keySet())
-                    .refreshToken(refreshService.issue(subject, audAndScp[0], audAndScp[1]))
-                    .build();
+                    .aud(scopes.getAud())
+                    .scp(scopes.getScp())
+                    .refresh(refreshService.issue(subject, scopes.getAud(), scopes.getScp()))
+                    .build()
+                    .sign(signer)
+                    .toResponse();
         } catch (JOSEException e) {
             throw new OAuth2AuthorizationException(new OAuth2Error(
                     OAuth2ErrorCodes.SERVER_ERROR,

@@ -6,7 +6,7 @@
 package com.mytiki.account.features.latest.org_info;
 
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.OauthScopes;
+import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
