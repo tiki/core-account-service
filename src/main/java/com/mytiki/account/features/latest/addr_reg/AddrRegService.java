@@ -2,6 +2,8 @@ package com.mytiki.account.features.latest.addr_reg;
 
 import com.mytiki.account.features.latest.app_info.AppInfoDO;
 import com.mytiki.account.features.latest.app_info.AppInfoService;
+import com.mytiki.account.features.latest.jwks.JwksDO;
+import com.mytiki.account.features.latest.jwks.JwksService;
 import com.mytiki.account.utilities.facade.B64F;
 import com.mytiki.account.utilities.facade.RsaF;
 import com.mytiki.account.utilities.facade.Sha3F;
@@ -21,15 +23,18 @@ import java.util.UUID;
 public class AddrRegService {
     private final AddrRegRepository repository;
     private final AppInfoService appInfoService;
+    private final JwksService jwksService;
 
     public AddrRegService(
             AddrRegRepository repository,
-            AppInfoService appInfoService) {
+            AppInfoService appInfoService,
+            JwksService jwksService) {
         this.repository = repository;
         this.appInfoService = appInfoService;
+        this.jwksService = jwksService;
     }
 
-    public AddrRegAORsp register(String appId, AddrRegAOReq req) {
+    public AddrRegAORsp register(String appId, AddrRegAOReq req, String custAuth) {
         guardSignature(req);
 
         Optional<AppInfoDO> app = appInfoService.getDO(appId);
@@ -39,7 +44,7 @@ public class AddrRegService {
                     .detail("Invalid App ID")
                     .help("Check your Authorization token")
                     .build();
-        guardCustomerToken(app.get(), req);
+        guardCustomerToken(custAuth, app.get().getJwks(), req);
 
         AddrRegDO reg = new AddrRegDO();
         reg.setCid(req.getId());
@@ -121,9 +126,13 @@ public class AddrRegService {
         }
     }
 
-    private void guardCustomerToken(AppInfoDO app, AddrRegAOReq req){
-        //if(app.getJwksEndpoint() == null) return;
-        //TODO bring in reg. proj
+    private void guardCustomerToken(String authorization, JwksDO jwks, AddrRegAOReq req){
+        if(jwks == null)
+            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
+                    .detail("Missing required JWKS endpoint")
+                    .build();
+        String token = authorization.replace("Bearer ", "");
+        jwksService.guard(jwks.getEndpoint(), token, req.getId());
     }
 
     private AddrRegAORsp toRsp(AddrRegDO reg){

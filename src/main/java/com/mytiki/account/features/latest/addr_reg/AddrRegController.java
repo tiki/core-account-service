@@ -37,10 +37,11 @@ public class AddrRegController {
     @RequestMapping(method = RequestMethod.POST)
     public AddrRegAORsp post(
             JwtAuthenticationToken token,
+            @RequestHeader(value = "X-Customer-Authorization", required = false) String custAuth,
             @PathVariable(name = "app-id") String appId,
             AddrRegAOReq body) {
         appInfo.guard(new OauthSub(token.getName()), appId);
-        return service.register(appId, body);
+        return service.register(appId, body, custAuth);
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-addr-reg-get",
