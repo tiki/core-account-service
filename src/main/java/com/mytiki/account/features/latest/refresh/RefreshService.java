@@ -10,7 +10,6 @@ import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import jakarta.transaction.Transactional;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
@@ -60,20 +59,15 @@ public class RefreshService {
             Optional<RefreshDO> found = repository.findByJti(UUID.fromString(jwt.getId()));
             if (found.isPresent()) {
                 repository.delete(found.get());
-                String newToken = new JwtBuilder()
+                return new JwtBuilder()
                         .sub(jwt.getSubject())
                         .aud(jwt.getAudience())
                         .scp(jwt.getClaim("scp"))
                         .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
+                        .refresh(issue(jwt.getSubject(), jwt.getAudience(), jwt.getClaim("scp")))
                         .build()
                         .sign(jwtSigner)
-                        .toToken();
-                return OAuth2AccessTokenResponse
-                        .withToken(newToken)
-                        .tokenType(OAuth2AccessToken.TokenType.BEARER)
-                        .refreshToken(issue(jwt.getSubject(), jwt.getAudience(), jwt.getClaim("scp")))
-                        .expiresIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
-                        .build();
+                        .toResponse();
             } else
                 throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_GRANT));
         } catch (JOSEException | JwtException e) {

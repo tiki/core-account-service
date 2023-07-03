@@ -183,14 +183,14 @@ public class JwtBuilder {
     public OAuth2AccessTokenResponse toResponse() {
         OAuth2AccessTokenResponse.Builder builder = OAuth2AccessTokenResponse
                 .withToken(jws.serialize())
-                .tokenType(OAuth2AccessToken.TokenType.BEARER)
-                .scopes(new HashSet<>(scp));
+                .tokenType(OAuth2AccessToken.TokenType.BEARER);
 
+        if(scp != null) builder.scopes(new HashSet<>(scp));
+        if(refresh != null) builder.refreshToken(refresh);
         if(exp != null){
             long expInMilli = exp.getTime() - ZonedDateTime.now().toInstant().toEpochMilli();
             builder.expiresIn(expInMilli / 1000);
         }
-        if(refresh != null) builder.refreshToken(refresh);
         return builder.build();
     }
 

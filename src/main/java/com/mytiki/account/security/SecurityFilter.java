@@ -64,7 +64,8 @@ public class SecurityFilter {
                                    HttpMethod.POST.name()),
                            new AntPathRequestMatcher(StripeController.PATH_CONTROLLER + "/*",
                                    HttpMethod.POST.name())))
-                .authorizeHttpRequests((req) -> req
+               //TODO revist this.
+               .authorizeHttpRequests((req) -> req
                         .requestMatchers(HttpMethod.GET, ApiConstants.HEALTH_ROUTE, Constants.API_DOCS_PATH, JwksController.WELL_KNOWN)
                             .permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**")

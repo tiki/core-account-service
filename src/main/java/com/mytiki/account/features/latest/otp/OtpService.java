@@ -20,7 +20,6 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
@@ -116,22 +115,15 @@ public class OtpService {
             }
 
             List<String>[] audAndScp = allowedScopes.getAudAndScp(scopes);
-            String token = new JwtBuilder()
+            return new JwtBuilder()
                     .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
                     .aud(audAndScp[0])
                     .scp(audAndScp[1])
                     .build()
+                    .refresh(refreshService.issue(subject, audAndScp[0], audAndScp[1]))
                     .sign(signer)
-                    .toToken();
-
-            return OAuth2AccessTokenResponse
-                    .withToken(token)
-                    .tokenType(OAuth2AccessToken.TokenType.BEARER)
-                    .expiresIn(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
-                    .scopes(scopes.keySet())
-                    .refreshToken(refreshService.issue(subject, audAndScp[0], audAndScp[1]))
-                    .build();
+                    .toResponse();
         } catch (JOSEException e) {
             throw new OAuth2AuthorizationException(new OAuth2Error(
                     OAuth2ErrorCodes.SERVER_ERROR,
