@@ -13,6 +13,7 @@ import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.main.App;
 import com.mytiki.account.mocks.JwtMock;
+import com.mytiki.account.security.oauth.OauthSub;
 import com.mytiki.account.utilities.facade.SendgridF;
 import com.mytiki.spring_rest_api.ApiException;
 import org.junit.jupiter.api.MethodOrderer;
@@ -151,7 +152,9 @@ public class OtpTest {
         assertTrue(token.getAccessToken().getExpiresAt().isAfter(Instant.now()));
 
         Jwt jwt = jwtDecoder.decode(token.getAccessToken().getTokenValue());
-        UserInfoAO userInfo = userInfoService.get(jwt.getSubject());
+        OauthSub sub = new OauthSub(jwt.getSubject());
+        assertTrue(sub.isUser());
+        UserInfoAO userInfo = userInfoService.get(sub.getId());
         assertEquals(testEmail, userInfo.getEmail());
     }
 
@@ -174,7 +177,9 @@ public class OtpTest {
         token = service.authorize(rsp.getDeviceId(), code, null);
 
         Jwt jwt = jwtDecoder.decode(token.getAccessToken().getTokenValue());
-        UserInfoAO userInfo = userInfoService.get(jwt.getSubject());
+        OauthSub sub = new OauthSub(jwt.getSubject());
+        assertTrue(sub.isUser());
+        UserInfoAO userInfo = userInfoService.get(sub.getId());
         assertEquals(testEmail, userInfo.getEmail());
     }
 

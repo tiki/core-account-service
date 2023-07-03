@@ -10,6 +10,8 @@ import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.security.oauth.OauthScopes;
+import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.security.oauth.OauthSubNamespace;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.nimbusds.jose.JOSEException;
@@ -41,7 +43,7 @@ public class ExchangeService {
             String requestedScope, String clientId, String subjectToken, String subjectTokenType) {
         String email = validate(clientId, subjectToken, subjectTokenType);
         UserInfoAO userInfo = userInfoService.createIfNotExists(email);
-        String subject = userInfo.getUserId();
+        OauthSub subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId());
         OauthScopes scopes = allowedScopes.filter(requestedScope);
         try {
             return new JwtBuilder()

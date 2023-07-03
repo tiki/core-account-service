@@ -3,6 +3,7 @@ package com.mytiki.account.utilities.builder;
 import com.mytiki.account.features.latest.jwks.JwksConfig;
 import com.mytiki.account.security.oauth.OauthDecoder;
 import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.security.oauth.OauthSubNamespace;
 import com.nimbusds.jose.*;
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -50,16 +51,16 @@ public class JwtBuilder {
     }
 
     public JwtBuilder sub(String subject){
-        sub = subject;
+        sub = new OauthSub(subject).toString();
         return this;
     }
 
     public JwtBuilder sub(OauthSub subject){
-        sub = subject.toString();
+        if(subject != null) sub = subject.toString();
         return this;
     }
 
-    public JwtBuilder sub(String namespace, String id){
+    public JwtBuilder sub(OauthSubNamespace namespace, String id){
         sub = new OauthSub(namespace, id).toString();
         return this;
     }
@@ -123,7 +124,7 @@ public class JwtBuilder {
                 .audience(aud)
                 .notBeforeTime(nbf)
                 .claim("scp", scp);
-        if(!custom.isEmpty()) custom.forEach(payload::claim);
+        if(custom != null) custom.forEach(payload::claim);
         jws = new JWSObject(
                 new JWSHeader
                         .Builder(JwksConfig.algorithm)

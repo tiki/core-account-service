@@ -1,5 +1,6 @@
 package com.mytiki.account.features.latest.addr_reg;
 
+import com.mytiki.account.security.oauth.OauthSub;
 import com.mytiki.account.utilities.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -78,6 +79,10 @@ public class AddrRegController {
             @PathVariable(name = "app-id") String appId,
             @PathVariable(name = "address") String address) {
         //OauthDecoder.guardGroups(token, appId);
+        OauthSub sub = new OauthSub(token.getName());
+        //if app, app-id should match
+        //if user, user should have app-id permissions
+
         service.delete(appId, address);
     }
 

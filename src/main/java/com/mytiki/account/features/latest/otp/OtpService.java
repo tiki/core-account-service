@@ -9,6 +9,8 @@ import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.security.oauth.OauthScopes;
+import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.security.oauth.OauthSubNamespace;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.B64F;
@@ -104,18 +106,17 @@ public class OtpService {
                     null
             ));
         try {
-            String subject = null;
+            OauthSub subject = new OauthSub();
             OauthScopes scopes = allowedScopes.filter(requestedScope);
             if(found.get().getEmail() != null) {
                 UserInfoAO userInfo = userInfoService.createIfNotExists(found.get().getEmail());
-                subject = userInfo.getUserId();
+                subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId());
             }else scopes = scopes.filter(anonymousScopes);
             return new JwtBuilder()
                     .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
                     .aud(scopes.getAud())
                     .scp(scopes.getScp())
-                    .roles("user")
                     .build()
                     .refresh(refreshService.issue(subject, scopes.getAud(), scopes.getScp()))
                     .sign(signer)

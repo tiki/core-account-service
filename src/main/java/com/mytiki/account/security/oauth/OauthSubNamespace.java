@@ -5,8 +5,7 @@ import java.util.Map;
 
 public enum OauthSubNamespace {
     USER("user"),
-    APP("app"),
-    ORG("org");
+    APP("app");
 
     public final String namespace;
     private static final Map<String, OauthSubNamespace> cache = new HashMap<>();

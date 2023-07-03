@@ -12,6 +12,8 @@ import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.security.oauth.OauthInternal;
 import com.mytiki.account.security.oauth.OauthScopes;
+import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.security.oauth.OauthSubNamespace;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.B64F;
@@ -117,7 +119,7 @@ public class ApiKeyService {
     }
 
     public OAuth2AccessTokenResponse authorize(String clientId, String clientSecret, String requestScopes){
-        String subject = null;
+        OauthSub subject = new OauthSub();
         OauthScopes scopes = allowedScopes.filter(requestScopes);
         OauthScopes internal = scopes.filter(oauthInternal.getScopes());
 
@@ -127,7 +129,7 @@ public class ApiKeyService {
                 throw new OAuth2AuthorizationException(new OAuth2Error(
                         OAuth2ErrorCodes.ACCESS_DENIED),
                         "client_id and/or client_secret are invalid");
-            subject = clientId;
+            subject = new OauthSub(OauthSubNamespace.APP, clientId);
         }else {
             UUID clientUUID;
             try {
@@ -157,7 +159,7 @@ public class ApiKeyService {
             }
             AppInfoDO app = found.get().getApp();
             if (app != null)
-                subject = app.getAppId().toString();
+                subject = new OauthSub(OauthSubNamespace.APP, app.getAppId().toString());
         }
         try{
             return new JwtBuilder()

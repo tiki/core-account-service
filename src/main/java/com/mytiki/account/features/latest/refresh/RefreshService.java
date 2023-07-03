@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.refresh;
 
+import com.mytiki.account.security.oauth.OauthSub;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.nimbusds.jose.JOSEException;
@@ -34,7 +35,7 @@ public class RefreshService {
         this.jwtDecoder = jwtDecoder;
     }
 
-    public String issue(String sub, List<String> aud, List<String> scp) throws JOSEException {
+    public String issue(OauthSub sub, List<String> aud, List<String> scp) throws JOSEException {
         RefreshDO refreshDO = new RefreshDO();
         ZonedDateTime now = ZonedDateTime.now();
         refreshDO.setJti(UUID.randomUUID());
@@ -64,7 +65,7 @@ public class RefreshService {
                         .aud(jwt.getAudience())
                         .scp(jwt.getClaim("scp"))
                         .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
-                        .refresh(issue(jwt.getSubject(), jwt.getAudience(), jwt.getClaim("scp")))
+                        .refresh(issue(new OauthSub(jwt.getSubject()), jwt.getAudience(), jwt.getClaim("scp")))
                         .build()
                         .sign(jwtSigner)
                         .toResponse();

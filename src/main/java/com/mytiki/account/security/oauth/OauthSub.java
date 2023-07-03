@@ -6,25 +6,26 @@ public class OauthSub {
 
     public OauthSub() {}
 
-    public OauthSub(String id, String namespace) {
+    public OauthSub(String namespace, String id) {
         this.id = id;
         this.namespace = OauthSubNamespace.from(namespace);
     }
 
-    public OauthSub(String id, OauthSubNamespace namespace) {
+    public OauthSub(OauthSubNamespace namespace, String id) {
         this.id = id;
         this.namespace = namespace;
     }
 
     public OauthSub(String sub) {
-       String[] split = sub.split(":");
-       if(split.length != 2) {
-           id = sub;
-       }
-       else {
-           namespace = OauthSubNamespace.from(split[0]);
-           id = split[1];
-       }
+        if(sub != null) {
+            String[] split = sub.split(":");
+            if (split.length != 2) {
+                id = sub;
+            } else {
+                namespace = OauthSubNamespace.from(split[0]);
+                id = split[1];
+            }
+        }
     }
 
     public String getId() {
@@ -49,10 +50,6 @@ public class OauthSub {
 
     public boolean isApp() {
         return namespace.equals(OauthSubNamespace.APP);
-    }
-
-    public boolean isOrg() {
-        return namespace.equals(OauthSubNamespace.ORG);
     }
 
     @Override
