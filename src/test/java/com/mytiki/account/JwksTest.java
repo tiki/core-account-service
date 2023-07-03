@@ -59,23 +59,23 @@ public class JwksTest {
 
     @Test
     public void Test_Cache_Success() throws URISyntaxException {
-        URI endpoint = new URI(JwksFixture.endpoint);
+        URI endpoint = new URI(JwksFixture.endpoint + UUID.randomUUID());
         mockServer.expect(requestTo(endpoint)).andRespond(withStatus(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(JwksFixture.ES256));
         service = new JwksService(repository, testRestTemplate.getRestTemplate(), 1000);
 
-        service.cache(JwksFixture.endpoint, true);
+        service.cache(endpoint.toString(), true);
         Optional<JwksDO> first = service.get(endpoint);
         Optional<JwksDO> second = service.get(endpoint);
 
         assertTrue(first.isPresent());
         assertTrue(second.isPresent());
-        assertEquals(first.get().getModified(), second.get().getModified());
+        assertEquals(first.get().getModified().toEpochSecond(), second.get().getModified().toEpochSecond());
     }
 
     @Test
-    public void Test_Fetch_Success() throws URISyntaxException, ParseException {
+    public void Test_Fetch_Success() throws URISyntaxException, ParseException, InterruptedException {
         URI endpoint = new URI(JwksFixture.endpoint);
         mockServer.expect(requestTo(endpoint)).andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -94,10 +94,10 @@ public class JwksTest {
         URI endpoint = new URI(JwksFixture.endpoint);
         mockServer.expect(requestTo(endpoint)).andRespond(withStatus(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(JwksFixture.RS256));
+                .body(JwksFixture.ES256));
         service.cache(JwksFixture.endpoint, false);
 
-        String jwt = JwksFixture.jwt(JwksFixture.RS256, null);
+        String jwt = JwksFixture.jwt(JwksFixture.ES256, null);
         service.guard(endpoint, jwt);
     }
 
@@ -106,11 +106,11 @@ public class JwksTest {
         URI endpoint = new URI(JwksFixture.endpoint);
         mockServer.expect(requestTo(endpoint)).andRespond(withStatus(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(JwksFixture.RS256));
+                .body(JwksFixture.ES256));
         service.cache(JwksFixture.endpoint, true);
 
         String sub = UUID.randomUUID().toString();
-        String jwt = JwksFixture.jwt(JwksFixture.RS256, sub);
+        String jwt = JwksFixture.jwt(JwksFixture.ES256, sub);
         service.guard(endpoint, jwt, sub);
     }
 
@@ -118,7 +118,7 @@ public class JwksTest {
     public void Test_Guard_NoKeys_Failure() throws URISyntaxException, ParseException, JOSEException {
         URI endpoint = new URI("https://" + UUID.randomUUID() + ".com");
         service.cache(JwksFixture.endpoint, false);
-        String jwt = JwksFixture.jwt(JwksFixture.RS256, null);
+        String jwt = JwksFixture.jwt(JwksFixture.ES256, null);
         ApiException ex = assertThrows(ApiException.class, () ->  service.guard(endpoint, jwt));
         assertEquals(HttpStatus.FORBIDDEN, ex.getHttpStatus());
     }
@@ -126,7 +126,7 @@ public class JwksTest {
     @Test
     public void Test_Guard_NoEndpoint_Failure() throws URISyntaxException, ParseException, JOSEException {
         URI endpoint = new URI("https://" + UUID.randomUUID() + ".com");
-        String jwt = JwksFixture.jwt(JwksFixture.RS256, null);
+        String jwt = JwksFixture.jwt(JwksFixture.ES256, null);
         ApiException ex = assertThrows(ApiException.class, () ->  service.guard(endpoint, jwt));
         assertEquals(HttpStatus.FORBIDDEN, ex.getHttpStatus());
     }

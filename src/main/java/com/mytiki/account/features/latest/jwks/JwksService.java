@@ -54,6 +54,11 @@ public class JwksService {
             jwks.setCreated(now);
             jwks.setModified(now);
             return repository.save(jwks);
+        }else if(found.get().getVerifySub() != verifySub) {
+            JwksDO update = found.get();
+            update.setVerifySub(verifySub);
+            update.setModified(ZonedDateTime.now());
+            return repository.save(update);
         }else return found.get();
     }
 

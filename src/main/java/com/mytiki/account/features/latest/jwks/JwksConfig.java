@@ -19,6 +19,7 @@ import org.bouncycastle.math.ec.ECPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
@@ -60,6 +61,19 @@ public class JwksConfig {
             @Value("${com.mytiki.account.jwt.kid}") String kid)
             throws JOSEException {
         return new ECDSASigner(jwkSet.getKeyByKeyId(kid).toECKey().toECPrivateKey(), Curve.P_256);
+    }
+
+    @Bean
+    public JwksController jwksController(@Autowired JWKSet jwkSet) {
+        return new JwksController(jwkSet);
+    }
+
+    @Bean
+    public JwksService jwksService(
+            @Autowired JwksRepository repository,
+            @Autowired RestTemplateBuilder restTemplateBuilder,
+            @Value("${com.mytiki.account.jwks.cache}") int cache) {
+        return new JwksService(repository, restTemplateBuilder.build(), cache);
     }
 
     private ECPrivateKey privateKey(KeyFactory keyFactory, String pkcs8) throws InvalidKeySpecException {
