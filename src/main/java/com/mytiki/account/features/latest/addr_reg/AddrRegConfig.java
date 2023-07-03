@@ -20,7 +20,9 @@ public class AddrRegConfig {
     }
 
     @Bean
-    AddrRegController addrRegController(@Autowired AddrRegService service) {
-        return new AddrRegController(service);
+    AddrRegController addrRegController(
+            @Autowired AddrRegService service,
+            @Autowired AppInfoService appInfoService) {
+        return new AddrRegController(service, appInfoService);
     }
 }

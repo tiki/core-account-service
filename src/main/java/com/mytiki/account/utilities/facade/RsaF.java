@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.utilities;
+package com.mytiki.account.utilities.facade;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -14,12 +14,10 @@ import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.signers.RSADigestSigner;
-import org.springframework.security.crypto.codec.Utf8;
 
 import java.io.IOException;
-import java.util.Base64;
 
-public class RSAFacade {
+public class RsaF {
     public static RSAPublicKey decodePublicKey(byte[] publicKey) throws IOException {
         try (ASN1InputStream inputStream = new ASN1InputStream(publicKey)) {
             ASN1Sequence topLevelSeq = ASN1Sequence.getInstance(inputStream.readObject());
@@ -59,7 +57,7 @@ public class RSAFacade {
                 new RSAKeyParameters(false, publicKey.getModulus(), publicKey.getPublicExponent());
         signer.init(false, keyParameters);
         signer.update(message, 0, message.length);
-        return signer.verifySignature(Base64.getDecoder().decode(signature));
+        return signer.verifySignature(B64F.decode(signature));
     }
 
     public static byte[] generate() throws JOSEException {

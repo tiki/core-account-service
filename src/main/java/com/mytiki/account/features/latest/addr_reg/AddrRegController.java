@@ -1,5 +1,7 @@
 package com.mytiki.account.features.latest.addr_reg;
 
+import com.mytiki.account.features.latest.app_info.AppInfoService;
+import com.mytiki.account.security.oauth.OauthSub;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,9 +21,11 @@ public class AddrRegController {
     public static final String PATH_CONTROLLER = ApiConstants.API_LATEST_ROUTE + "app/{app-id}/address";
 
     private final AddrRegService service;
+    private final AppInfoService appInfo;
 
-    public AddrRegController(AddrRegService service) {
+    public AddrRegController(AddrRegService service, AppInfoService appInfo) {
         this.service = service;
+        this.appInfo = appInfo;
     }
 
 
@@ -35,8 +39,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             AddrRegAOReq body) {
-        // TODO we need to pull and verify the app-id is in the group
-        // List<String> groups = token.getTokenAttributes().get("groups");
+        appInfo.guard(new OauthSub(token.getName()), appId);
         return service.register(appId, body);
     }
 
@@ -50,6 +53,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             @PathVariable(name = "address") String address) {
+        appInfo.guard(new OauthSub(token.getName()), appId);
         return service.get(appId, address);
     }
 
@@ -63,6 +67,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             @RequestParam(name = "id") String id) {
+        appInfo.guard(new OauthSub(token.getName()), appId);
         return service.getAll(appId, id);
     }
 
@@ -77,6 +82,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             @PathVariable(name = "address") String address) {
+        appInfo.guard(new OauthSub(token.getName()), appId);
         service.delete(appId, address);
     }
 
@@ -91,6 +97,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             @RequestParam(name = "id") String id) {
+        appInfo.guard(new OauthSub(token.getName()), appId);
         service.deleteAll(appId, id);
     }
 }
