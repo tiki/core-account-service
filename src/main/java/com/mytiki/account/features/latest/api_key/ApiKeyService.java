@@ -11,7 +11,6 @@ import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.security.oauth.OauthInternal;
-import com.mytiki.account.security.oauth.OauthScope;
 import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.JwtBuilder;
@@ -31,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -120,10 +118,10 @@ public class ApiKeyService {
 
     public OAuth2AccessTokenResponse authorize(String clientId, String clientSecret, String requestScopes){
         String subject = null;
-        Map<String, OauthScope> scopes = allowedScopes.parse(requestScopes);
-        Map<String, OauthScope> internal = allowedScopes.filter(scopes, oauthInternal.getScopes());
+        OauthScopes scopes = allowedScopes.filter(requestScopes);
+        OauthScopes internal = scopes.filter(oauthInternal.getScopes());
 
-        if(!internal.isEmpty()){
+        if(!internal.getScopes().isEmpty()){
             String hashedSecret = oauthInternal.getKeys().get(clientId);
             if(!secretEncoder.matches(clientSecret, hashedSecret))
                 throw new OAuth2AuthorizationException(new OAuth2Error(
@@ -149,7 +147,7 @@ public class ApiKeyService {
                         null
                 ));
             if (found.get().getHashedSecret() == null && clientSecret == null) {
-                scopes = allowedScopes.filter(scopes, publicScopes);
+                scopes = scopes.filter(publicScopes);
             } else {
                 if (!secretEncoder.matches(clientSecret, found.get().getHashedSecret())) {
                     throw new OAuth2AuthorizationException(new OAuth2Error(
@@ -161,14 +159,13 @@ public class ApiKeyService {
             if (app != null)
                 subject = app.getAppId().toString();
         }
-        List<String>[] audAndScp = allowedScopes.getAudAndScp(scopes);
         try{
             return new JwtBuilder()
                     .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
-                    .aud(audAndScp[0])
-                    .scp(audAndScp[1])
-                    .refresh(refreshService.issue(subject, audAndScp[0], audAndScp[1]))
+                    .aud(scopes.getAud())
+                    .scp(scopes.getScp())
+                    .refresh(refreshService.issue(subject, scopes.getAud(), scopes.getScp()))
                     .build()
                     .sign(signer)
                     .toResponse();

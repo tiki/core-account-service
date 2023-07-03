@@ -17,43 +17,49 @@ import java.util.stream.Collectors;
 @ConfigurationProperties(value = "com.mytiki.account.oauth")
 public class OauthScopes {
     private Map<String,OauthScope> scopes;
+    private List<String> aud;
+    private List<String> scp;
 
     public Map<String, OauthScope> getScopes() {
         return scopes;
     }
 
+    public List<String> getAud() {
+        return aud;
+    }
+
+    public List<String> getScp() {
+        return scp;
+    }
+
     public void setScopes(Map<String, OauthScope> scopes) {
         this.scopes = scopes;
-    }
-
-    public Map<String, OauthScope> parse(String req){
-        return req == null ?
-                new HashMap<>() :
-                Arrays.stream(req.split(" "))
-                        .filter(scopes::containsKey)
-                        .collect(Collectors.toMap(e -> e, scopes::get));
-    }
-
-    public Map<String, OauthScope> filter(Map<String, OauthScope> scopes, List<String> criteria){
-        return scopes.entrySet()
-                .stream()
-                .filter(entry -> criteria.contains(entry.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    public List<String>[] getAudAndScp(Map<String, OauthScope> scopes){
         Set<String> aud = new HashSet<>();
         Set<String> scp = new HashSet<>();
         scopes.values().forEach(scope -> {
-            if(scope.getAud() != null)
-                aud.addAll(scope.getAud());
-            if(scope.getScp() != null)
-                scp.addAll(scope.getScp());
+            if(scope.getAud() != null) aud.addAll(scope.getAud());
+            if(scope.getScp() != null) scp.addAll(scope.getScp());
         });
-        List<String>[] rsp = new List[2];
-        rsp[0] = aud.stream().toList();
-        rsp[1] = scp.stream().toList();
-        return rsp;
+        this.aud = aud.stream().toList();
+        this.scp = scp.stream().toList();
+    }
+
+    public OauthScopes filter(String criteria) {
+        List<String> list = criteria == null ?
+                new ArrayList<>() :
+                Arrays.stream(criteria.split(" ")).toList();
+        return filter(list);
+    }
+
+    public OauthScopes filter(List<String> criteria) {
+        OauthScopes oauthScopes = new OauthScopes();
+        Map<String,OauthScope> filtered = scopes
+                .entrySet()
+                .stream()
+                .filter(entry -> criteria.contains(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        oauthScopes.setScopes(filtered);
+        return oauthScopes;
     }
 
     public static boolean hasScope(JwtAuthenticationToken token, String scope){

@@ -9,7 +9,6 @@ import com.mytiki.account.features.latest.exchange.shopify.ShopifyClient;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.oauth.OauthScope;
 import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.JwtBuilder;
@@ -19,9 +18,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
-
-import java.util.List;
-import java.util.Map;
 
 public class ExchangeService {
 
@@ -46,15 +42,14 @@ public class ExchangeService {
         String email = validate(clientId, subjectToken, subjectTokenType);
         UserInfoAO userInfo = userInfoService.createIfNotExists(email);
         String subject = userInfo.getUserId();
-        Map<String, OauthScope> scopes = allowedScopes.parse(requestedScope);
-        List<String>[] audAndScp = allowedScopes.getAudAndScp(scopes);
+        OauthScopes scopes = allowedScopes.filter(requestedScope);
         try {
             return new JwtBuilder()
                     .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
-                    .aud(audAndScp[0])
-                    .scp(audAndScp[1])
-                    .refresh(refreshService.issue(subject, audAndScp[0], audAndScp[1]))
+                    .aud(scopes.getAud())
+                    .scp(scopes.getScp())
+                    .refresh(refreshService.issue(subject, scopes.getAud(), scopes.getScp()))
                     .build()
                     .sign(signer)
                     .toResponse();
