@@ -1,5 +1,6 @@
 package com.mytiki.account.features.latest.addr_reg;
 
+import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.security.oauth.OauthSub;
 import com.mytiki.account.utilities.Constants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,9 +20,11 @@ public class AddrRegController {
     public static final String PATH_CONTROLLER = Constants.BASE_ROUTE + "app/{app-id}/address";
 
     private final AddrRegService service;
+    private final AppInfoService appInfo;
 
-    public AddrRegController(AddrRegService service) {
+    public AddrRegController(AddrRegService service, AppInfoService appInfo) {
         this.service = service;
+        this.appInfo = appInfo;
     }
 
 
@@ -35,7 +38,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             AddrRegAOReq body) {
-        //OauthDecoder.guardGroups(token, appId);
+        appInfo.guard(new OauthSub(token.getName()), appId);
         return service.register(appId, body);
     }
 
@@ -49,7 +52,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             @PathVariable(name = "address") String address) {
-        //OauthDecoder.guardGroups(token, appId);
+        appInfo.guard(new OauthSub(token.getName()), appId);
         return service.get(appId, address);
     }
 
@@ -63,7 +66,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             @RequestParam(name = "id") String id) {
-        //OauthDecoder.guardGroups(token, appId);
+        appInfo.guard(new OauthSub(token.getName()), appId);
         return service.getAll(appId, id);
     }
 
@@ -78,11 +81,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             @PathVariable(name = "address") String address) {
-        //OauthDecoder.guardGroups(token, appId);
-        OauthSub sub = new OauthSub(token.getName());
-        //if app, app-id should match
-        //if user, user should have app-id permissions
-
+        appInfo.guard(new OauthSub(token.getName()), appId);
         service.delete(appId, address);
     }
 
@@ -97,7 +96,7 @@ public class AddrRegController {
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
             @RequestParam(name = "id") String id) {
-        //OauthDecoder.guardGroups(token, appId);
+        appInfo.guard(new OauthSub(token.getName()), appId);
         service.deleteAll(appId, id);
     }
 }

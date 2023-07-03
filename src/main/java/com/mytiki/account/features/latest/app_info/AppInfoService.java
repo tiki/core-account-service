@@ -7,6 +7,7 @@ package com.mytiki.account.features.latest.app_info;
 
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
+import com.mytiki.account.security.oauth.OauthSub;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,19 +113,27 @@ public class AppInfoService {
         return rsp;
     }
 
-    public void guardUser(String appId, String userId) {
-        Optional<UserInfoDO> user = userInfoService.getDO(userId);
-        if (user.isEmpty())
+    public void guard(OauthSub sub, String appId){
+        if (sub.isApp() && !sub.getId().equals(appId)) {
             throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
-                    .detail("Invalid user")
+                    .detail("Invalid claim: sub")
+                    .help("App ID does not match claim")
                     .build();
-        Optional<AppInfoDO> app = repository.findByAppId(UUID.fromString(appId));
-        if (app.isPresent()) {
-            if (!app.get().getOrg().getUsers().contains(user.get()))
+        }else if (sub.isUser()){
+            Optional<UserInfoDO> user = userInfoService.getDO(sub.getId());
+            if (user.isEmpty())
                 throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
-                        .detail("User does not have permission")
-                        .help("User must belong to App's Org")
+                        .detail("Invalid claim: sub")
+                        .help("Invalid User ID")
                         .build();
+            Optional<AppInfoDO> app = repository.findByAppId(UUID.fromString(appId));
+            if (app.isPresent()) {
+                if (!app.get().getOrg().getUsers().contains(user.get()))
+                    throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
+                            .detail("Invalid claim: sub")
+                            .help("User ID must belong to App's Org")
+                            .build();
+            }
         }
     }
 }
