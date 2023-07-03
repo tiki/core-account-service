@@ -1,5 +1,6 @@
 package com.mytiki.account.features.latest.jwks;
 
+import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.facade.B64F;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -17,7 +18,9 @@ import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.math.ec.ECPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -28,7 +31,10 @@ import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 
+@EnableJpaRepositories(JwksConfig.PACKAGE_PATH)
+@EntityScan(JwksConfig.PACKAGE_PATH)
 public class JwksConfig {
+    public static final String PACKAGE_PATH = Constants.PACKAGE_FEATURES_LATEST_DOT_PATH + ".jwks";
     public static String keyId;
     public static JWSAlgorithm algorithm = JWSAlgorithm.ES256;
 

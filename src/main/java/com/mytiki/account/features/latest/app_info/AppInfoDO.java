@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.app_info;
 
+import com.mytiki.account.features.latest.jwks.JwksDO;
 import com.mytiki.account.features.latest.org_info.OrgInfoDO;
 import jakarta.persistence.*;
 
@@ -19,8 +20,7 @@ public class AppInfoDO implements Serializable {
     private UUID appId;
     private String name;
     private OrgInfoDO org;
-    private String jwksEndpoint;
-    private Boolean verifySub;
+    private JwksDO jwks;
     private ZonedDateTime created;
     private ZonedDateTime modified;
 
@@ -62,22 +62,14 @@ public class AppInfoDO implements Serializable {
         this.org = org;
     }
 
-    @Column(name = "jwks_endpoint")
-    public String getJwksEndpoint() {
-        return jwksEndpoint;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "jwks_id")
+    public JwksDO getJwks() {
+        return jwks;
     }
 
-    public void setJwksEndpoint(String jwksEndpoint) {
-        this.jwksEndpoint = jwksEndpoint;
-    }
-
-    @Column(name = "jwks_verify_sub")
-    public Boolean getVerifySub() {
-        return verifySub;
-    }
-
-    public void setVerifySub(Boolean verifySub) {
-        this.verifySub = verifySub;
+    public void setJwks(JwksDO jwks) {
+        this.jwks = jwks;
     }
 
     @Column(name = "created_utc")

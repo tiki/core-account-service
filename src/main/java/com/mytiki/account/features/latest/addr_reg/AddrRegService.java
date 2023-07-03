@@ -122,7 +122,7 @@ public class AddrRegService {
     }
 
     private void guardCustomerToken(AppInfoDO app, AddrRegAOReq req){
-        if(app.getJwksEndpoint() == null) return;
+        //if(app.getJwksEndpoint() == null) return;
         //TODO bring in reg. proj
     }
 
