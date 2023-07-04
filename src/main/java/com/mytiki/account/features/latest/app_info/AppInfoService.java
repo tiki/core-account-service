@@ -111,21 +111,12 @@ public class AppInfoService {
                     .help("App ID does not match claim")
                     .build();
         }else if (sub.isUser()){
-            //TODO figure out how to make this 1 query
-            Optional<UserInfoDO> user = userInfoService.getDO(sub.getId());
-            if (user.isEmpty())
+            Optional<AppInfoDO> app = repository.findByAppIdAndUserId(UUID.fromString(appId), UUID.fromString(sub.getId()));
+            if (app.isEmpty())
                 throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
                         .detail("Invalid claim: sub")
-                        .help("Invalid User ID")
+                        .help("User ID must belong to App's Org")
                         .build();
-            Optional<AppInfoDO> app = repository.findByAppId(UUID.fromString(appId));
-            if (app.isPresent()) {
-                if (!app.get().getOrg().getUsers().contains(user.get()))
-                    throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
-                            .detail("Invalid claim: sub")
-                            .help("User ID must belong to App's Org")
-                            .build();
-            }
         }
     }
 }
