@@ -13,6 +13,8 @@ import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoRepository;
 import com.mytiki.account.main.App;
 import com.mytiki.account.mocks.JwtMock;
+import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.security.oauth.OauthSubNamespace;
 import com.mytiki.spring_rest_api.ApiException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +43,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles(profiles = {"ci", "dev", "local"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Disabled  //TODO fix this.
 public class ApiKeyTest {
 
     @Autowired
@@ -207,11 +208,13 @@ public class ApiKeyTest {
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
         ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), true);
 
-        String scope = "storage";
+        String scope = "account:public";
         OAuth2AccessTokenResponse rsp = service.authorize(created.getId(), created.getSecret(), scope);
         Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());
         assertNotNull(rsp.getAccessToken().getTokenValue());
-        assertEquals(app.getAppId(), jwt.getSubject());
+        OauthSub sub = new OauthSub(jwt.getSubject());
+        assertEquals(OauthSubNamespace.APP, sub.getNamespace());
+        assertEquals(app.getAppId(), sub.getId());
         assertTrue(rsp.getAccessToken().getScopes().contains(scope));
     }
 
@@ -230,7 +233,9 @@ public class ApiKeyTest {
         OAuth2AccessTokenResponse rsp = service.authorize(created.getId(), created.getSecret(), null);
         Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());
         assertNotNull(rsp.getAccessToken().getTokenValue());
-        assertEquals(app.getAppId(), jwt.getSubject());
+        OauthSub sub = new OauthSub(jwt.getSubject());
+        assertEquals(OauthSubNamespace.APP, sub.getNamespace());
+        assertEquals(app.getAppId(), sub.getId());
     }
 
     @Test
@@ -249,7 +254,9 @@ public class ApiKeyTest {
         OAuth2AccessTokenResponse rsp = service.authorize(created.getId(), created.getSecret(), scope);
         Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());
         assertNotNull(rsp.getAccessToken().getTokenValue());
-        assertEquals(app.getAppId(), jwt.getSubject());
+        OauthSub sub = new OauthSub(jwt.getSubject());
+        assertEquals(OauthSubNamespace.APP, sub.getNamespace());
+        assertEquals(app.getAppId(), sub.getId());
         assertFalse(rsp.getAccessToken().getScopes().contains(scope));
     }
 

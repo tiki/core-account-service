@@ -3,6 +3,7 @@ package com.mytiki.account.features.latest.addr_reg;
 import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.security.oauth.OauthSub;
 import com.mytiki.account.utilities.Constants;
+import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = AddrRegController.PATH_CONTROLLER)
 public class AddrRegController {
-    public static final String PATH_CONTROLLER = Constants.BASE_ROUTE + "app/{app-id}/address";
+    public static final String PATH_CONTROLLER = ApiConstants.API_LATEST_ROUTE + "app/{app-id}/address";
 
     private final AddrRegService service;
     private final AppInfoService appInfo;
@@ -36,10 +37,11 @@ public class AddrRegController {
     @RequestMapping(method = RequestMethod.POST)
     public AddrRegAORsp post(
             JwtAuthenticationToken token,
+            @RequestHeader(value = "X-Customer-Authorization", required = false) String custAuth,
             @PathVariable(name = "app-id") String appId,
             AddrRegAOReq body) {
         appInfo.guard(new OauthSub(token.getName()), appId);
-        return service.register(appId, body);
+        return service.register(appId, body, custAuth);
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-addr-reg-get",

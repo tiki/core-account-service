@@ -23,6 +23,18 @@ CREATE TABLE IF NOT EXISTS refresh(
 );
 
 -- -----------------------------------------------------------------------
+-- JWKS CACHE
+-- -----------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS jwks(
+   jwks_id BIGSERIAL PRIMARY KEY,
+   endpoint TEXT NOT NULL UNIQUE,
+   key_set TEXT,
+   verify_sub BOOLEAN DEFAULT false,
+   modified_utc TIMESTAMP WITH TIME ZONE NOT NULL,
+   created_utc TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+-- -----------------------------------------------------------------------
 -- ORG INFO
 -- -----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS org_info(
@@ -41,8 +53,7 @@ CREATE TABLE IF NOT EXISTS app_info(
     app_id UUID NOT NULL UNIQUE,
     app_name TEXT NOT NULL,
     org_info_id BIGINT REFERENCES org_info(org_info_id) NOT NULL,
-    jwks_endpoint TEXT,
-    jwks_verify_sub BOOLEAN,
+    jwks_id BIGINT REFERENCES jwks(jwks_id),
     sign_key BYTEA NOT NULL UNIQUE,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
     modified_utc TIMESTAMP WITH TIME ZONE NOT NULL
@@ -85,15 +96,3 @@ CREATE TABLE IF NOT EXISTS addr_reg(
 );
 CREATE INDEX ON addr_reg (app_info_id, custom_id);
 CREATE INDEX ON addr_reg (app_info_id, address);
-
-
--- -----------------------------------------------------------------------
--- JWKS CACHE
--- -----------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS jwks(
-   jwks_id BIGSERIAL PRIMARY KEY,
-   endpoint TEXT NOT NULL UNIQUE,
-   key_set TEXT NOT NULL,
-   modified_utc TIMESTAMP WITH TIME ZONE NOT NULL,
-   created_utc TIMESTAMP WITH TIME ZONE NOT NULL
-);

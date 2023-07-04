@@ -8,10 +8,15 @@ package com.mytiki.account.features.latest.app_info;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.utilities.facade.B64F;
+import com.mytiki.account.utilities.facade.RsaF;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
+import com.nimbusds.jose.JOSEException;
+import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +44,15 @@ public class AppInfoService {
            app.setAppId(UUID.randomUUID());
            app.setCreated(now);
            app.setModified(now);
+           try {
+               app.setSignKey(RsaF.generate());
+           } catch (JOSEException e) {
+               throw new ApiExceptionBuilder(HttpStatus.EXPECTATION_FAILED)
+                       .message("Issue with Sign Key")
+                       .detail(e.getMessage())
+                       .help("Please contact support")
+                       .build();
+           }
            return toAO(repository.save(app));
        }
     }
@@ -110,6 +124,16 @@ public class AppInfoService {
         rsp.setModified(src.getModified());
         rsp.setCreated(src.getCreated());
         rsp.setOrgId(src.getOrg().getOrgId().toString());
+        try{
+            RSAPublicKey pubkey = RsaF.toPublic(src.getSignKey());
+            rsp.setPubKey(B64F.encode(pubkey.getEncoded()));
+        } catch (IOException e) {
+            throw new ApiExceptionBuilder(HttpStatus.EXPECTATION_FAILED)
+                    .message("Issue with Sign Key")
+                    .detail(e.getMessage())
+                    .help("Please contact support")
+                    .build();
+        }
         return rsp;
     }
 

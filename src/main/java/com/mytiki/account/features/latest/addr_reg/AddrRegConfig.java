@@ -1,6 +1,7 @@
 package com.mytiki.account.features.latest.addr_reg;
 
 import com.mytiki.account.features.latest.app_info.AppInfoService;
+import com.mytiki.account.features.latest.jwks.JwksService;
 import com.mytiki.account.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -15,8 +16,9 @@ public class AddrRegConfig {
     @Bean
     AddrRegService addrRegService(
             @Autowired AddrRegRepository repository,
-            @Autowired AppInfoService appInfoService) {
-        return new AddrRegService(repository, appInfoService);
+            @Autowired AppInfoService appInfoService,
+            @Autowired JwksService jwksService) {
+        return new AddrRegService(repository, appInfoService, jwksService);
     }
 
     @Bean

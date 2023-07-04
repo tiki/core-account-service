@@ -5,8 +5,11 @@
 
 package com.mytiki.account.features.latest.app_info;
 
+import com.mytiki.account.features.latest.jwks.JwksDO;
 import com.mytiki.account.features.latest.org_info.OrgInfoDO;
+import com.mytiki.account.utilities.converter.RsaPrivateConvert;
 import jakarta.persistence.*;
+import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -19,8 +22,8 @@ public class AppInfoDO implements Serializable {
     private UUID appId;
     private String name;
     private OrgInfoDO org;
-    private String jwksEndpoint;
-    private Boolean verifySub;
+    private JwksDO jwks;
+    private RSAPrivateKey signKey;
     private ZonedDateTime created;
     private ZonedDateTime modified;
 
@@ -62,22 +65,24 @@ public class AppInfoDO implements Serializable {
         this.org = org;
     }
 
-    @Column(name = "jwks_endpoint")
-    public String getJwksEndpoint() {
-        return jwksEndpoint;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "jwks_id")
+    public JwksDO getJwks() {
+        return jwks;
     }
 
-    public void setJwksEndpoint(String jwksEndpoint) {
-        this.jwksEndpoint = jwksEndpoint;
+    public void setJwks(JwksDO jwks) {
+        this.jwks = jwks;
     }
 
-    @Column(name = "jwks_verify_sub")
-    public Boolean getVerifySub() {
-        return verifySub;
+    @Column(name = "sign_key")
+    @Convert(converter = RsaPrivateConvert.class)
+    public RSAPrivateKey getSignKey() {
+        return signKey;
     }
 
-    public void setVerifySub(Boolean verifySub) {
-        this.verifySub = verifySub;
+    public void setSignKey(RSAPrivateKey signKey) {
+        this.signKey = signKey;
     }
 
     @Column(name = "created_utc")
