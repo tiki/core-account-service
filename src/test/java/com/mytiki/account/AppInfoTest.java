@@ -31,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles(profiles = {"ci", "dev", "local"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Disabled  //TODO fix this.
 public class AppInfoTest {
 
     @Autowired
