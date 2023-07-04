@@ -127,12 +127,10 @@ public class AddrRegService {
     }
 
     private void guardCustomerToken(String authorization, JwksDO jwks, AddrRegAOReq req){
-        if(jwks == null)
-            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
-                    .detail("Missing required JWKS endpoint")
-                    .build();
-        String token = authorization.replace("Bearer ", "");
-        jwksService.guard(jwks.getEndpoint(), token, req.getId());
+        if(jwks != null) {
+            String token = authorization.replace("Bearer ", "");
+            jwksService.guard(jwks.getEndpoint(), token, req.getId());
+        }
     }
 
     private AddrRegAORsp toRsp(AddrRegDO reg){
