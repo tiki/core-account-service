@@ -12,4 +12,5 @@ import java.util.UUID;
 
 public interface AppInfoRepository extends JpaRepository<AppInfoDO, Long> {
     Optional<AppInfoDO> findByAppId(UUID apiId);
+    void deleteByAppId(UUID appId);
 }

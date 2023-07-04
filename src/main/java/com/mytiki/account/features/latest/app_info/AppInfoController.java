@@ -5,16 +5,14 @@
 
 package com.mytiki.account.features.latest.app_info;
 
-import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @Tag(name = "")
 @RestController
@@ -31,42 +29,53 @@ public class AppInfoController {
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-get",
             summary = "Get App",
-            description = "Get an app's profile",
-            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
-    @RequestMapping(method = RequestMethod.GET, path = "/{appId}")
-    public AppInfoAO get(JwtAuthenticationToken token, @PathVariable String appId) {
-        if(OauthScopes.hasScope(token, "internal:read"))
-            return service.get(appId);
-        return service.getForUser(token.getName(), appId);
+            description = "Retrieve the details about an App",
+            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @RequestMapping(method = RequestMethod.GET, path = "/{app-id}")
+    @Secured({"SCOPE_account:admin", "SCOPE_account:internal:read"})
+    public AppInfoAO get(
+            JwtAuthenticationToken token,
+            @PathVariable(name = "app-id") String appId) {
+        service.guard(token, appId);
+        return service.get(appId);
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-create",
             summary = "Create App",
             description = "Create a new App",
-            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
+            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.POST)
-    public AppInfoAO get(Principal principal, @RequestBody AppInfoAOReq body) {
-        return service.create(body.getName(), principal.getName());
+    public AppInfoAO create(
+            JwtAuthenticationToken token,
+            @RequestBody AppInfoAOReq body) {
+        return service.create(body.getName(), token.getName());
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-update",
             summary = "Update App",
-            description = "Create a new App",
-            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
-    @RequestMapping(method = RequestMethod.POST,  path = "/{appId}")
-    public AppInfoAO get(
-            Principal principal,
-            @PathVariable String appId,
+            description = "Update the details for an App",
+            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @Secured("SCOPE_account:admin")
+    @RequestMapping(method = RequestMethod.POST,  path = "/{app-id}")
+    public AppInfoAO update(
+            JwtAuthenticationToken token,
+            @PathVariable(name = "app-id") String appId,
             @RequestBody AppInfoAOReq body) {
-        return service.update(principal.getName(), appId, body);
+        service.guard(token, appId);
+        return service.update(appId, body);
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-delete",
             summary = "Delete App",
-            description = "Delete an App",
-            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
-    @RequestMapping(method = RequestMethod.DELETE, path = "/{appId}")
-    public void delete(Principal principal, @PathVariable String appId) {
-        service.delete(principal.getName(), appId);
+            description = "Permanently delete an App",
+            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @Secured("SCOPE_account:admin")
+    @RequestMapping(method = RequestMethod.DELETE, path = "/{app-id}")
+    public void delete(
+            JwtAuthenticationToken token,
+            @PathVariable(name = "app-id") String appId) {
+        service.guard(token, appId);
+        service.delete(appId);
     }
 }
