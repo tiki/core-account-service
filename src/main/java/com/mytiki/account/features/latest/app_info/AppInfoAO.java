@@ -11,6 +11,7 @@ public class AppInfoAO {
     private String appId;
     private String name;
     private String orgId;
+    private String pubKey;
     private ZonedDateTime modified;
     private ZonedDateTime created;
 
@@ -36,6 +37,14 @@ public class AppInfoAO {
 
     public void setOrgId(String orgId) {
         this.orgId = orgId;
+    }
+
+    public String getPubKey() {
+        return pubKey;
+    }
+
+    public void setPubKey(String pubKey) {
+        this.pubKey = pubKey;
     }
 
     public ZonedDateTime getModified() {

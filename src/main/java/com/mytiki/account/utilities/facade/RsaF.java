@@ -57,12 +57,20 @@ public class RsaF {
                 new RSAKeyParameters(false, publicKey.getModulus(), publicKey.getPublicExponent());
         signer.init(false, keyParameters);
         signer.update(message, 0, message.length);
-        return signer.verifySignature(B64F.decode(signature));
+        return signer.verifySignature(signature);
     }
 
-    public static byte[] generate() throws JOSEException {
+    public static RSAPrivateKey generate() throws JOSEException {
         RSAKey keypair = new RSAKeyGenerator(RSAKeyGenerator.MIN_KEY_SIZE_BITS).generate();
-        return keypair.toRSAPrivateKey().getEncoded();
+        return new RSAPrivateKey(
+                keypair.getModulus().decodeToBigInteger(),
+                keypair.getPublicExponent().decodeToBigInteger(),
+                keypair.getPrivateExponent().decodeToBigInteger(),
+                keypair.getFirstPrimeFactor().decodeToBigInteger(),
+                keypair.getSecondPrimeFactor().decodeToBigInteger(),
+                keypair.getFirstFactorCRTExponent().decodeToBigInteger(),
+                keypair.getSecondFactorCRTExponent().decodeToBigInteger(),
+                keypair.getFirstCRTCoefficient().decodeToBigInteger());
     }
 
     public static RSAPublicKey toPublic(RSAPrivateKey privateKey){
