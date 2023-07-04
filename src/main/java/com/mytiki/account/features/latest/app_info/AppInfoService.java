@@ -14,6 +14,7 @@ import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import com.nimbusds.jose.JOSEException;
 import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -137,7 +138,11 @@ public class AppInfoService {
         return rsp;
     }
 
-    public void guard(OauthSub sub, String appId){
+    public void guard(JwtAuthenticationToken token, String appId){
+        boolean isInternal = token.getAuthorities().stream()
+                .anyMatch(granted -> granted.getAuthority().equals("SCOPE_account:internal:read"));
+        if(isInternal) return;
+        OauthSub sub = new OauthSub(token.getName());
         if (sub.isApp() && !sub.getId().equals(appId)) {
             throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
                     .detail("Invalid claim: sub")
