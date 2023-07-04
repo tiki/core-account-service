@@ -8,8 +8,6 @@ package com.mytiki.account.features.latest.api_key;
 import com.mytiki.account.features.latest.app_info.AppInfoDO;
 import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.features.latest.refresh.RefreshService;
-import com.mytiki.account.features.latest.user_info.UserInfoDO;
-import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.security.oauth.OauthInternal;
 import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.security.oauth.OauthSub;
@@ -37,7 +35,6 @@ import java.util.UUID;
 
 public class ApiKeyService {
     private final ApiKeyRepository repository;
-    private final UserInfoService userInfoService;
     private final AppInfoService appInfoService;
     private final RefreshService refreshService;
     private final JWSSigner signer;
@@ -48,7 +45,6 @@ public class ApiKeyService {
 
     public ApiKeyService(
             ApiKeyRepository repository,
-            UserInfoService userInfoService,
             AppInfoService appInfoService,
             RefreshService refreshService,
             JWSSigner signer,
@@ -56,7 +52,6 @@ public class ApiKeyService {
             List<String> publicScopes,
             OauthInternal oauthInternal) {
         this.repository = repository;
-        this.userInfoService = userInfoService;
         this.appInfoService = appInfoService;
         this.refreshService = refreshService;
         this.signer = signer;
@@ -67,9 +62,8 @@ public class ApiKeyService {
     }
 
     @Transactional
-    public ApiKeyAOCreate create(String userId, String appId, boolean isPublic){
+    public ApiKeyAOCreate create(String appId, boolean isPublic){
         String secret = null;
-        guardAppUser(userId, appId);
         Optional<AppInfoDO> app = appInfoService.getDO(appId);
         if(app.isEmpty())
             throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
@@ -96,9 +90,7 @@ public class ApiKeyService {
         return rsp;
     }
 
-    @Transactional
-    public List<ApiKeyAO> getByAppId(String userId, String appId){
-        guardAppUser(userId, appId);
+    public List<ApiKeyAO> getByAppId(String appId){
         List<ApiKeyDO> keys = repository.findAllByAppAppId(UUID.fromString(appId));
         return keys.stream().map(key -> {
             ApiKeyAO rsp = new ApiKeyAO();
@@ -110,12 +102,11 @@ public class ApiKeyService {
     }
 
     @Transactional
-    public void revoke(String userId, String keyId){
-        Optional<ApiKeyDO> found = repository.findById(UUID.fromString(keyId));
-        if(found.isPresent()){
-            guardAppUser(userId, found.get().getApp().getAppId().toString());
-            repository.delete(found.get());
-        }
+    public void revoke(String appId, String keyId){
+        Optional<ApiKeyDO> found = repository.findByAppAppIdAndId(
+                UUID.fromString(appId),
+                UUID.fromString(keyId));
+        found.ifPresent(repository::delete);
     }
 
     public OAuth2AccessTokenResponse authorize(String clientId, String clientSecret, String requestScopes){
@@ -178,18 +169,6 @@ public class ApiKeyService {
                     null
             ), e);
         }
-    }
-
-    private void guardAppUser(String userId, String appId){
-        Optional<UserInfoDO> user = userInfoService.getDO(userId);
-        if(user.isEmpty())
-            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
-        List<String> allowedApps = user.get().getOrg().getApps()
-                .stream()
-                .map(app -> app.getAppId().toString())
-                .toList();
-        if(!allowedApps.contains(appId))
-            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
     }
 
     private String generateSecret(int len){

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "App")
+@Tag(name = "")
 @RestController
 @RequestMapping(value = AddrRegController.PATH_CONTROLLER)
 public class AddrRegController {
@@ -26,7 +26,6 @@ public class AddrRegController {
         this.service = service;
         this.appInfo = appInfo;
     }
-
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-addr-reg-post",
             summary = "Register Address",
