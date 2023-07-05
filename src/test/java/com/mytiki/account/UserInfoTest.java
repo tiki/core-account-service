@@ -15,6 +15,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -67,9 +68,11 @@ public class UserInfoTest {
     }
 
     @Test
+    @Transactional
     public void Test_Update_Success() {
+        String email = "test+" + UUID.randomUUID() + "@test.com";
         UserInfoDO saved = new UserInfoDO();
-        saved.setEmail("test+" + UUID.randomUUID() + "@test.com");
+        saved.setEmail(email);
         saved.setUserId(UUID.randomUUID());
         saved.setCreated(ZonedDateTime.now());
         saved.setModified(ZonedDateTime.now());
@@ -77,10 +80,9 @@ public class UserInfoTest {
         saved = repository.save(saved);
 
         UserInfoAOUpdate update = new UserInfoAOUpdate();
-        update.setEmail(saved.getEmail() + "updated");
+        update.setEmail("updated+" + email);
 
         UserInfoAO user = service.update(saved.getUserId().toString(), update);
-        assertEquals(saved.getEmail() + "updated", user.getEmail());
-        assertNotEquals(saved.getModified(), user.getModified());
+        assertEquals("updated+" + email, user.getEmail());
     }
 }

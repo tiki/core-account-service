@@ -3,7 +3,6 @@ package com.mytiki.account.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.account.features.latest.jwks.JwksController;
 import com.mytiki.account.features.latest.otp.OtpController;
-import com.mytiki.account.features.latest.stripe.StripeController;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.spring_rest_api.ApiConstants;
 import com.mytiki.spring_rest_api.SecurityConstants;
@@ -61,16 +60,12 @@ public class SecurityFilter {
                            new AntPathRequestMatcher(ApiConstants.API_LATEST_ROUTE + Constants.OAUTH_TOKEN_PATH,
                                    HttpMethod.POST.name()),
                            new AntPathRequestMatcher(ApiConstants.API_LATEST_ROUTE + OtpController.PATH_ISSUE,
-                                   HttpMethod.POST.name()),
-                           new AntPathRequestMatcher(StripeController.PATH_CONTROLLER + "/*",
                                    HttpMethod.POST.name())))
                //TODO revist this.
                .authorizeHttpRequests((req) -> req
                         .requestMatchers(HttpMethod.GET, ApiConstants.HEALTH_ROUTE, Constants.API_DOCS_PATH, JwksController.WELL_KNOWN)
                             .permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**")
-                            .permitAll()
-                        .requestMatchers(HttpMethod.POST, StripeController.PATH_CONTROLLER + "/*")
                             .permitAll()
                         .requestMatchers(HttpMethod.POST, ApiConstants.API_LATEST_ROUTE + Constants.OAUTH_TOKEN_PATH, ApiConstants.API_LATEST_ROUTE + OtpController.PATH_ISSUE)
                             .permitAll()
