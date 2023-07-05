@@ -9,7 +9,6 @@ import com.mytiki.account.utilities.Constants;
 import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -35,12 +34,11 @@ public class RefreshController {
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-oauth-revoke-post",
             summary = "Revoke Token",
-            description = "Revoke a refresh token.",
-            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
+            description = "Revoke a Refresh token.")
     @ApiResponse(responseCode = "200")
     @RequestMapping(
             method = RequestMethod.POST,
-            path = Constants.OAUTH_REVOKE_PATH,
+            path = Constants.AUTH_REVOKE_PATH,
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public void revoke(@RequestParam String token) {
         service.revoke(token);
@@ -48,12 +46,12 @@ public class RefreshController {
 
     @RequestMapping(
             method = RequestMethod.POST,
-            path = Constants.OAUTH_TOKEN_PATH,
+            path = Constants.AUTH_TOKEN_PATH,
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE},
             params = {"refresh_token"})
-    public OAuth2AccessTokenResponse tokenGrantRefresh(
+    public OAuth2AccessTokenResponse grant(
             @RequestParam(name = "grant_type") AuthorizationGrantType grantType,
-            @RequestParam(name = "refresh_token") String refreshToken) {
+            @RequestParam(name = "refresh_token", required = false) String refreshToken) {
         if (!grantType.equals(AuthorizationGrantType.REFRESH_TOKEN))
             throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.UNSUPPORTED_GRANT_TYPE));
         return service.authorize(refreshToken);

@@ -5,7 +5,6 @@
 
 package com.mytiki.account.features.latest.org_info;
 
-import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -23,8 +22,7 @@ public class OrgInfoConfig {
     }
 
     @Bean
-    public OrgInfoController orgInfoController(@Autowired OrgInfoService service,
-                                               @Autowired UserInfoService userInfoService){
-        return new OrgInfoController(service, userInfoService);
+    public OrgInfoController orgInfoController(@Autowired OrgInfoService service){
+        return new OrgInfoController(service);
     }
 }

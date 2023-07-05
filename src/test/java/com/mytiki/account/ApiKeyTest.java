@@ -15,12 +15,13 @@ import com.mytiki.account.main.App;
 import com.mytiki.account.mocks.JwtMock;
 import com.mytiki.account.security.oauth.OauthSub;
 import com.mytiki.account.security.oauth.OauthSubNamespace;
-import com.mytiki.spring_rest_api.ApiException;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
@@ -75,26 +76,10 @@ public class ApiKeyTest {
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
-        ApiKeyAOCreate key = service.create(testUser.getUserId().toString(), app.getAppId(), true);
+        ApiKeyAOCreate key = service.create(app.getAppId(), true);
         assertNotNull(key.getId());
         assertNotNull(key.getCreated());
         assertNull(key.getSecret());
-    }
-
-    @Test
-    public void Test_Create_Unauthorized_Failure() {
-        final UUID userId = UUID.randomUUID();
-        UserInfoDO testUser = new UserInfoDO();
-        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
-        testUser.setUserId(userId);
-        testUser.setCreated(ZonedDateTime.now());
-        testUser.setModified(ZonedDateTime.now());
-        testUser.setOrg(orgInfoService.create());
-        userInfoRepository.save(testUser);
-
-        ApiException ex = assertThrows(ApiException.class,
-                () -> service.create(userId.toString(), UUID.randomUUID().toString(), true));
-        assertEquals(HttpStatus.FORBIDDEN, ex.getHttpStatus());
     }
 
     @Test
@@ -108,29 +93,11 @@ public class ApiKeyTest {
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
-        ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), true);
-        List<ApiKeyAO> found = service.getByAppId(testUser.getUserId().toString(), app.getAppId());
+        ApiKeyAOCreate created = service.create(app.getAppId(), true);
+        List<ApiKeyAO> found = service.getByAppId(app.getAppId());
 
         assertEquals(1, found.size());
         assertEquals(created.getId(), found.get(0).getId());
-    }
-
-    @Test
-    public void Test_Get_Unauthorized_Failure() {
-        final UUID userId = UUID.randomUUID();
-        UserInfoDO testUser = new UserInfoDO();
-        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
-        testUser.setUserId(userId);
-        testUser.setCreated(ZonedDateTime.now());
-        testUser.setModified(ZonedDateTime.now());
-        testUser.setOrg(orgInfoService.create());
-        testUser = userInfoRepository.save(testUser);
-        AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
-        service.create(testUser.getUserId().toString(), app.getAppId(), true);
-
-        ApiException ex = assertThrows(ApiException.class,
-                () -> service.getByAppId(userId.toString(), UUID.randomUUID().toString()));
-        assertEquals(HttpStatus.FORBIDDEN, ex.getHttpStatus());
     }
 
     @Test
@@ -144,28 +111,11 @@ public class ApiKeyTest {
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
-        ApiKeyAOCreate key = service.create(testUser.getUserId().toString(), app.getAppId(), true);
-        service.revoke(testUser.getUserId().toString(), key.getId());
+        ApiKeyAOCreate key = service.create(app.getAppId(), true);
+        service.revoke(app.getAppId(), key.getId());
 
         Optional<ApiKeyDO> found = repository.findById(UUID.fromString(key.getId()));
         assertTrue(found.isEmpty());
-    }
-
-    @Test
-    public void Test_Revoke_Unauthorized_Failure() {
-        UserInfoDO testUser = new UserInfoDO();
-        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
-        testUser.setUserId(UUID.randomUUID());
-        testUser.setCreated(ZonedDateTime.now());
-        testUser.setModified(ZonedDateTime.now());
-        testUser.setOrg(orgInfoService.create());
-        testUser = userInfoRepository.save(testUser);
-        AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
-
-        ApiKeyAOCreate key = service.create(testUser.getUserId().toString(), app.getAppId(), true);
-        ApiException ex = assertThrows(ApiException.class,
-                () -> service.revoke(UUID.randomUUID().toString(), key.getId()));
-        assertEquals(HttpStatus.FORBIDDEN, ex.getHttpStatus());
     }
 
     @Test
@@ -184,7 +134,7 @@ public class ApiKeyTest {
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
 
-        ApiKeyAOCreate key = service.create(testUser.getUserId().toString(), app.getAppId(), false);
+        ApiKeyAOCreate key = service.create(app.getAppId(), false);
         assertNotNull(key.getId());
         assertNotNull(key.getCreated());
         assertNotNull(key.getSecret());
@@ -206,9 +156,9 @@ public class ApiKeyTest {
         testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
-        ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), true);
+        ApiKeyAOCreate created = service.create(app.getAppId(), true);
 
-        String scope = "account:public";
+        String scope = "account:app";
         OAuth2AccessTokenResponse rsp = service.authorize(created.getId(), created.getSecret(), scope);
         Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());
         assertNotNull(rsp.getAccessToken().getTokenValue());
@@ -228,7 +178,7 @@ public class ApiKeyTest {
         testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
-        ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), false);
+        ApiKeyAOCreate created = service.create(app.getAppId(), false);
 
         OAuth2AccessTokenResponse rsp = service.authorize(created.getId(), created.getSecret(), null);
         Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());
@@ -248,7 +198,7 @@ public class ApiKeyTest {
         testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
-        ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), true);
+        ApiKeyAOCreate created = service.create(app.getAppId(), true);
 
         String scope = "auth";
         OAuth2AccessTokenResponse rsp = service.authorize(created.getId(), created.getSecret(), scope);
@@ -270,7 +220,7 @@ public class ApiKeyTest {
         testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
-        ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), false);
+        ApiKeyAOCreate created = service.create(app.getAppId(), false);
 
         OAuth2AuthorizationException ex = assertThrows(OAuth2AuthorizationException.class,
                 () -> service.authorize(created.getId(), UUID.randomUUID().toString(), null));
@@ -287,7 +237,7 @@ public class ApiKeyTest {
         testUser.setOrg(orgInfoService.create());
         testUser = userInfoRepository.save(testUser);
         AppInfoAO app = appInfoService.create("testApp", testUser.getUserId().toString());
-        ApiKeyAOCreate created = service.create(testUser.getUserId().toString(), app.getAppId(), false);
+        ApiKeyAOCreate created = service.create(app.getAppId(), false);
 
         OAuth2AuthorizationException ex = assertThrows(OAuth2AuthorizationException.class,
                 () -> service.authorize(UUID.randomUUID().toString(), created.getId(), null));

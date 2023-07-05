@@ -7,17 +7,12 @@ package com.mytiki.account.features.latest.user_info;
 
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.spring_rest_api.ApiConstants;
-import com.mytiki.spring_rest_api.ApiException;
-import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.validator.routines.EmailValidator;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 @Tag(name = "")
 @RestController
 @RequestMapping(value = UserInfoController.PATH_CONTROLLER)
@@ -31,38 +26,29 @@ public class UserInfoController {
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-post",
-            summary = "Update a User",
-            description = "Update the authorized user's profile",
-            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
-    @RequestMapping(method = RequestMethod.POST, path =  "/{userId}")
+            summary = "Update User",
+            description = "Update the authorized User's profile",
+            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @Secured("SCOPE_account:admin")
+    @RequestMapping(method = RequestMethod.POST)
     public UserInfoAO update(
-            Principal principal,
-            @PathVariable String userId,
+            JwtAuthenticationToken token,
             @RequestBody UserInfoAOUpdate body) {
-        if(!principal.getName().equals(userId))
-            throw new ApiException(HttpStatus.FORBIDDEN);
-        if(body.getEmail() != null) {
-            if (!EmailValidator.getInstance().isValid(body.getEmail()))
-                throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
-                        .message("Invalid email")
-                        .build();
-        }
-        return service.update(userId, body);
+        return service.update(token.getName(), body);
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-get",
             summary = "Get User",
             description = "Get the authorized user's profile",
-            security = @SecurityRequirement(name = "oauth", scopes = "auth"))
+            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.GET)
-    public UserInfoAO get(Principal principal) {
-        if(principal == null || principal.getName() == null)
-            throw new ApiException(HttpStatus.FORBIDDEN);
-        return service.get(principal.getName());
+    public UserInfoAO get(JwtAuthenticationToken token) {
+        return service.get(token.getName());
     }
 
     @Operation(hidden = true)
-    @Secured("SCOPE_internal:read")
+    @Secured("SCOPE_account:internal:read")
     @RequestMapping(method = RequestMethod.GET, path =  "/{userId}")
     public UserInfoAO getById(@PathVariable String userId) {
         return service.get(userId);

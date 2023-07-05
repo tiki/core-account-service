@@ -7,6 +7,7 @@ package com.mytiki.account.features.latest.user_info;
 
 import com.mytiki.account.features.latest.org_info.OrgInfoService;
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
 
 import java.time.ZonedDateTime;
@@ -14,11 +15,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class UserInfoService {
-
     private final UserInfoRepository repository;
     private final OrgInfoService orgInfoService;
 
-    public UserInfoService(UserInfoRepository repository, OrgInfoService orgInfoService) {
+    public UserInfoService(
+            UserInfoRepository repository,
+            OrgInfoService orgInfoService) {
         this.repository = repository;
         this.orgInfoService = orgInfoService;
     }
@@ -73,6 +75,13 @@ public class UserInfoService {
     }
 
     public UserInfoAO update(String subject, UserInfoAOUpdate update){
+        if(update.getEmail() != null) {
+            if (!EmailValidator.getInstance().isValid(update.getEmail()))
+                throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
+                        .message("Invalid email")
+                        .build();
+        }
+
         Optional<UserInfoDO> found = repository.findByUserId(UUID.fromString(subject));
         if(found.isEmpty())
             throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)

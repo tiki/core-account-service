@@ -7,7 +7,6 @@ package com.mytiki.account.features.latest.api_key;
 
 import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.features.latest.refresh.RefreshService;
-import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.security.oauth.OauthInternal;
 import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.utilities.Constants;
@@ -26,21 +25,22 @@ public class ApiKeyConfig {
     public static final String PACKAGE_PATH = Constants.PACKAGE_FEATURES_LATEST_DOT_PATH + ".api_key";
 
     @Bean
-    public ApiKeyController apiKeyController(@Autowired ApiKeyService service){
-        return new ApiKeyController(service);
+    public ApiKeyController apiKeyController(
+            @Autowired ApiKeyService service,
+            @Autowired AppInfoService appInfoService){
+        return new ApiKeyController(service, appInfoService);
     }
 
     @Bean
     public ApiKeyService apiKeyService(
             @Autowired ApiKeyRepository repository,
-            @Autowired UserInfoService userInfoService,
             @Autowired AppInfoService appInfoService,
             @Autowired RefreshService refreshService,
             @Autowired JWSSigner signer,
             @Autowired OauthScopes allowedScopes,
             @Value("${com.mytiki.account.oauth.client_credentials.public.scopes}") List<String> publicScopes,
             @Autowired OauthInternal oauthInternal){
-        return new ApiKeyService(repository, userInfoService, appInfoService, refreshService, signer,
+        return new ApiKeyService(repository, appInfoService, refreshService, signer,
                 allowedScopes, publicScopes, oauthInternal);
     }
 }
