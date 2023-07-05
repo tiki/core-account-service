@@ -18,7 +18,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -51,7 +50,6 @@ public class OrgInfoTest {
     }
 
     @Test
-    @Transactional
     public void Test_Get_Success() {
         UserInfoAO user = userInfoService.createIfNotExists(UUID.randomUUID() + "@test.com");
         OrgInfoAO org = service.getByUser(user.getUserId());

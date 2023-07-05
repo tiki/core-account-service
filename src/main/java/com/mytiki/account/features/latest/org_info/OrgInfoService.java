@@ -5,8 +5,7 @@
 
 package com.mytiki.account.features.latest.org_info;
 
-import com.mytiki.spring_rest_api.ApiExceptionBuilder;
-import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -29,29 +28,16 @@ public class OrgInfoService {
         return repository.save(org);
     }
 
+    @Transactional
     public OrgInfoAO getByUser(String userId){
         Optional<OrgInfoDO> found = repository.findByUserId(UUID.fromString(userId));
         return found.map(this::toAO).orElse(null);
     }
 
+    @Transactional
     public OrgInfoAO get(String orgId){
         Optional<OrgInfoDO> found = repository.findByOrgId(UUID.fromString(orgId));
         return found.map(this::toAO).orElse(null);
-    }
-
-    public OrgInfoDO setBilling(String orgId, String billingId){
-        Optional<OrgInfoDO> found = repository.findByOrgId(UUID.fromString(orgId));
-        if(found.isPresent()){
-            OrgInfoDO updated = found.get();
-            updated.setBillingId(billingId);
-            updated.setModified(ZonedDateTime.now());
-            return repository.save(updated);
-        }else{
-            throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
-                    .message("Invalid orgId")
-                    .properties("orgId", orgId)
-                    .build();
-        }
     }
 
     private OrgInfoAO toAO(OrgInfoDO src){
