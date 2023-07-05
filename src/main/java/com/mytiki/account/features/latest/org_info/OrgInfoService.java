@@ -7,10 +7,8 @@ package com.mytiki.account.features.latest.org_info;
 
 import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -31,22 +29,9 @@ public class OrgInfoService {
         return repository.save(org);
     }
 
-    @Transactional
-    public OrgInfoAO getForUser(String userId, String orgId){
-        Optional<OrgInfoDO> found = repository.findByOrgId(UUID.fromString(orgId));
-        if(found.isPresent()){
-            List<String> allowedUserIds = found.get().getUsers()
-                    .stream()
-                    .map(user -> user.getUserId().toString())
-                    .toList();
-            if(!allowedUserIds.contains(userId))
-                throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
-            return toAO(found.get());
-        }else{
-            OrgInfoAO rsp = new OrgInfoAO();
-            rsp.setOrgId(orgId);
-            return rsp;
-        }
+    public OrgInfoAO getByUser(String userId){
+        Optional<OrgInfoDO> found = repository.findByUserId(UUID.fromString(userId));
+        return found.map(this::toAO).orElse(null);
     }
 
     public OrgInfoAO get(String orgId){

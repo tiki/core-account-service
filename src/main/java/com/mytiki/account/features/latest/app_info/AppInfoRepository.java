@@ -14,6 +14,6 @@ import java.util.UUID;
 public interface AppInfoRepository extends JpaRepository<AppInfoDO, Long> {
     Optional<AppInfoDO> findByAppId(UUID appId);
     void deleteByAppId(UUID appId);
-    @Query("SELECT a FROM AppInfoDO a WHERE a.appId = ?1 AND a.org.orgId = (SELECT u.org.orgId FROM UserInfoDO u WHERE u.userId = ?2)")
+    @Query("SELECT a FROM AppInfoDO a INNER JOIN a.org o INNER JOIN o.users u WHERE a.appId = :appId AND u.userId = :userId")
     Optional<AppInfoDO> findByAppIdAndUserId(UUID appId, UUID userId);
 }

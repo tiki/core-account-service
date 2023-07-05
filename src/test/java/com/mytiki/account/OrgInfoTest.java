@@ -5,10 +5,8 @@
 
 package com.mytiki.account;
 
-import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.features.latest.org_info.OrgInfoAO;
 import com.mytiki.account.features.latest.org_info.OrgInfoDO;
-import com.mytiki.account.features.latest.org_info.OrgInfoRepository;
 import com.mytiki.account.features.latest.org_info.OrgInfoService;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
@@ -38,13 +36,7 @@ public class OrgInfoTest {
     private OrgInfoService service;
 
     @Autowired
-    private OrgInfoRepository repository;
-
-    @Autowired
     private UserInfoService userInfoService;
-
-    @Autowired
-    private AppInfoService appInfoService;
 
     @Test
     public void Test_Create_Success() {
@@ -60,7 +52,7 @@ public class OrgInfoTest {
     @Test
     public void Test_Get_Success() {
         UserInfoAO user = userInfoService.createIfNotExists(UUID.randomUUID() + "@test.com");
-        OrgInfoAO org = service.getForUser(user.getUserId(), user.getOrgId());
+        OrgInfoAO org = service.getByUser(user.getUserId());
 
         assertTrue(org.getUsers().contains(user.getUserId()));
         assertEquals(user.getOrgId(), org.getOrgId());
@@ -71,14 +63,7 @@ public class OrgInfoTest {
 
     @Test
     public void Test_Get_None_Success() {
-        String orgId = UUID.randomUUID().toString();
-        OrgInfoAO org = service.getForUser(UUID.randomUUID().toString(), orgId);
-
-        assertEquals(orgId, org.getOrgId());
-        assertNull(org.getApps());
-        assertNull(org.getUsers());
-        assertNull(org.getBillingId());
-        assertNull(org.getCreated());
-        assertNull(org.getModified());
+        OrgInfoAO org = service.getByUser(UUID.randomUUID().toString());
+        assertNull(org);
     }
 }
