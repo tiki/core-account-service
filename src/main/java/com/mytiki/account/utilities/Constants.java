@@ -18,11 +18,12 @@ public interface Constants {
     String PACKAGE_FEATURES_LATEST_SLASH_PATH = MODULE_SLASH_PATH + "/" + SLICE_FEATURES + "/" + SLICE_LATEST;
 
     String API_DOCS_PATH = "/v3/api-docs.yaml";
+    String WELL_KNOWN_PATH = "/.well-known";
 
     Long TOKEN_EXPIRY_DURATION_SECONDS = 600L;
     Long REFRESH_EXPIRY_DURATION_SECONDS = 2592000L;
 
-    String OAUTH_PATH = "oauth";
-    String OAUTH_TOKEN_PATH = OAUTH_PATH + "/token";
-    String OAUTH_REVOKE_PATH = OAUTH_PATH + "/revoke";
+    String AUTH_PATH = "auth";
+    String AUTH_TOKEN_PATH = AUTH_PATH + "/token";
+    String AUTH_REVOKE_PATH = AUTH_PATH + "/revoke";
 }

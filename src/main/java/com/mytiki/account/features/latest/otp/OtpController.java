@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
 public class OtpController {
-    public static final String PATH_ISSUE = "otp/start";
 
     private final OtpService service;
 
@@ -34,29 +33,29 @@ public class OtpController {
     @Operation(
             operationId = Constants.PROJECT_DASH_PATH +  "-otp-start-post",
             summary = "Request OTP",
-            description = "Start a new passwordless authorization flow")
-    @RequestMapping(method = RequestMethod.POST, path = PATH_ISSUE)
+            description = "Start a one-time password (email) authorization flow")
+    @RequestMapping(method = RequestMethod.POST, path = "auth/otp")
     public OtpAOStartRsp issue(@RequestBody OtpAOStartReq body) {
         return service.start(body);
     }
 
     @Operation(
             operationId = Constants.PROJECT_DASH_PATH +  "-oauth-token-post",
-            summary = "Token Grant",
-            description = "Issue authorization token. Use password grant for OTP flow.")
+            summary = "Grant Token",
+            description = "Grant a new authorization token (with scope)")
     @RequestMapping(
             method = RequestMethod.POST,
-            path = Constants.OAUTH_TOKEN_PATH,
+            path = Constants.AUTH_TOKEN_PATH,
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE},
             params = {"username", "password"})
     public OAuth2AccessTokenResponse grant(
             @Parameter(
                     schema = @Schema(type = "string"),
-                    description = "(password, refresh_token, client_credentials)") //, urn:ietf:params:oauth:grant-type:jwt-bearer
+                    description = "(password, refresh_token, client_credentials, urn:ietf:params:oauth:grant-type:token-exchange)")
             @RequestParam(name = "grant_type") AuthorizationGrantType grantType,
             @RequestParam(required = false) String scope,
-            @RequestParam(name = "username") String deviceId,
-            @RequestParam(name = "password") String code) {
+            @RequestParam(name = "username", required = false) String deviceId,
+            @RequestParam(name = "password", required = false) String code) {
         if (!grantType.equals(AuthorizationGrantType.PASSWORD))
             throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.UNSUPPORTED_GRANT_TYPE));
         return service.authorize(deviceId, code, scope);

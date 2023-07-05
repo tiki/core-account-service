@@ -32,15 +32,15 @@ public class ExchangeController {
 
     @RequestMapping(
             method = RequestMethod.POST,
-            path = Constants.OAUTH_TOKEN_PATH,
+            path = Constants.AUTH_TOKEN_PATH,
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE},
             params = {"subject_token", "subject_token_type"})
-    public OAuth2AccessTokenResponse tokenGrantRefresh(
+    public OAuth2AccessTokenResponse grant(
             @RequestParam(name = "grant_type") AuthorizationGrantType grantType,
             @RequestParam(required = false) String scope,
-            @RequestParam(name = "client_id") String clientId,
-            @RequestParam(name = "subject_token") String subjectToken,
-            @RequestParam(name = "subject_token_type") String subjectTokenType) {
+            @RequestParam(name = "client_id", required = false) String clientId,
+            @RequestParam(name = "subject_token", required = false) String subjectToken,
+            @RequestParam(name = "subject_token_type", required = false) String subjectTokenType) {
         if (!grantType.equals(new AuthorizationGrantType("urn:ietf:params:oauth:grant-type:token-exchange")))
             throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.UNSUPPORTED_GRANT_TYPE));
         return service.authorize(scope, clientId, subjectToken, subjectTokenType);

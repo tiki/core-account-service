@@ -80,7 +80,7 @@ public class ApiKeyController {
 
     @RequestMapping(
             method = RequestMethod.POST,
-            path = Constants.OAUTH_TOKEN_PATH,
+            path = Constants.AUTH_TOKEN_PATH,
             consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE},
             params = {"client_id", "client_secret"})
     public OAuth2AccessTokenResponse grant(
