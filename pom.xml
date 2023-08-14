@@ -124,7 +124,7 @@
         <dependency>
             <groupId>com.stripe</groupId>
             <artifactId>stripe-java</artifactId>
-            <version>22.24.0</version>
+            <version>22.31.0</version>
         </dependency>
 
         <dependency>
