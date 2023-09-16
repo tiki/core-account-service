@@ -39,7 +39,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up JDK
         uses: actions/setup-java@v3
@@ -98,7 +98,7 @@ jobs:
     environment: Production
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Terraform Variables
         working-directory: ./infra
@@ -133,7 +133,7 @@ jobs:
     environment: Production
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create Sentry release
         uses: getsentry/action-release@v1
@@ -152,7 +152,7 @@ jobs:
     environment: Production
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: OpenApi
         uses: readmeio/rdme@8.6.4
