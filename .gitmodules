@@ -1,9 +1,0 @@
-[submodule "console"]
-	path = console
-	url = https://github.com/tiki/tiki-account-console
-[submodule "refresh"]
-	path = refresh
-	url = https://github.com/tiki/tiki-account-refresh
-[submodule "idp"]
-	path = idp
-	url = https://github.com/tiki/tiki-account-idp
