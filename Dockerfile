@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk:20 as base
+FROM azul/zulu-openjdk:21 as base
 
 RUN apt update -y
 RUN apt install wget -y
