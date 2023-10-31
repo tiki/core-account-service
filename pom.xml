@@ -11,23 +11,23 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.mytiki</groupId>
-    <artifactId>l0_auth</artifactId>
+    <artifactId>account</artifactId>
     <version>2.2.4</version>
     <packaging>jar</packaging>
 
-    <name>L0 Auth</name>
-    <description>Authorization Service</description>
+    <name>Account</name>
+    <description>Account Management Service</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.3</version>
+        <version>3.1.1</version>
     </parent>
 
     <properties>
         <start-class>com.mytiki.account.main.App</start-class>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>19</java.version>
+        <java.version>20</java.version>
     </properties>
 
     <dependencies>
