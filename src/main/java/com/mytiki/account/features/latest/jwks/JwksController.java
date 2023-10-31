@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.jwks;
 
+import com.mytiki.account.health.HealthController;
 import com.nimbusds.jose.jwk.JWKSet;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,8 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
+@RequestMapping(value = JwksController.ROUTE)
 public class JwksController {
-    public static final String WELL_KNOWN = "/.well-known/jwks.json";
+    public static final String ROUTE = "/.well-known/jwks.json";
     private final JWKSet jwkSet;
 
     public JwksController(JWKSet jwkSet) {
@@ -23,7 +25,7 @@ public class JwksController {
     }
 
     @Operation(hidden = true)
-    @RequestMapping(method = RequestMethod.GET, path = WELL_KNOWN)
+    @RequestMapping(method = RequestMethod.GET)
     public Map<String, Object> get() {
         return jwkSet.toJSONObject(true);
     }

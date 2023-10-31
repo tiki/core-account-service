@@ -24,7 +24,7 @@ import java.util.List;
 @EnableJpaRepositories(OtpConfig.PACKAGE_PATH)
 @EntityScan(OtpConfig.PACKAGE_PATH)
 public class OtpConfig {
-    public static final String PACKAGE_PATH = Constants.PACKAGE_FEATURES_LATEST_DOT_PATH + ".otp";
+    public static final String PACKAGE_PATH = Constants.PKG_FEAT_LATEST_DOT_PATH + ".otp";
     public static final String TEMPLATE_BODY_HTML = "otp-body-html.mustache";
     public static final String TEMPLATE_BODY_TXT = "otp-body-txt.mustache";
     public static final String TEMPLATE_SUBJECT = "otp-subject.mustache";

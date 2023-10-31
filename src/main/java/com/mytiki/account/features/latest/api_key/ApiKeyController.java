@@ -7,7 +7,6 @@ package com.mytiki.account.features.latest.api_key;
 
 import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.utilities.Constants;
-import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +24,7 @@ import java.util.List;
 
 @Tag(name = "")
 @RestController
-@RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
+@RequestMapping(value = Constants.API_LATEST_ROUTE)
 public class ApiKeyController {
     public static final String PATH_CONTROLLER = "app/{app-id}/key";
 

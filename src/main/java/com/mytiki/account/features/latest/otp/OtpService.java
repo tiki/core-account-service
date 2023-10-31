@@ -12,11 +12,11 @@ import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.security.oauth.OauthSub;
 import com.mytiki.account.security.oauth.OauthSubNamespace;
 import com.mytiki.account.utilities.Constants;
+import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.B64F;
 import com.mytiki.account.utilities.facade.MustacheF;
 import com.mytiki.account.utilities.facade.SendgridF;
-import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -82,10 +82,10 @@ public class OtpService {
             rsp.setExpires(expires);
             return rsp;
         } else {
-            throw new ApiExceptionBuilder(HttpStatus.EXPECTATION_FAILED)
+            throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
                     .message("One-time Password (OTP) failed")
                     .detail("Issue with sending email")
-                    .build();
+                    .exception();
         }
     }
 
@@ -132,9 +132,9 @@ public class OtpService {
 
     private boolean sendEmail(String email, String code) {
         if(!EmailValidator.getInstance().isValid(email))
-            throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
+            throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
                     .message("Invalid email")
-                    .build();
+                    .exception();
 
         Map<String, String> input = new HashMap<>(1);
         input.put("OTP", code);
@@ -151,11 +151,11 @@ public class OtpService {
             md.update(code.getBytes(StandardCharsets.UTF_8));
             return B64F.encode(md.digest(deviceId.getBytes(StandardCharsets.UTF_8)));
         } catch (NoSuchAlgorithmException e) {
-            throw new ApiExceptionBuilder(HttpStatus.EXPECTATION_FAILED)
+            throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
                     .message("One-time Password (OTP) failed")
                     .detail("Issue with SHA256")
                     .cause(e)
-                    .build();
+                    .exception();
         }
     }
 
@@ -165,11 +165,11 @@ public class OtpService {
             SecureRandom.getInstanceStrong().nextBytes(bytes);
             return B64F.encode(bytes);
         } catch (NoSuchAlgorithmException e) {
-            throw new ApiExceptionBuilder(HttpStatus.EXPECTATION_FAILED)
+            throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
                     .message("One-time Password (OTP) failed")
                     .detail("Issue with SecureRandom generation")
                     .cause(e)
-                    .build();
+                    .exception();
         }
     }
 
@@ -180,11 +180,11 @@ public class OtpService {
             Arrays.stream(ints).forEach(i -> result.append(Integer.toString(i, 36)));
             return result.toString().toUpperCase();
         } catch (NoSuchAlgorithmException e) {
-            throw new ApiExceptionBuilder(HttpStatus.EXPECTATION_FAILED)
+            throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
                     .message("One-time Password (OTP) failed")
                     .detail("Issue with SecureRandom generation")
                     .cause(e)
-                    .build();
+                    .exception();
         }
     }
 }

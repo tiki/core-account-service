@@ -14,7 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(OrgInfoConfig.PACKAGE_PATH)
 @EntityScan(OrgInfoConfig.PACKAGE_PATH)
 public class OrgInfoConfig {
-    public static final String PACKAGE_PATH = Constants.PACKAGE_FEATURES_LATEST_DOT_PATH + ".org_info";
+    public static final String PACKAGE_PATH = Constants.PKG_FEAT_LATEST_DOT_PATH + ".org_info";
 
     @Bean
     public OrgInfoService orgInfoService(@Autowired OrgInfoRepository repository){

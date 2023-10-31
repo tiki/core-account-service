@@ -9,9 +9,9 @@ import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.facade.B64F;
 import com.mytiki.account.utilities.facade.RsaF;
-import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import com.nimbusds.jose.JOSEException;
 import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.springframework.http.HttpStatus;
@@ -35,7 +35,7 @@ public class AppInfoService {
     public AppInfoAO create(String name, String userId){
        Optional<UserInfoDO> user =  userInfoService.getDO(userId);
        if(user.isEmpty())
-           throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
+           throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
        else {
            ZonedDateTime now = ZonedDateTime.now();
            AppInfoDO app = new AppInfoDO();
@@ -47,11 +47,11 @@ public class AppInfoService {
            try {
                app.setSignKey(RsaF.generate());
            } catch (JOSEException e) {
-               throw new ApiExceptionBuilder(HttpStatus.EXPECTATION_FAILED)
+               throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
                        .message("Issue with Sign Key")
                        .detail(e.getMessage())
                        .help("Please contact support")
-                       .build();
+                       .exception();
            }
            return toAO(repository.save(app));
        }
@@ -65,9 +65,9 @@ public class AppInfoService {
     public AppInfoAO update(String appId, AppInfoAOReq req){
         Optional<AppInfoDO> found = repository.findByAppId(UUID.fromString(appId));
         if(found.isEmpty())
-            throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
+            throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
                     .detail("Invalid App ID")
-                    .build();
+                    .exception();
         AppInfoDO update = found.get();
         update.setName(req.getName());
         update = repository.save(update);
@@ -93,11 +93,11 @@ public class AppInfoService {
             RSAPublicKey pubkey = RsaF.toPublic(src.getSignKey());
             rsp.setPubKey(B64F.encode(pubkey.getEncoded()));
         } catch (IOException e) {
-            throw new ApiExceptionBuilder(HttpStatus.EXPECTATION_FAILED)
+            throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
                     .message("Issue with Sign Key")
                     .detail(e.getMessage())
                     .help("Please contact support")
-                    .build();
+                    .exception();
         }
         return rsp;
     }
@@ -106,17 +106,17 @@ public class AppInfoService {
         if(OauthScopes.hasScope(token,"account:internal:read")) return;
         OauthSub sub = new OauthSub(token.getName());
         if (sub.isApp() && !sub.getId().equals(appId)) {
-            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
+            throw new ErrorBuilder(HttpStatus.FORBIDDEN)
                     .detail("Invalid claim: sub")
                     .help("App ID does not match claim")
-                    .build();
+                    .exception();
         }else if (sub.isUser()){
             Optional<AppInfoDO> app = repository.findByAppIdAndUserId(UUID.fromString(appId), UUID.fromString(sub.getId()));
             if (app.isEmpty())
-                throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
+                throw new ErrorBuilder(HttpStatus.FORBIDDEN)
                         .detail("Invalid claim: sub")
                         .help("User ID must belong to App's Org")
-                        .build();
+                        .exception();
         }
     }
 }

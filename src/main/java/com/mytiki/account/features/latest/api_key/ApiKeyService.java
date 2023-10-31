@@ -13,9 +13,9 @@ import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.security.oauth.OauthSub;
 import com.mytiki.account.security.oauth.OauthSubNamespace;
 import com.mytiki.account.utilities.Constants;
+import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.B64F;
-import com.mytiki.spring_rest_api.ApiExceptionBuilder;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.http.HttpStatus;
@@ -66,10 +66,10 @@ public class ApiKeyService {
         String secret = null;
         Optional<AppInfoDO> app = appInfoService.getDO(appId);
         if(app.isEmpty())
-            throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
+            throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
                     .message("Invalid App")
                     .help("Get valid appIds from ../oauth/userinfo")
-                    .build();
+                    .exception();
 
         ApiKeyDO apiKey = new ApiKeyDO();
         apiKey.setId(UUID.randomUUID());

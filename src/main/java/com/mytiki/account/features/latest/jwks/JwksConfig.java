@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
 package com.mytiki.account.features.latest.jwks;
 
 import com.mytiki.account.utilities.Constants;
@@ -35,7 +40,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 @EnableJpaRepositories(JwksConfig.PACKAGE_PATH)
 @EntityScan(JwksConfig.PACKAGE_PATH)
 public class JwksConfig {
-    public static final String PACKAGE_PATH = Constants.PACKAGE_FEATURES_LATEST_DOT_PATH + ".jwks";
+    public static final String PACKAGE_PATH = Constants.PKG_FEAT_LATEST_DOT_PATH + ".jwks";
     public static String keyId;
     public static JWSAlgorithm algorithm = JWSAlgorithm.ES256;
 

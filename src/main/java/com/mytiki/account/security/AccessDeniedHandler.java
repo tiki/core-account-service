@@ -6,7 +6,7 @@
 package com.mytiki.account.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mytiki.spring_rest_api.ApiError;
+import com.mytiki.account.utilities.error.ApiError;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;

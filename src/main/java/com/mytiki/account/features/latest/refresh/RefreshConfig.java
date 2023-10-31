@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 @EnableJpaRepositories(RefreshConfig.PACKAGE_PATH)
 @EntityScan(RefreshConfig.PACKAGE_PATH)
 public class RefreshConfig {
-    public static final String PACKAGE_PATH = Constants.PACKAGE_FEATURES_LATEST_DOT_PATH + ".refresh";
+    public static final String PACKAGE_PATH = Constants.PKG_FEAT_LATEST_DOT_PATH + ".refresh";
 
     @Bean
     public RefreshService refreshService(

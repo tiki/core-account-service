@@ -1,11 +1,17 @@
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
 package com.mytiki.account.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mytiki.account.features.latest.jwks.JwksController;
+import com.mytiki.account.health.HealthController;
 import com.mytiki.account.utilities.Constants;
-import com.mytiki.spring_rest_api.ApiConstants;
-import com.mytiki.spring_rest_api.SecurityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +20,11 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 public class SecurityFilter {
     private final AccessDeniedHandler accessDeniedHandler;
@@ -46,19 +57,45 @@ public class SecurityFilter {
                        .frameOptions(Customizer.withDefaults())
                        .xssProtection(Customizer.withDefaults())
                        .referrerPolicy(Customizer.withDefaults())
-                       .permissionsPolicy((pp) -> pp.policy(SecurityConstants.FEATURE_POLICY)))
+                       .permissionsPolicy((pp) -> pp.policy(
+                               "accelerometer" + " 'none'" + "ambient-light-sensor" + " 'none'" +
+                               "autoplay" + " 'none'" + "battery" + " 'none'" + "camera" + " 'none'" + "display-capture" + " 'none'" +
+                               "document-domain" + " 'none'" + "encrypted-media" + " 'none'" + "execution-while-not-rendered" + " 'none'" +
+                               "execution-while-out-of-viewport" + " 'none'" + "fullscreen" + " 'none'" + "geolocation" + " 'none'" +
+                               "gyroscope" + " 'none'" + "layout-animations" + " 'none'" + "legacy-image-formats" + " 'none'" +
+                               "magnetometer" + " 'none'" + "microphone" + " 'none'" + "midi" + " 'none'" + "navigation-override" + " 'none'" +
+                               "oversized-images" + " 'none'" + "payment" + " 'none'" + "picture-in-picture" + " 'none'" + "publickey-credentials-get" + " 'none'" +
+                               "sync-xhr" + " 'none'" + "usb" + " 'none'" + "vr wake-lock" + " 'none'" + "xr-spatial-tracking" + " 'none'")))
                .anonymous(Customizer.withDefaults())
-               .cors((cors) -> cors
-                       .configurationSource(SecurityConstants.corsConfigurationSource()))
+               .cors((cors) -> {
+                   CorsConfiguration configuration = new CorsConfiguration();
+                   configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
+                   configuration.setAllowedMethods(
+                           Arrays.asList(
+                                   HttpMethod.OPTIONS.name(),
+                                   HttpMethod.GET.name(),
+                                   HttpMethod.PUT.name(),
+                                   HttpMethod.POST.name(),
+                                   HttpMethod.DELETE.name()));
+                   configuration.setAllowedHeaders(
+                           Arrays.asList(
+                                   HttpHeaders.CONTENT_TYPE,
+                                   HttpHeaders.AUTHORIZATION,
+                                   HttpHeaders.ACCEPT));
+                   configuration.setAllowCredentials(true);
+                   UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                   source.registerCorsConfiguration("/**", configuration);
+                   cors.configurationSource(source);
+               })
                .csrf((csrf) -> csrf
                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                       .ignoringRequestMatchers(ApiConstants.API_LATEST_ROUTE + Constants.AUTH_PATH + "/**"))
+                       .ignoringRequestMatchers(Constants.API_LATEST_ROUTE + Constants.AUTH_PATH + "/**"))
                .authorizeHttpRequests((req) -> req
-                       .requestMatchers(HttpMethod.GET, ApiConstants.HEALTH_ROUTE).permitAll()
-                       .requestMatchers(HttpMethod.GET, Constants.API_DOCS_PATH).permitAll()
-                       .requestMatchers(HttpMethod.GET, Constants.WELL_KNOWN_PATH + "/**").permitAll()
+                       .requestMatchers(HttpMethod.GET, HealthController.ROUTE).permitAll()
+                       .requestMatchers(HttpMethod.GET, Constants.API_DOCS_ROUTE).permitAll()
+                       .requestMatchers(HttpMethod.GET, JwksController.ROUTE).permitAll()
                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                       .requestMatchers(HttpMethod.POST, ApiConstants.API_LATEST_ROUTE + Constants.AUTH_PATH + "/**").permitAll()
+                       .requestMatchers(HttpMethod.POST, Constants.API_LATEST_ROUTE + Constants.AUTH_PATH + "/**").permitAll()
                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.decoder(jwtDecoder))

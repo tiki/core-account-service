@@ -6,7 +6,7 @@
 package com.mytiki.account.features.latest.user_info;
 
 import com.mytiki.account.features.latest.org_info.OrgInfoService;
-import com.mytiki.spring_rest_api.ApiExceptionBuilder;
+import com.mytiki.account.utilities.builder.ErrorBuilder;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
 
@@ -41,14 +41,14 @@ public class UserInfoService {
     public UserInfoDO addToOrg(String userId, String orgId, String emailToAdd){
         Optional<UserInfoDO> user = getDO(userId);
         if(user.isEmpty() || !user.get().getOrg().getOrgId().toString().equals(orgId))
-            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN).build();
+            throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
 
         Optional<UserInfoDO> found = repository.findByEmail(emailToAdd);
         if(found.isEmpty()) {
-            throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
+            throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
                     .message("User does not exist")
                     .properties("email", emailToAdd)
-                    .build();
+                    .exception();
         }else {
             UserInfoDO updated = found.get();
             updated.setOrg(user.get().getOrg());
@@ -77,16 +77,16 @@ public class UserInfoService {
     public UserInfoAO update(String subject, UserInfoAOUpdate update){
         if(update.getEmail() != null) {
             if (!EmailValidator.getInstance().isValid(update.getEmail()))
-                throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
+                throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
                         .message("Invalid email")
-                        .build();
+                        .exception();
         }
 
         Optional<UserInfoDO> found = repository.findByUserId(UUID.fromString(subject));
         if(found.isEmpty())
-            throw new ApiExceptionBuilder(HttpStatus.BAD_REQUEST)
+            throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
                     .message("Invalid sub claim")
-                    .build();
+                    .exception();
 
         UserInfoDO saved = found.get();
         if(update.getEmail() != null)

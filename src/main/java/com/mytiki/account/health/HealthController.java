@@ -5,16 +5,17 @@
 
 package com.mytiki.account.health;
 
-import com.mytiki.spring_rest_api.ApiConstants;
-import com.mytiki.spring_rest_api.ApiError;
+
+import com.mytiki.account.utilities.error.ApiError;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = ApiConstants.HEALTH_ROUTE)
+@RequestMapping(value = HealthController.ROUTE)
 public class HealthController {
+    public static final String ROUTE = "/health";
 
     @Operation(hidden = true)
     @RequestMapping(method = RequestMethod.GET)

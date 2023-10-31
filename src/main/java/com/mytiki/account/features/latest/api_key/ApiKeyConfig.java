@@ -22,7 +22,7 @@ import java.util.List;
 @EnableJpaRepositories(ApiKeyConfig.PACKAGE_PATH)
 @EntityScan(ApiKeyConfig.PACKAGE_PATH)
 public class ApiKeyConfig {
-    public static final String PACKAGE_PATH = Constants.PACKAGE_FEATURES_LATEST_DOT_PATH + ".api_key";
+    public static final String PACKAGE_PATH = Constants.PKG_FEAT_LATEST_DOT_PATH + ".api_key";
 
     @Bean
     public ApiKeyController apiKeyController(

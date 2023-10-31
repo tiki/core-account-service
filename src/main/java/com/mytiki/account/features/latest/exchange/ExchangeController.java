@@ -6,7 +6,6 @@
 package com.mytiki.account.features.latest.exchange;
 
 import com.mytiki.account.utilities.Constants;
-import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "")
 @RestController
-@RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
+@RequestMapping(value = Constants.API_LATEST_ROUTE)
 public class ExchangeController {
 
     private final ExchangeService service;

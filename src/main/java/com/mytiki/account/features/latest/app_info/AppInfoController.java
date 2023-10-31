@@ -6,7 +6,6 @@
 package com.mytiki.account.features.latest.app_info;
 
 import com.mytiki.account.utilities.Constants;
-import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = AppInfoController.PATH_CONTROLLER)
 public class AppInfoController {
-    public static final String PATH_CONTROLLER = ApiConstants.API_LATEST_ROUTE + "app";
+    public static final String PATH_CONTROLLER = Constants.API_LATEST_ROUTE + "app";
 
     private final AppInfoService service;
 

@@ -1,6 +1,11 @@
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
 package com.mytiki.account.features.latest.jwks;
 
-import com.mytiki.spring_rest_api.ApiExceptionBuilder;
+import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.KeyType;
@@ -88,26 +93,26 @@ public class JwksService {
     public void guard(URI endpoint, String token, String sub){
         Optional<JwksDO> found = get(endpoint);
         if(found.isEmpty())
-            throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
+            throw new ErrorBuilder(HttpStatus.FORBIDDEN)
                 .detail("JWKS Endpoint Not Found")
-                .build();
+                .exception();
         try {
             if(found.get().getKeySet() == null)
-                throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
+                throw new ErrorBuilder(HttpStatus.FORBIDDEN)
                         .detail("JWKS KeySet Not Found")
-                        .build();
+                        .exception();
 
             JwtDecoder decoder = decoder(found.get().getKeySet());
             Jwt jwt = decoder.decode(token);
             if(found.get().getVerifySub() && !jwt.getSubject().equals(sub)){
-                throw new ApiExceptionBuilder(HttpStatus.FORBIDDEN)
+                throw new ErrorBuilder(HttpStatus.FORBIDDEN)
                         .detail("Invalid claim: sub")
-                        .build();
+                        .exception();
             }
         } catch (JwtException e){
-            throw new ApiExceptionBuilder(HttpStatus.UNAUTHORIZED)
+            throw new ErrorBuilder(HttpStatus.UNAUTHORIZED)
                     .message("Invalid token")
-                    .build();
+                    .exception();
         }
     }
 
