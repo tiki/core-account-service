@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
 package com.mytiki.account;
 
 import com.mytiki.account.features.latest.jwks.JwksDO;
@@ -5,7 +10,7 @@ import com.mytiki.account.features.latest.jwks.JwksRepository;
 import com.mytiki.account.features.latest.jwks.JwksService;
 import com.mytiki.account.fixtures.JwksFixture;
 import com.mytiki.account.main.App;
-import com.mytiki.spring_rest_api.ApiException;
+import com.mytiki.account.utilities.error.ApiException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import org.junit.jupiter.api.*;

@@ -12,7 +12,7 @@ import com.mytiki.account.features.latest.org_info.OrgInfoService;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoRepository;
 import com.mytiki.account.main.App;
-import com.mytiki.spring_rest_api.ApiException;
+import com.mytiki.account.utilities.error.ApiException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
