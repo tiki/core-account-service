@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Core Account Service
+
+Parameters:
+  Username:
+    Type: String
+    Description: The database username.
+  Password:
+    Type: String
+    Description: The database password.
+  SecurityGroup:
+    Type: String
+    Description: The security group id.
+
+
+Resources:
+  Database:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBName: account_service
+      AllocatedStorage: 25
+      AutoMinorVersionUpgrade: true
+      BackupRetentionPeriod: 30
+      DBInstanceIdentifier: core-account-service
+      DBInstanceClass: db.t4g.micro
+      DeletionProtection: false
+      Engine: postgres
+      EngineVersion: 15.3
+      MasterUsername: !Ref Username
+      MasterUserPassword: !Ref Password
+      PubliclyAccessible: false
+      StorageEncrypted: true
+      MaxAllocatedStorage: 250
+      CACertificateIdentifier: rds-ca-ecc384-g1
+      VPCSecurityGroups:
+        - !Ref SecurityGroup
+
+

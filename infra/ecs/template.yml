@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Core Account Service
+
+Parameters:
+  Subnets:
+    Type: List<String>
+    Description: List of public subnets for the load balancer.
+  DeployRole:
+    Type: String
+    Description: IAM deployment role for uploading containers.
+  Port:
+    Type: Number
+    Description: Port number for the service.
+    Default: 8228
+  ExecutionRole:
+    Type: String
+    Description: Arn for the ecs task execution role.
+  SecurityGroup:
+    Type: String
+    Description: The security group id.
+  TargetGroup:
+    Type: String
+    Description: The target group arn.
+  Version:
+    Type: String
+    Description: The container version number.
+
+
+Resources:
+  Registry:
+    Type : AWS::ECR::Repository
+    Properties:
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      ImageTagMutability: IMMUTABLE
+      RepositoryName: core-account-service
+      RepositoryPolicyText: !Sub "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"new statement\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\": [\"arn:aws:iam::${AWS::AccountId}:role/${DeployRole}\"]},\"Action\": \"ecr:PutImage\"}]}"
+
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: core-account-service
+
+  Task:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        -
+          Name: core-account-service
+          Essential: true
+          Image: !Sub [ "${URI}:${Version}", { URI: !GetAtt Registry.RepositoryUri, Version: !Ref Version } ]
+          PortMappings:
+            - ContainerPort: !Ref Port
+      Cpu: 512
+      Memory: 2048
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !Ref ExecutionRole
+      RuntimePlatform:
+        CpuArchitecture: ARM64
+        OperatingSystemFamily: LINUX
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !GetAtt Cluster.Arn
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 50
+      DeploymentController:
+        Type: ECS
+      DesiredCount: 2
+      HealthCheckGracePeriodSeconds: 300
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: core-account-service
+          ContainerPort: !Ref Port
+          TargetGroupArn: !Ref TargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref SecurityGroup
+          Subnets: !Ref Subnets
+      PlatformVersion: LATEST
+      ServiceName: core-account-service
+      TaskDefinition: !GetAtt Task.TaskDefinitionArn
+
+
