@@ -46,3 +46,5 @@ application-local.properties
 .aws-sam
 packaged.yaml
 packaged.yml
+
+/node_modules
