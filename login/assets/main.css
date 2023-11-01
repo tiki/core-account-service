@@ -1,0 +1,102 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.tiki-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+.tiki-main-column {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40vw;
+}
+
+.tiki-header-img {
+  width: 7em;
+}
+
+h1 {
+  color: #00133f;
+  margin-top: 0.5em;
+
+}
+
+.tiki-oauth-btn {
+    padding: .75em;
+    cursor: pointer;
+    border-style: none;
+    border-width: 1px;
+    border-radius: 0.375em;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: #FFF8DD;
+    margin: 1em 0;
+    align-items: center;
+}
+
+.tiki-oauth-btn:hover{
+    
+}
+
+.tiki-oauth-img{
+    width: 1.5em;
+    margin-right: 1em;
+}
+
+
+.tiki-login-card{
+    width: 60%;
+}
+
+.tiki-login-form{
+    margin-top: 2em;
+}
+
+label {
+  display: block; 
+  color: #505C59;
+  opacity: 1;
+  font-weight: 600;
+  font-size: 0.875em;
+}
+
+input {
+    width: 100%;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    padding: 0.75em;
+    border: 2px solid #262E33;
+    border-radius: 0.375em;
+}
+
+.tiki-submit-btn {
+    cursor: pointer;
+    color: #FFB822;
+    padding: 1em;
+    border-style: none;
+    border-width: 1px;
+    border-radius: 0.375em;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: rgb(28 0 0/1);
+    margin-top: 1em;
+}
+
+.tiki-secondary-column{
+    width: 60vw; 
+    background-color: #FFF8DD;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
