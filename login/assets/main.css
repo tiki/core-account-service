@@ -31,31 +31,32 @@ h1 {
 }
 
 .tiki-oauth-btn {
-    padding: .75em;
-    cursor: pointer;
-    border-style: none;
-    border-width: 1px;
-    border-radius: 0.375em;
+    text-align: center;
     width: 100%;
+    margin: 1em 0;
     display: flex;
     justify-content: center;
-    background-color: #FFF8DD;
-    margin: 1em 0;
     align-items: center;
+    border: 1px solid black;
+    padding: 0.7em;
+    border-radius: 0.375em;
+    cursor: pointer;
+    background-color: #FFFFFF;
+}
+
+.github-img{
+    width: 1.5em;
+    margin-right: 0.85em;
 }
 
 .tiki-oauth-btn:hover{
-    
-}
-
-.tiki-oauth-img{
-    width: 1.5em;
-    margin-right: 1em;
+    border: 2px solid black;
+    transition: 50ms ease-in;
 }
 
 
 .tiki-login-card{
-    width: 60%;
+    width: 80%;
 }
 
 .tiki-login-form{
@@ -82,7 +83,7 @@ input {
 .tiki-submit-btn {
     cursor: pointer;
     color: #FFB822;
-    padding: 1em;
+    padding: 1.5em;
     border-style: none;
     border-width: 1px;
     border-radius: 0.375em;
@@ -100,3 +101,16 @@ input {
     align-items: center;
     justify-content: center;
 }
+
+@media (max-width: 600px) {
+    .tiki-secondary-column {
+        display: none;
+    }
+    .tiki-main-column {
+        width: 100vw;
+        background-color: #FFF8DD;
+    }
+    .tiki-login-card{
+        width: 80vw;
+    }
+  }
