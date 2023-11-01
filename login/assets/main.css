@@ -54,13 +54,16 @@ h1 {
     transition: 50ms ease-in;
 }
 
-
-.tiki-login-card{
-    width: 80%;
+.tiki-word-divider {
+    text-align: center;
 }
 
 .tiki-login-form{
-    margin-top: 2em;
+    margin-top: 1.5em;
+}
+
+.tiki-login-card{
+    width: 80%;
 }
 
 label {
