@@ -1,9 +1,9 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "core-account-role"
+stack_name = "core-account-service-role"
 s3_bucket = "mytiki-sam-deploy"
-s3_prefix = "core/account/role"
+s3_prefix = "core/account/service/role"
 region = "us-east-2"
 
 [default.deploy.parameters]

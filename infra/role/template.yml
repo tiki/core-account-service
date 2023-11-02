@@ -6,7 +6,7 @@ Parameters:
   RoleName:
     Description: Name of the IAM Role for the deployment
     Type: String
-    Default: "GitHubDeployCoreAccount"
+    Default: "GitHubDeployCoreAccountService"
 
 Resources:
   Role:
