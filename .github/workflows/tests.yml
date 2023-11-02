@@ -64,10 +64,9 @@ jobs:
       - name: Maven Package
         run: mvn clean package
 
-      - name: Publish Results
-        uses: dorny/test-reporter@v1
-        if: always()
+      - name: Upload Results
+        uses: actions/upload-artifact@v3
+        if: success() || failure()
         with:
-          name: Test Report
-          path: "target/surefire-reports/**/*.xml"
-          reporter: java-junit
+          name: test-results
+          path: target/surefire-reports/**/*.xml
