@@ -56,3 +56,7 @@ Resources:
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
             Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/core-ocean-sar-*
+          - Effect: Allow
+            Action:
+              - ecr:GetAuthorizationToken
+            Resource: "*"
