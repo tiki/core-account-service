@@ -38,6 +38,10 @@ jobs:
           role-session-name: ${{ vars.SESSION_NAME }}
           aws-region: ${{ vars.AWS_REGION }}
 
+      - name: SetVars
+        run: |
+          sed -i 's/${AWS::AccountId}/${{ secrets.AWS_ACCOUNT_ID }}/' infra/role/template.yml
+
       - name: SAM Role
         run: cd infra/role && sam build && sam package && sam deploy
 
