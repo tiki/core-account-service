@@ -45,46 +45,44 @@ jobs:
       - name: SAM Role
         run: cd infra/role && sam build && sam package && sam deploy
 
-#  push:
-#    runs-on: ubuntu-latest
+  push:
+    runs-on: ubuntu-latest
+    needs: role
 #    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/')
-#    environment: Production
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#
-#      - name: Set up JDK
-#        uses: actions/setup-java@v3
-#        with:
-#          java-version: '20'
-#          distribution: 'zulu'
-#
-#      - name: Maven Package
-#        run: mvn clean package -Dmaven.test.skip
-#
-#      - name: Maven project version
-#        id: version
-#        run: echo "version=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
-#
-#      - name: AWS Credentials
-#        uses: aws-actions/configure-aws-credentials@v4
-#        with:
-#          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubDeployCoreIcebergCatalog
-#          role-session-name: ${{ vars.SESSION_NAME }}
-#          aws-region: ${{ vars.AWS_REGION }}
-#
-#      - name: Build and push
-#        uses: docker/build-push-action@v5
-#        with:
-#          context: .
-#          target: production
-#          push: true
-#          tags: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/core-account-service:${{ steps.version.outputs.version }}
-#          build-args: |
-#            JAR_FILE=target/*.jar
-#
-#    outputs:
-#      version: ${{ steps.version.outputs.version }}
+    environment: Production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '20'
+          distribution: 'zulu'
+
+      - name: Maven Package
+        run: mvn clean package -Dmaven.test.skip
+
+      - name: Maven project version
+        id: version
+        run: echo "version=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+
+      - name: AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubDeployCoreAccountService
+          role-session-name: ${{ vars.SESSION_NAME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          target: production
+          push: true
+          tags: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/core-account-service:${{ steps.version.outputs.version }}
+          build-args: |
+            JAR_FILE=target/*.jar
 #
 #  deploy:
 #    runs-on: ubuntu-latest
