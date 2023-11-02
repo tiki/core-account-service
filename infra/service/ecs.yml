@@ -24,7 +24,12 @@ Parameters:
   Version:
     Type: String
     Description: The container version number.
-
+  Database:
+    Type: String
+    Description: The endpoint for the database.
+  Secret:
+    Type: String
+    Description: The arn for the secret properties.
 
 Resources:
   Registry:
@@ -51,6 +56,31 @@ Resources:
           Image: !Sub [ "${URI}:${Version}", { URI: !GetAtt Registry.RepositoryUri, Version: !Ref Version } ]
           PortMappings:
             - ContainerPort: !Ref Port
+          Environment:
+            - Name: SPRING_DATASOURCE_URL
+              Value: !Sub "jdbc:postgresql://${Database}:5432/account_service"
+          Secrets:
+            - Name: SPRING_DATASOURCE_USERNAME
+              ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_USERNAME::"
+            - Name: SPRING_DATASOURCE_PASSWORD
+              ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_PASSWORD::"
+            - Name: SENDGRID_API_KEY
+              ValueFrom: !Sub "${Secret}:SENDGRID_API_KEY::"
+            - Name: ACCOUNT_JWT_PRIVATE_KEY
+              ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_PRIVATE_KEY::"
+            - Name: ACCOUNT_JWT_KID
+              ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_KID::"
+            - Name: ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON
+              ValueFrom: !Sub "${Secret}:ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON::"
+            - Name: SENTRY_DSN
+              ValueFrom: !Sub "${Secret}:SENTRY_DSN::"
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: core-account-service
+              awslogs-create-group: true
+              awslogs-stream-prefix: ecs
       Cpu: 512
       Memory: 2048
       NetworkMode: awsvpc

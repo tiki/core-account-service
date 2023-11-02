@@ -4,10 +4,10 @@ Description: Core Account Service
 Parameters:
   Username:
     Type: String
-    Description: The database username.
+    Description: The database username
   Password:
     Type: String
-    Description: The database password.
+    Description: The database password
   SecurityGroup:
     Type: String
     Description: The security group id.
@@ -35,4 +35,7 @@ Resources:
       VPCSecurityGroups:
         - !Ref SecurityGroup
 
-
+Outputs:
+  Database:
+    Description: Database endpoint
+    Value: !GetAtt Database.Endpoint.Address

@@ -13,12 +13,21 @@ concurrency:
 jobs:
   JUnit:
     runs-on: ubuntu-latest
+    environment: Test
+    env:
+      ACCOUNT_JWT_KID: ${{ secrets.ACCOUNT_JWT_PRIVATE_KEY }}
+      ACCOUNT_JWT_PRIVATE_KEY: ${{ secrets.ACCOUNT_JWT_PRIVATE_KEY }}
+      ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON: ${{ secrets.ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+      SPRING_DATASOURCE_USERNAME: ${{ vars.SPRING_DATASOURCE_USERNAME }}
+      SPRING_DATASOURCE_PASSWORD: ${{ vars.SPRING_DATASOURCE_PASSWORD }}
+      SPRING_DATASOURCE_URL: ${{ vars.SPRING_DATASOURCE_URL }}
     services:
       postgres:
         image: postgres:14.5
         env:
-          POSTGRES_USER: tester
-          POSTGRES_PASSWORD: pgtestpw
+          POSTGRES_USER: ${{ vars.SPRING_DATASOURCE_USERNAME }}
+          POSTGRES_PASSWORD: ${{ vars.SPRING_DATASOURCE_PASSWORD }}
           POSTGRES_DB: account_service
           POSTGRES_PORT: 5432
         ports:
@@ -50,12 +59,10 @@ jobs:
       - name: Create Tables
         run: psql -h localhost -d account_service -U tester -f database/create_tables.sql
         env:
-          PGPASSWORD: pgtestpw
+          PGPASSWORD: ${{ vars.SPRING_DATASOURCE_PASSWORD }}
 
       - name: Maven Package
-        run: doppler run -c tst -- mvn clean package
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_ST }}
+        run: mvn clean package
 
       - name: Publish Results
         uses: dorny/test-reporter@v1

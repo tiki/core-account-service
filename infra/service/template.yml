@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Core Account Service
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: The id of the VPC to use.
+  Subnets:
+    Type: String
+    Description: Comma seperated list of public subnets for the load balancer.
+  Certificate:
+    Type: String
+    Description: ARN of the SSL certificate.
+  Port:
+    Type: Number
+    Description: Port number for the service.
+    Default: 8228
+  DeployRole:
+    Type: String
+    Description: IAM deployment role for uploading containers.
+  ExecutionRole:
+    Type: String
+    Description: Arn for the ecs task execution role.
+  Version:
+    Type: String
+    Description: The container version number.
+  KmsKeyId:
+    Type: String
+    Description: The key identifier used to encrypt the secret
+  SecretArn:
+    Type: String
+    Description: The arn for the database secret
+
+Resources:
+  EC2:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ec2.yml
+      Parameters:
+        Subnets: !Ref Subnets
+        VpcId: !Ref VpcId
+        Certificate: !Ref Certificate
+        Port: !Ref Port
+
+  RDS:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: rds.yml
+      Parameters:
+        KmsKeyId: !Ref KmsKeyId
+        SecretArn: !Ref SecretArn
+        SecurityGroup: !GetAtt [EC2, Outputs.SecurityGroup]
+
+  ECS:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ecs.yml
+      Parameters:
+        Subnets: !Ref Subnets
+        DeployRole: !Ref DeployRole
+        ExecutionRole: !Ref ExecutionRole
+        SecurityGroup: !GetAtt [EC2, Outputs.SecurityGroup]
+        TargetGroup: !GetAtt [EC2, Outputs.TargetGroup]
+        Version: !Ref Version
+        Database: !GetAtt [RDS, Outputs.Database]
