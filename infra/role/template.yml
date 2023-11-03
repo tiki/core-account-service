@@ -82,7 +82,7 @@ Resources:
               - ec2:AuthorizeSecurityGroupEgress
             Resource:
               - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:vpc/*
-              - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*"
+              - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*
           - Effect: Allow
             Action:
               - elasticloadbalancing:DescribeLoadBalancers
