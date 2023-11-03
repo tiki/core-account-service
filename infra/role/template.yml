@@ -135,6 +135,7 @@ Resources:
             Action:
               - ecs:CreateService
               - ecs:DescribeServices
+              - ecs:UpdateService
             Resource: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:service/*/*
           - Effect: Allow
             Action: iam:PassRole
