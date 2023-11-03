@@ -152,7 +152,7 @@ Resources:
             - ContainerPort: !Ref Port
           Environment:
             - Name: SPRING_DATASOURCE_URL
-              Value: !Sub [ "jdbc:postgresql://${Database}:5432/account_service", { Database: !GetAtt Database.Endpoint.Address } ]
+              Value: !Sub [ "jdbc:postgresql://${Endpoint}:5432/account_service", { Endpoint: !GetAtt Database.Endpoint.Address } ]
           Secrets:
             - Name: SPRING_DATASOURCE_USERNAME
               ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_USERNAME::"
