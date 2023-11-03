@@ -1,8 +1,12 @@
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
 package com.mytiki.account.features.latest.addr_reg;
 
 import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.utilities.Constants;
-import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = AddrRegController.PATH_CONTROLLER)
 public class AddrRegController {
-    public static final String PATH_CONTROLLER = ApiConstants.API_LATEST_ROUTE + "app/{app-id}/address";
+    public static final String PATH_CONTROLLER = Constants.API_LATEST_ROUTE + "app/{app-id}/address";
 
     private final AddrRegService service;
     private final AppInfoService appInfo;

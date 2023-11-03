@@ -6,7 +6,6 @@
 package com.mytiki.account.features.latest.otp;
 
 import com.mytiki.account.utilities.Constants;
-import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "")
 @RestController
-@RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
+@RequestMapping(value = Constants.API_LATEST_ROUTE)
 public class OtpController {
 
     private final OtpService service;

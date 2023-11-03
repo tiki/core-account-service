@@ -15,7 +15,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(UserInfoConfig.PACKAGE_PATH)
 @EntityScan(UserInfoConfig.PACKAGE_PATH)
 public class UserInfoConfig {
-    public static final String PACKAGE_PATH = Constants.PACKAGE_FEATURES_LATEST_DOT_PATH + ".user_info";
+    public static final String PACKAGE_PATH = Constants.PKG_FEAT_LATEST_DOT_PATH + ".user_info";
 
     @Bean
     public UserInfoController userInfoController(@Autowired UserInfoService service){

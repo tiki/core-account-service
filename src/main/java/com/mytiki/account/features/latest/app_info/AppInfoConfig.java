@@ -15,7 +15,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(AppInfoConfig.PACKAGE_PATH)
 @EntityScan(AppInfoConfig.PACKAGE_PATH)
 public class AppInfoConfig {
-    public static final String PACKAGE_PATH = Constants.PACKAGE_FEATURES_LATEST_DOT_PATH + ".app_info";
+    public static final String PACKAGE_PATH = Constants.PKG_FEAT_LATEST_DOT_PATH + ".app_info";
 
     @Bean
     public AppInfoService appInfoService(

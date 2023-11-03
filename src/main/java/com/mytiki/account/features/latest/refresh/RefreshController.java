@@ -6,7 +6,6 @@
 package com.mytiki.account.features.latest.refresh;
 
 import com.mytiki.account.utilities.Constants;
-import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "")
 @RestController
-@RequestMapping(value = ApiConstants.API_LATEST_ROUTE)
+@RequestMapping(value = Constants.API_LATEST_ROUTE)
 public class RefreshController {
 
     private final RefreshService service;

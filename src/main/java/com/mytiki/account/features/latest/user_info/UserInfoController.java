@@ -6,18 +6,18 @@
 package com.mytiki.account.features.latest.user_info;
 
 import com.mytiki.account.utilities.Constants;
-import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+
 @Tag(name = "")
 @RestController
 @RequestMapping(value = UserInfoController.PATH_CONTROLLER)
 public class UserInfoController {
-    public static final String PATH_CONTROLLER = ApiConstants.API_LATEST_ROUTE + "user";
+    public static final String PATH_CONTROLLER = Constants.API_LATEST_ROUTE + "user";
 
     private final UserInfoService service;
 

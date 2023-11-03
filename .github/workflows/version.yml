@@ -13,22 +13,8 @@ concurrency:
 jobs:
   Version:
     if: startsWith(github.head_ref, 'release/')
+    environment: Production
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:14.5
-        env:
-          POSTGRES_USER: tester
-          POSTGRES_PASSWORD: pgtestpw
-          POSTGRES_DB: account_service
-          POSTGRES_PORT: 5432
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -60,30 +46,6 @@ jobs:
         run: |
           sed -i '0,/<version>*.*.*<\/version>/s//<version>${{ steps.semver.outputs.nextStrict }}<\/version>/' pom.xml
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '20'
-          distribution: 'zulu'
-
-      - name: Install CLI
-        uses: dopplerhq/cli-action@v2
-
-      - name: Install PostgreSQL client
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes postgresql-client
-
-      - name: Create Tables
-        run: psql -h localhost -d account_service -U tester -f database/create_tables.sql
-        env:
-          PGPASSWORD: pgtestpw
-
-      - name: OAS3
-        run: doppler run -c tst -- mvn clean verify
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_ST }}
-
       - name: Commit Changes
         continue-on-error: true
         env:
@@ -95,6 +57,3 @@ jobs:
           git add openapi.yaml
           git commit -m 'version bump'
           git push
-
-    outputs:
-      version: ${{ steps.semver.outputs.nextStrict }}

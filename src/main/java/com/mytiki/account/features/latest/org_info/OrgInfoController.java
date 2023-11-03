@@ -6,7 +6,6 @@
 package com.mytiki.account.features.latest.org_info;
 
 import com.mytiki.account.utilities.Constants;
-import com.mytiki.spring_rest_api.ApiConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = OrgInfoController.PATH_CONTROLLER)
 public class OrgInfoController {
-    public static final String PATH_CONTROLLER = ApiConstants.API_LATEST_ROUTE + "org";
+    public static final String PATH_CONTROLLER = Constants.API_LATEST_ROUTE + "org";
 
     private final OrgInfoService service;
 

@@ -41,3 +41,8 @@ application-local.properties
 
 # Maven Wrapper Jar
 .mvn/wrapper/maven-wrapper.jar
+
+# AWS
+.aws-sam
+packaged.yaml
+packaged.yml
