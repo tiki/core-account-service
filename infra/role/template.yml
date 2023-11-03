@@ -122,6 +122,7 @@ Resources:
             Action:
               - ecr:DescribeRepositories
               - ecr:SetRepositoryPolicy
+              - ecr:BatchGetImage
             Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/core-account-service
           - Effect: Allow
             Action:
