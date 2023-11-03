@@ -182,7 +182,7 @@ Resources:
         - FARGATE
       ExecutionRoleArn: !Ref ExecutionRole
       RuntimePlatform:
-        CpuArchitecture: ARM64
+        CpuArchitecture: X86_64
         OperatingSystemFamily: LINUX
 
   Service:
