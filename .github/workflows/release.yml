@@ -25,12 +25,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '21'
-          distribution: 'corretto'
-
       - name: AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -45,36 +39,9 @@ jobs:
       - name: SAM Role
         run: cd infra/role && sam build && sam package && sam deploy
 
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: role
-    environment: Production
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubDeployCoreAccountService
-          role-session-name: ${{ vars.SESSION_NAME }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Maven project version
-        id: version
-        run: echo "version=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
-
-      - name: SAM Publish
-        run: |
-          cd infra/service
-          sam build --parameter-overrides ParameterKey=Subnets,ParameterValue=${{ secrets.SUBNETS }} ParameterKey=VpcId,ParameterValue=${{ secrets.VPCID }} ParameterKey=Certificate,ParameterValue=${{ secrets.CERTIFICATE }} ParameterKey=Username,ParameterValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} ParameterKey=Password,ParameterValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} ParameterKey=DeployRole,ParameterValue=${{ vars.DEPLOYROLE }} ParameterKey=ExecutionRole,ParameterValue=${{ secrets.EXECUTIONROLE }} ParameterKey=Secret,ParameterValue=${{ secrets.SECRETARN }} ParameterKey=Version,ParameterValue=${{ steps.version.outputs.version }}
-          sam package
-          sam deploy --parameter-overrides ParameterKey=Subnets,ParameterValue=${{ secrets.SUBNETS }} ParameterKey=VpcId,ParameterValue=${{ secrets.VPCID }} ParameterKey=Certificate,ParameterValue=${{ secrets.CERTIFICATE }} ParameterKey=Username,ParameterValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} ParameterKey=Password,ParameterValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} ParameterKey=DeployRole,ParameterValue=${{ vars.DEPLOYROLE }} ParameterKey=ExecutionRole,ParameterValue=${{ secrets.EXECUTIONROLE }} ParameterKey=Secret,ParameterValue=${{ secrets.SECRETARN }} ParameterKey=Version,ParameterValue=${{ steps.version.outputs.version }}
-
   push:
     runs-on: ubuntu-latest
-    needs: deploy
+    needs: role
     environment: Production
     steps:
       - name: Checkout
@@ -83,8 +50,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '20'
-          distribution: 'zulu'
+          java-version: '21'
+          distribution: 'corretto'
 
       - name: Maven Package
         run: mvn clean package -Dmaven.test.skip
@@ -113,6 +80,32 @@ jobs:
           tags: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/core-account-service:${{ steps.version.outputs.version }}
           build-args: |
             JAR_FILE=target/*.jar
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: push
+    environment: Production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubDeployCoreAccountService
+          role-session-name: ${{ vars.SESSION_NAME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Maven project version
+        id: version
+        run: echo "version=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+
+      - name: SAM Publish
+        run: |
+          cd infra/service
+          sam build --parameter-overrides ParameterKey=Subnets,ParameterValue=${{ secrets.SUBNETS }} ParameterKey=VpcId,ParameterValue=${{ secrets.VPCID }} ParameterKey=Certificate,ParameterValue=${{ secrets.CERTIFICATE }} ParameterKey=Username,ParameterValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} ParameterKey=Password,ParameterValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} ParameterKey=DeployRole,ParameterValue=${{ vars.DEPLOYROLE }} ParameterKey=ExecutionRole,ParameterValue=${{ secrets.EXECUTIONROLE }} ParameterKey=Secret,ParameterValue=${{ secrets.SECRETARN }} ParameterKey=Version,ParameterValue=${{ steps.version.outputs.version }}
+          sam package
+          sam deploy --parameter-overrides ParameterKey=Subnets,ParameterValue=${{ secrets.SUBNETS }} ParameterKey=VpcId,ParameterValue=${{ secrets.VPCID }} ParameterKey=Certificate,ParameterValue=${{ secrets.CERTIFICATE }} ParameterKey=Username,ParameterValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} ParameterKey=Password,ParameterValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} ParameterKey=DeployRole,ParameterValue=${{ vars.DEPLOYROLE }} ParameterKey=ExecutionRole,ParameterValue=${{ secrets.EXECUTIONROLE }} ParameterKey=Secret,ParameterValue=${{ secrets.SECRETARN }} ParameterKey=Version,ParameterValue=${{ steps.version.outputs.version }}
 
   sentry:
     runs-on: ubuntu-latest
