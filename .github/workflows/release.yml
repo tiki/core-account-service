@@ -65,7 +65,7 @@ jobs:
         run: |
           cd infra/service
           sam build --parameter-overrides Subnets=${{ secrets.SUBNETS }},VpcId=${{ secrets.VPCID }},Certificate=${{ secrets.CERTIFICATE }},Username=${{ secrets.SPRING_DATASOURCE_USERNAME }},Password=${{ secrets.SPRING_DATASOURCE_PASSWORD }},DeployRole=${{ vars.DEPLOYROLE }},ExecutionRole=${{ secrets.EXECUTIONROLE }},Secret=${{ secrets.SECRETARN }}
-          sam package --parameter-overrides Subnets=${{ secrets.SUBNETS }},VpcId=${{ secrets.VPCID }},Certificate=${{ secrets.CERTIFICATE }},Username=${{ secrets.SPRING_DATASOURCE_USERNAME }},Password=${{ secrets.SPRING_DATASOURCE_PASSWORD }},DeployRole=${{ vars.DEPLOYROLE }},ExecutionRole=${{ secrets.EXECUTIONROLE }},Secret=${{ secrets.SECRETARN }}
+          sam package
           sam deploy --parameter-overrides Subnets=${{ secrets.SUBNETS }},VpcId=${{ secrets.VPCID }},Certificate=${{ secrets.CERTIFICATE }},Username=${{ secrets.SPRING_DATASOURCE_USERNAME }},Password=${{ secrets.SPRING_DATASOURCE_PASSWORD }},DeployRole=${{ vars.DEPLOYROLE }},ExecutionRole=${{ secrets.EXECUTIONROLE }},Secret=${{ secrets.SECRETARN }}
 
   push:
