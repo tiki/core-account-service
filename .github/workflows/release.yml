@@ -45,10 +45,32 @@ jobs:
       - name: SAM Role
         run: cd infra/role && sam build && sam package && sam deploy
 
-  push:
+
+  deploy:
     runs-on: ubuntu-latest
     needs: role
-#    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/')
+    environment: Production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubDeployCoreAccountService
+          role-session-name: ${{ vars.SESSION_NAME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: SAM Publish
+        run: |
+          cd infra/service
+          sam build --parameter-overrides Subnets=${{ secrets.SUBNETS }},VpcId=${{ secrets.VPCID }},Certificate=${{ secrets.CERTIFICATE }},Username=${{ secrets.SPRING_DATASOURCE_USERNAME }},Password=${{ secrets.SPRING_DATASOURCE_PASSWORD }},DeployRole=${{ vars.DEPLOYROLE }},ExecutionRole=${{ secrets.EXECUTIONROLE }},Secret=${{ secrets.SECRETARN }}
+          sam package --parameter-overrides Subnets=${{ secrets.SUBNETS }},VpcId=${{ secrets.VPCID }},Certificate=${{ secrets.CERTIFICATE }},Username=${{ secrets.SPRING_DATASOURCE_USERNAME }},Password=${{ secrets.SPRING_DATASOURCE_PASSWORD }},DeployRole=${{ vars.DEPLOYROLE }},ExecutionRole=${{ secrets.EXECUTIONROLE }},Secret=${{ secrets.SECRETARN }}
+          sam deploy --parameter-overrides Subnets=${{ secrets.SUBNETS }},VpcId=${{ secrets.VPCID }},Certificate=${{ secrets.CERTIFICATE }},Username=${{ secrets.SPRING_DATASOURCE_USERNAME }},Password=${{ secrets.SPRING_DATASOURCE_PASSWORD }},DeployRole=${{ vars.DEPLOYROLE }},ExecutionRole=${{ secrets.EXECUTIONROLE }},Secret=${{ secrets.SECRETARN }}
+
+  push:
+    runs-on: ubuntu-latest
+    needs: deploy
     environment: Production
     steps:
       - name: Checkout
@@ -87,60 +109,25 @@ jobs:
           tags: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/core-account-service:${{ steps.version.outputs.version }}
           build-args: |
             JAR_FILE=target/*.jar
-#
-#  deploy:
-#    runs-on: ubuntu-latest
-#    needs: [ test_and_push ]
-#    environment: Production
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#
-#      - name: Setup Terraform Variables
-#        working-directory: ./infra
-#        run: |-
-#          cat > pipeline.auto.tfvars <<EOF
-#          sem_ver = "${{ needs.test_and_push.outputs.version }}"
-#          EOF
-#
-#      - name: Setup Terraform
-#        uses: hashicorp/setup-terraform@v3
-#        with:
-#          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-#
-#      - name: Terraform Format
-#        id: fmt
-#        run: terraform fmt
-#        working-directory: infra
-#
-#      - name: Terraform Init
-#        id: init
-#        run: terraform init
-#        working-directory: infra
-#
-#      - name: Terraform Apply
-#        id: apply
-#        run: terraform apply -auto-approve
-#        working-directory: infra
-#
-#  sentry:
-#    runs-on: ubuntu-latest
-#    needs: deploy_to_infra
-#    environment: Production
-#    steps:
-#      - name: Checkout Repository
-#        uses: actions/checkout@v4
-#
-#      - name: Create Sentry release
-#        uses: getsentry/action-release@v1
-#        env:
-#          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-#          SENTRY_ORG: 'my-tiki'
-#          SENTRY_PROJECT: 'account'
-#        with:
-#          environment: public
-#          ignore_missing: true
-#          ignore_empty: true
+
+  sentry:
+    runs-on: ubuntu-latest
+    needs: push
+    environment: Production
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: 'my-tiki'
+          SENTRY_PROJECT: 'account'
+        with:
+          environment: public
+          ignore_missing: true
+          ignore_empty: true
 #
 #  publish:
 #    runs-on: ubuntu-latest

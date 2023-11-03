@@ -8,6 +8,7 @@ Parameters:
   Password:
     Type: String
     Description: The database password
+    NoEcho: true
   SecurityGroup:
     Type: String
     Description: The security group id.

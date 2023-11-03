@@ -25,12 +25,16 @@ Parameters:
   Version:
     Type: String
     Description: The container version number.
-  KmsKeyId:
+  Username:
     Type: String
-    Description: The key identifier used to encrypt the secret
-  SecretArn:
+    Description: The database username
+  Password:
     Type: String
-    Description: The arn for the database secret
+    Description: The database password
+    NoEcho: true
+  Secret:
+    Type: String
+    Description: The arn for the secret properties.
 
 Resources:
   EC2:
@@ -48,8 +52,8 @@ Resources:
     Properties:
       Location: rds.yml
       Parameters:
-        KmsKeyId: !Ref KmsKeyId
-        SecretArn: !Ref SecretArn
+        Username: !Ref Username
+        Password: !Ref Password
         SecurityGroup: !GetAtt [EC2, Outputs.SecurityGroup]
 
   ECS:
@@ -64,3 +68,4 @@ Resources:
         TargetGroup: !GetAtt [EC2, Outputs.TargetGroup]
         Version: !Ref Version
         Database: !GetAtt [RDS, Outputs.Database]
+        Secret: !Ref Secret

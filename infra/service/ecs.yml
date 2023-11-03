@@ -41,79 +41,79 @@ Resources:
       RepositoryName: core-account-service
       RepositoryPolicyText: !Sub "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"new statement\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\": [\"arn:aws:iam::${AWS::AccountId}:role/${DeployRole}\"]},\"Action\": \"ecr:PutImage\"}]}"
 
-  Cluster:
-    Type: AWS::ECS::Cluster
-    Properties:
-      ClusterName: core-account-service
-
-  Task:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      ContainerDefinitions:
-        -
-          Name: core-account-service
-          Essential: true
-          Image: !Sub [ "${URI}:${Version}", { URI: !GetAtt Registry.RepositoryUri, Version: !Ref Version } ]
-          PortMappings:
-            - ContainerPort: !Ref Port
-          Environment:
-            - Name: SPRING_DATASOURCE_URL
-              Value: !Sub "jdbc:postgresql://${Database}:5432/account_service"
-          Secrets:
-            - Name: SPRING_DATASOURCE_USERNAME
-              ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_USERNAME::"
-            - Name: SPRING_DATASOURCE_PASSWORD
-              ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_PASSWORD::"
-            - Name: SENDGRID_API_KEY
-              ValueFrom: !Sub "${Secret}:SENDGRID_API_KEY::"
-            - Name: ACCOUNT_JWT_PRIVATE_KEY
-              ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_PRIVATE_KEY::"
-            - Name: ACCOUNT_JWT_KID
-              ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_KID::"
-            - Name: ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON
-              ValueFrom: !Sub "${Secret}:ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON::"
-            - Name: SENTRY_DSN
-              ValueFrom: !Sub "${Secret}:SENTRY_DSN::"
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-region: !Ref AWS::Region
-              awslogs-group: core-account-service
-              awslogs-create-group: true
-              awslogs-stream-prefix: ecs
-      Cpu: 512
-      Memory: 2048
-      NetworkMode: awsvpc
-      RequiresCompatibilities:
-        - FARGATE
-      ExecutionRoleArn: !Ref ExecutionRole
-      RuntimePlatform:
-        CpuArchitecture: ARM64
-        OperatingSystemFamily: LINUX
-
-  Service:
-    Type: AWS::ECS::Service
-    Properties:
-      Cluster: !GetAtt Cluster.Arn
-      DeploymentConfiguration:
-        MinimumHealthyPercent: 50
-      DeploymentController:
-        Type: ECS
-      DesiredCount: 2
-      HealthCheckGracePeriodSeconds: 300
-      LaunchType: FARGATE
-      LoadBalancers:
-        - ContainerName: core-account-service
-          ContainerPort: !Ref Port
-          TargetGroupArn: !Ref TargetGroup
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
-          SecurityGroups:
-            - !Ref SecurityGroup
-          Subnets: !Ref Subnets
-      PlatformVersion: LATEST
-      ServiceName: core-account-service
-      TaskDefinition: !GetAtt Task.TaskDefinitionArn
+#  Cluster:
+#    Type: AWS::ECS::Cluster
+#    Properties:
+#      ClusterName: core-account-service
+#
+#  Task:
+#    Type: AWS::ECS::TaskDefinition
+#    Properties:
+#      ContainerDefinitions:
+#        -
+#          Name: core-account-service
+#          Essential: true
+#          Image: !Sub [ "${URI}:${Version}", { URI: !GetAtt Registry.RepositoryUri, Version: !Ref Version } ]
+#          PortMappings:
+#            - ContainerPort: !Ref Port
+#          Environment:
+#            - Name: SPRING_DATASOURCE_URL
+#              Value: !Sub "jdbc:postgresql://${Database}:5432/account_service"
+#          Secrets:
+#            - Name: SPRING_DATASOURCE_USERNAME
+#              ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_USERNAME::"
+#            - Name: SPRING_DATASOURCE_PASSWORD
+#              ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_PASSWORD::"
+#            - Name: SENDGRID_API_KEY
+#              ValueFrom: !Sub "${Secret}:SENDGRID_API_KEY::"
+#            - Name: ACCOUNT_JWT_PRIVATE_KEY
+#              ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_PRIVATE_KEY::"
+#            - Name: ACCOUNT_JWT_KID
+#              ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_KID::"
+#            - Name: ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON
+#              ValueFrom: !Sub "${Secret}:ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON::"
+#            - Name: SENTRY_DSN
+#              ValueFrom: !Sub "${Secret}:SENTRY_DSN::"
+#          LogConfiguration:
+#            LogDriver: awslogs
+#            Options:
+#              awslogs-region: !Ref AWS::Region
+#              awslogs-group: core-account-service
+#              awslogs-create-group: true
+#              awslogs-stream-prefix: ecs
+#      Cpu: 512
+#      Memory: 2048
+#      NetworkMode: awsvpc
+#      RequiresCompatibilities:
+#        - FARGATE
+#      ExecutionRoleArn: !Ref ExecutionRole
+#      RuntimePlatform:
+#        CpuArchitecture: ARM64
+#        OperatingSystemFamily: LINUX
+#
+#  Service:
+#    Type: AWS::ECS::Service
+#    Properties:
+#      Cluster: !GetAtt Cluster.Arn
+#      DeploymentConfiguration:
+#        MinimumHealthyPercent: 50
+#      DeploymentController:
+#        Type: ECS
+#      DesiredCount: 2
+#      HealthCheckGracePeriodSeconds: 300
+#      LaunchType: FARGATE
+#      LoadBalancers:
+#        - ContainerName: core-account-service
+#          ContainerPort: !Ref Port
+#          TargetGroupArn: !Ref TargetGroup
+#      NetworkConfiguration:
+#        AwsvpcConfiguration:
+#          AssignPublicIp: ENABLED
+#          SecurityGroups:
+#            - !Ref SecurityGroup
+#          Subnets: !Ref Subnets
+#      PlatformVersion: LATEST
+#      ServiceName: core-account-service
+#      TaskDefinition: !GetAtt Task.TaskDefinitionArn
 
 
