@@ -112,7 +112,7 @@ Resources:
             Resource: "*"
           - Effect: Allow
             Action:
-              - rds:DescribeDBInstances
+              - rds:CreateDBInstance
             Resource: !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:*
           - Effect: Allow
             Action:
