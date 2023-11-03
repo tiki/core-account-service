@@ -61,12 +61,16 @@ jobs:
           role-session-name: ${{ vars.SESSION_NAME }}
           aws-region: ${{ vars.AWS_REGION }}
 
+      - name: Maven project version
+        id: version
+        run: echo "version=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+
       - name: SAM Publish
         run: |
           cd infra/service
-          sam build --parameter-overrides ParameterKey=Subnets,ParameterValue=${{ secrets.SUBNETS }} ParameterKey=VpcId,ParameterValue=${{ secrets.VPCID }} ParameterKey=Certificate,ParameterValue=${{ secrets.CERTIFICATE }} ParameterKey=Username,ParameterValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} ParameterKey=Password,ParameterValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} ParameterKey=DeployRole,ParameterValue=${{ vars.DEPLOYROLE }} ParameterKey=ExecutionRole,ParameterValue=${{ secrets.EXECUTIONROLE }} ParameterKey=Secret,ParameterValue=${{ secrets.SECRETARN }}
+          sam build --parameter-overrides ParameterKey=Subnets,ParameterValue=${{ secrets.SUBNETS }} ParameterKey=VpcId,ParameterValue=${{ secrets.VPCID }} ParameterKey=Certificate,ParameterValue=${{ secrets.CERTIFICATE }} ParameterKey=Username,ParameterValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} ParameterKey=Password,ParameterValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} ParameterKey=DeployRole,ParameterValue=${{ vars.DEPLOYROLE }} ParameterKey=ExecutionRole,ParameterValue=${{ secrets.EXECUTIONROLE }} ParameterKey=Secret,ParameterValue=${{ secrets.SECRETARN }} ParameterKey=Version,ParameterValue=${{ steps.version.outputs.version }}
           sam package
-          sam deploy --parameter-overrides ParameterKey=Subnets,ParameterValue=${{ secrets.SUBNETS }} ParameterKey=VpcId,ParameterValue=${{ secrets.VPCID }} ParameterKey=Certificate,ParameterValue=${{ secrets.CERTIFICATE }} ParameterKey=Username,ParameterValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} ParameterKey=Password,ParameterValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} ParameterKey=DeployRole,ParameterValue=${{ vars.DEPLOYROLE }} ParameterKey=ExecutionRole,ParameterValue=${{ secrets.EXECUTIONROLE }} ParameterKey=Secret,ParameterValue=${{ secrets.SECRETARN }}
+          sam deploy --parameter-overrides ParameterKey=Subnets,ParameterValue=${{ secrets.SUBNETS }} ParameterKey=VpcId,ParameterValue=${{ secrets.VPCID }} ParameterKey=Certificate,ParameterValue=${{ secrets.CERTIFICATE }} ParameterKey=Username,ParameterValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} ParameterKey=Password,ParameterValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} ParameterKey=DeployRole,ParameterValue=${{ vars.DEPLOYROLE }} ParameterKey=ExecutionRole,ParameterValue=${{ secrets.EXECUTIONROLE }} ParameterKey=Secret,ParameterValue=${{ secrets.SECRETARN }} ParameterKey=Version,ParameterValue=${{ steps.version.outputs.version }}
 
   push:
     runs-on: ubuntu-latest
