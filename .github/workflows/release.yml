@@ -78,8 +78,8 @@ jobs:
           target: production
           push: true
           tags: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/core-account-service:${{ steps.version.outputs.version }}
-          build-args: |
-            JAR_FILE=target/*.jar
+          build-args:
+            - JAR_FILE=target/*.jar
 
   deploy:
     runs-on: ubuntu-latest
