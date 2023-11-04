@@ -106,20 +106,30 @@ jobs:
           sam package
           sam deploy --parameter-overrides ParameterKey=Subnets,ParameterValue=${{ secrets.SUBNETS }} ParameterKey=VpcId,ParameterValue=${{ secrets.VPCID }} ParameterKey=Certificate,ParameterValue=${{ secrets.CERTIFICATE }} ParameterKey=Username,ParameterValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} ParameterKey=Password,ParameterValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} ParameterKey=DeployRole,ParameterValue=${{ vars.DEPLOYROLE }} ParameterKey=ExecutionRole,ParameterValue=${{ secrets.EXECUTIONROLE }} ParameterKey=Secret,ParameterValue=${{ secrets.SECRETARN }} ParameterKey=Version,ParameterValue=${{ steps.version.outputs.version }}
 
-#  publish:
-#    runs-on: ubuntu-latest
-#    needs: [ sentry_release, test_and_push ]
-#    environment: Production
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#
-#      - name: OpenApi
-#        uses: readmeio/rdme@8.6.6
-#        with:
-#          rdme: openapi openapi.yaml --key=${{ secrets.README_API_KEY }} --id=63c6011fa9d9d30086fb6427
-#
-#      - name: Release
-#        uses: ncipollo/release-action@v1
-#        with:
-#          tag: ${{ needs.test_and_push.outputs.version }}
+  publish:
+    runs-on: ubuntu-latest
+    needs: deploy
+    environment: Production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Maven project version
+        id: version
+        run: echo "version=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+
+      - name: OpenApi
+        uses: readmeio/rdme@8.6.6
+        with:
+          rdme: openapi openapi.yaml --key=${{ secrets.README_API_KEY }} --id=654682c267d53307768c761f
+
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.version.outputs.version }}
