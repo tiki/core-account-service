@@ -1,4 +1,4 @@
-name: OAS3
+name: Update
 
 on:
   pull_request:
@@ -11,9 +11,57 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  JUnit:
+  Version:
+    if: startsWith(github.head_ref, 'release/')
+    environment: Production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '20'
+          distribution: 'corretto'
+
+      - name: Checkout PR
+        id: getpr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr checkout ${{ github.event.pull_request.number }}
+          export PR_BRANCH=$(git branch --show-current)
+          echo "branch=$PR_BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Get Version
+        id: semver
+        uses: ietf-tools/semver-action@v1
+        with:
+          token: ${{ github.token }}
+          branch: ${{ steps.getpr.outputs.branch }}
+
+      - name: Set Version
+        run: |
+          sed -i '0,/<version>*.*.*<\/version>/s//<version>${{ steps.semver.outputs.nextStrict }}<\/version>/' pom.xml
+
+      - name: Commit Changes
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GH Action"
+          git add pom.xml
+          git commit -m 'version bump'
+          git push
+
+
+  OAS3:
     runs-on: ubuntu-latest
     environment: Test
+    needs: Version
     env:
       ACCOUNT_JWT_KID: ${{ secrets.ACCOUNT_JWT_PRIVATE_KEY }}
       ACCOUNT_JWT_PRIVATE_KEY: ${{ secrets.ACCOUNT_JWT_PRIVATE_KEY }}
@@ -47,6 +95,15 @@ jobs:
         with:
           java-version: '20'
           distribution: 'corretto'
+
+      - name: Checkout PR
+        id: getpr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr checkout ${{ github.event.pull_request.number }}
+          export PR_BRANCH=$(git branch --show-current)
+          echo "branch=$PR_BRANCH" >> $GITHUB_OUTPUT
 
       - name: Install PostgreSQL client
         run: |
