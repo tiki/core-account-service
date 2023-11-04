@@ -1,4 +1,4 @@
-name: Tests
+name: OAS3
 
 on:
   pull_request:
@@ -58,12 +58,16 @@ jobs:
         env:
           PGPASSWORD: ${{ vars.SPRING_DATASOURCE_PASSWORD }}
 
-      - name: Maven Package
-        run: mvn clean package
+      - name: Generate OAS3 spec
+        run: mvn clean verify
 
-      - name: Upload Results
-        uses: actions/upload-artifact@v3
-        if: success() || failure()
-        with:
-          name: test-results
-          path: target/surefire-reports/**/*.xml
+      - name: Commit Changes
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GH Action"
+          git add openapi.yaml
+          git commit -m 'oas update'
+          git push

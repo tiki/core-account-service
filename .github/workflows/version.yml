@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '20'
-          distribution: 'zulu'
+          distribution: 'corretto'
 
       - name: Checkout PR
         id: getpr
@@ -54,6 +54,5 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GH Action"
           git add pom.xml
-          git add openapi.yaml
           git commit -m 'version bump'
           git push

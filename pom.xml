@@ -28,6 +28,7 @@
         <start-class>com.mytiki.account.main.App</start-class>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>20</java.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
     </properties>
 
     <dependencies>
@@ -173,7 +174,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <apiDocsUrl>http://localhost:10502/v3/api-docs.yaml
+                    <apiDocsUrl>http://localhost:10228/v3/api-docs.yaml
                     </apiDocsUrl>
                     <outputFileName>openapi.yaml</outputFileName>
                     <outputDir>${project.basedir}</outputDir>
