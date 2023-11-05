@@ -1,0 +1,211 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Core Account Service
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: The id of the VPC to use.
+  Subnets:
+    Type: List<String>
+    Description: Comma seperated list of public subnets for the load balancer.
+  Certificate:
+    Type: String
+    Description: ARN of the SSL certificate.
+  Port:
+    Type: Number
+    Description: Port number for the service.
+    Default: 8228
+  DeployRole:
+    Type: String
+    Description: IAM deployment role for uploading containers.
+  ExecutionRole:
+    Type: String
+    Description: Arn for the ecs task execution role.
+  Version:
+    Type: String
+    Description: The container version number.
+  Username:
+    Type: String
+    Description: The database username
+  Password:
+    Type: String
+    Description: The database password
+    NoEcho: true
+  Secret:
+    Type: String
+    Description: The arn for the secret properties.
+
+Resources:
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VpcId
+      GroupName: core-account-service
+      GroupDescription: Core Account Service
+      Tags:
+        - Key: Name
+          Value: Core Account Service
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupName: core-account-service
+        - IpProtocol: tcp
+          FromPort: 8228
+          ToPort: 8228
+          SourceSecurityGroupName: core-account-service
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIpv6: ::/0
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: core-account-service
+      Scheme: internet-facing
+      Type: application
+      SecurityGroups:
+        - !Ref SecurityGroup
+      Subnets: !Ref Subnets
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: LoadBalancer
+    Properties:
+      VpcId: !Ref VpcId
+      Name: core-account-service
+      Port: !Ref Port
+      Protocol: HTTP
+      HealthCheckEnabled: true
+      HealthCheckPath: /health
+      HealthCheckProtocol: HTTP
+      TargetType: ip
+
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref Certificate
+      SslPolicy: ELBSecurityPolicy-TLS13-1-0-2021-06
+      LoadBalancerArn: !GetAtt LoadBalancer.LoadBalancerArn
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !GetAtt TargetGroup.TargetGroupArn
+
+  Database:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBName: account_service
+      AllocatedStorage: 25
+      AutoMinorVersionUpgrade: true
+      BackupRetentionPeriod: 30
+      DBInstanceIdentifier: core-account-service
+      DBInstanceClass: db.t4g.micro
+      DeletionProtection: false
+      Engine: postgres
+      EngineVersion: 15.3
+      MasterUsername: !Ref Username
+      MasterUserPassword: !Ref Password
+      PubliclyAccessible: false
+      StorageEncrypted: true
+      MaxAllocatedStorage: 250
+      CACertificateIdentifier: rds-ca-ecc384-g1
+      VPCSecurityGroups:
+        - !GetAtt SecurityGroup.GroupId
+
+  Registry:
+    Type: AWS::ECR::Repository
+    Properties:
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      ImageTagMutability: IMMUTABLE
+      RepositoryName: core-account-service
+      RepositoryPolicyText: !Sub "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"new statement\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\": [\"arn:aws:iam::${AWS::AccountId}:role/${DeployRole}\"]},\"Action\": \"ecr:PutImage\"}]}"
+
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: core-account-service
+
+  Task:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        -
+          Name: core-account-service
+          Essential: true
+          Image: !Sub [ "${URI}:${Version}", { URI: !GetAtt Registry.RepositoryUri, Version: !Ref Version } ]
+          PortMappings:
+            - ContainerPort: !Ref Port
+          Environment:
+            - Name: SPRING_DATASOURCE_URL
+              Value: !Sub [ "jdbc:postgresql://${Endpoint}:5432/account_service", { Endpoint: !GetAtt Database.Endpoint.Address } ]
+          Secrets:
+            - Name: SPRING_DATASOURCE_USERNAME
+              ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_USERNAME::"
+            - Name: SPRING_DATASOURCE_PASSWORD
+              ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_PASSWORD::"
+            - Name: SENDGRID_API_KEY
+              ValueFrom: !Sub "${Secret}:SENDGRID_API_KEY::"
+            - Name: ACCOUNT_JWT_PRIVATE_KEY
+              ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_PRIVATE_KEY::"
+            - Name: ACCOUNT_JWT_KID
+              ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_KID::"
+            - Name: ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON
+              ValueFrom: !Sub "${Secret}:ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON::"
+            - Name: SENTRY_DSN
+              ValueFrom: !Sub "${Secret}:SENTRY_DSN::"
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: core-account-service
+              awslogs-create-group: true
+              awslogs-stream-prefix: ecs
+      Cpu: 512
+      Memory: 2048
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !Ref ExecutionRole
+      RuntimePlatform:
+        CpuArchitecture: X86_64
+        OperatingSystemFamily: LINUX
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !GetAtt Cluster.Arn
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 50
+      DeploymentController:
+        Type: ECS
+      DesiredCount: 2
+      HealthCheckGracePeriodSeconds: 300
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: core-account-service
+          ContainerPort: !Ref Port
+          TargetGroupArn: !GetAtt TargetGroup.TargetGroupArn
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !GetAtt SecurityGroup.GroupId
+          Subnets: !Ref Subnets
+      PlatformVersion: LATEST
+      ServiceName: core-account-service
+      TaskDefinition: !GetAtt Task.TaskDefinitionArn

@@ -1,0 +1,16 @@
+version = 0.1
+
+[default.global.parameters]
+stack_name = "core-account-service-service"
+s3_bucket = "mytiki-sam-deploy"
+s3_prefix = "core/account/service/service"
+region = "us-east-2"
+
+[default.deploy.parameters]
+confirm_changeset = false
+capabilities = [
+    "CAPABILITY_IAM",
+    "CAPABILITY_AUTO_EXPAND"
+]
+image_repositories = []
+parameter_overrides = []

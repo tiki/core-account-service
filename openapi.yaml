@@ -1,27 +1,38 @@
 openapi: 3.0.1
 info:
-  title: L0 Auth
-  description: Authorization Service
+  title: TIKI Account
+  description: TIKI's account management service —configure and provision access to
+    the data platform
   license:
     name: MIT
-    url: https://github.com/tiki/l0-auth/blob/main/LICENSE
-  version: 2.2.4
+    url: https://github.com/tiki/tiki-account/blob/main/LICENSE
+  version: 2.3.1
 servers:
-- url: https://auth.l0.mytiki.com
+- url: https://mytiki.com/api/account
 paths:
-  /api/latest/user/{userId}:
+  /api/latest/user:
+    get:
+      tags:
+      - ""
+      summary: Get User
+      description: Get the authorized user's profile
+      operationId: account-user-get
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoAO'
+      security:
+      - oauth:
+        - account:admin
     post:
       tags:
       - ""
-      summary: Update a User
-      description: Update the authorized user's profile
-      operationId: l0-auth-user-post
-      parameters:
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: string
+      summary: Update User
+      description: Update the authorized User's profile
+      operationId: account-user-post
       requestBody:
         content:
           application/json:
@@ -37,14 +48,91 @@ paths:
                 $ref: '#/components/schemas/UserInfoAO'
       security:
       - oauth:
-        - auth
-  /api/latest/otp/start:
+        - account:admin
+  /api/latest/auth/token:
+    post:
+      tags:
+      - ""
+      summary: Grant Token
+      description: Grant a new authorization token (with scope)
+      operationId: account-oauth-token-post_1_1_1
+      parameters:
+      - name: grant_type
+        in: query
+        description: "(password, refresh_token, client_credentials, urn:ietf:params:oauth:grant-type:token-exchange)"
+        required: true
+        schema:
+          type: string
+      - name: scope
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: username
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: password
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: client_id
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: subject_token
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: subject_token_type
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: refresh_token
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: client_secret
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuth2AccessTokenResponse'
+  /api/latest/auth/revoke:
+    post:
+      tags:
+      - ""
+      summary: Revoke Token
+      description: Revoke a Refresh token.
+      operationId: account-oauth-revoke-post
+      parameters:
+      - name: token
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /api/latest/auth/otp:
     post:
       tags:
       - ""
       summary: Request OTP
-      description: Start a new passwordless authorization flow
-      operationId: l0-auth-otp-start-post
+      description: Start a one-time password (email) authorization flow
+      operationId: account-otp-start-post
       requestBody:
         content:
           application/json:
@@ -58,140 +146,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OtpAOStartRsp'
-  /api/latest/org/{orgId}:
-    get:
-      tags:
-      - ""
-      summary: Get Org
-      description: Get an org's profile
-      operationId: l0-auth-org-get
-      parameters:
-      - name: orgId
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrgInfoAO'
-      security:
-      - oauth:
-        - auth
-    post:
-      tags:
-      - ""
-      summary: Add to Org
-      description: Add a user to an org
-      operationId: l0-auth-org-post-user
-      parameters:
-      - name: orgId
-        in: path
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OrgInfoAOReq'
-        required: true
-      responses:
-        "204":
-          description: No Content
-      security:
-      - oauth:
-        - auth
-  /api/latest/oauth/token:
-    post:
-      tags:
-      - ""
-      summary: Token Grant
-      description: Issue authorization token. Use password grant for OTP flow.
-      operationId: l0-auth-oauth-token-post_1_1_1
-      parameters:
-      - name: grant_type
-        in: query
-        description: "(password, refresh_token, client_credentials)"
-        required: true
-        schema:
-          type: string
-      - name: scope
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: username
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: password
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: client_id
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: subject_token
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: subject_token_type
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: refresh_token
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: client_secret
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuth2AccessTokenResponse'
-  /api/latest/oauth/revoke:
-    post:
-      tags:
-      - ""
-      summary: Revoke Token
-      description: Revoke a refresh token.
-      operationId: l0-auth-oauth-revoke-post
-      parameters:
-      - name: token
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-      security:
-      - oauth:
-        - auth
   /api/latest/app:
     post:
       tags:
       - ""
       summary: Create App
       description: Create a new App
-      operationId: l0-auth-app-create
+      operationId: account-app-create
       requestBody:
         content:
           application/json:
@@ -207,16 +168,16 @@ paths:
                 $ref: '#/components/schemas/AppInfoAO'
       security:
       - oauth:
-        - auth
-  /api/latest/app/{appId}:
+        - account:admin
+  /api/latest/app/{app-id}:
     get:
       tags:
       - ""
       summary: Get App
-      description: Get an app's profile
-      operationId: l0-auth-app-get
+      description: Retrieve the details about an App
+      operationId: account-app-get
       parameters:
-      - name: appId
+      - name: app-id
         in: path
         required: true
         schema:
@@ -230,15 +191,15 @@ paths:
                 $ref: '#/components/schemas/AppInfoAO'
       security:
       - oauth:
-        - auth
+        - account:admin
     post:
       tags:
       - ""
       summary: Update App
-      description: Create a new App
-      operationId: l0-auth-app-update
+      description: Update the details for an App
+      operationId: account-app-update
       parameters:
-      - name: appId
+      - name: app-id
         in: path
         required: true
         schema:
@@ -258,15 +219,15 @@ paths:
                 $ref: '#/components/schemas/AppInfoAO'
       security:
       - oauth:
-        - auth
+        - account:admin
     delete:
       tags:
       - ""
       summary: Delete App
-      description: Delete an App
-      operationId: l0-auth-app-delete
+      description: Permanently delete an App
+      operationId: account-app-delete
       parameters:
-      - name: appId
+      - name: app-id
         in: path
         required: true
         schema:
@@ -276,16 +237,16 @@ paths:
           description: OK
       security:
       - oauth:
-        - auth
-  /api/latest/app/{appId}/key:
+        - account:admin
+  /api/latest/app/{app-id}/key:
     get:
       tags:
       - ""
-      summary: Get App Keys
-      description: Get the API Keys for the given App (appId)
-      operationId: l0-auth-api-keys-get
+      summary: Get API Keys
+      description: Retrieve the API Keys for an App
+      operationId: account-api-keys-get
       parameters:
-      - name: appId
+      - name: app-id
         in: path
         required: true
         schema:
@@ -301,15 +262,15 @@ paths:
                   $ref: '#/components/schemas/ApiKeyAO'
       security:
       - oauth:
-        - auth
+        - account:admin
     post:
       tags:
       - ""
-      summary: Create App Key
-      description: Create a new API Key for the given App (appId)
-      operationId: l0-auth-api-keys-create
+      summary: Create API Key
+      description: Create a new API Key for an App
+      operationId: account-api-keys-create
       parameters:
-      - name: appId
+      - name: app-id
         in: path
         required: true
         schema:
@@ -328,34 +289,21 @@ paths:
                 $ref: '#/components/schemas/ApiKeyAOCreate'
       security:
       - oauth:
-        - auth
-  /api/latest/user:
-    get:
-      tags:
-      - ""
-      summary: Get User
-      description: Get the authorized user's profile
-      operationId: l0-auth-user-get
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserInfoAO'
-      security:
-      - oauth:
-        - auth
-  /api/latest/key/{keyId}:
+        - account:admin
     delete:
       tags:
       - ""
       summary: Delete Key
-      description: Revoke (permanent!) an API Key
-      operationId: l0-auth-api-keys-delete
+      description: Permanently revoke an API Key
+      operationId: account-api-keys-delete
       parameters:
-      - name: keyId
+      - name: app-id
         in: path
+        required: true
+        schema:
+          type: string
+      - name: key-id
+        in: query
         required: true
         schema:
           type: string
@@ -364,7 +312,119 @@ paths:
           description: OK
       security:
       - oauth:
-        - auth
+        - account:admin
+  /api/latest/app/{app-id}/address:
+    get:
+      tags:
+      - ""
+      summary: Get Addresses
+      description: Retrieve and filter registered addresses
+      operationId: account-addr-reg-get
+      parameters:
+      - name: app-id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: address
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: id
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AddrRegAORsp'
+      security:
+      - oauth:
+        - account:app
+    post:
+      tags:
+      - ""
+      summary: Register Address
+      description: Register an end user address
+      operationId: account-addr-reg-post
+      parameters:
+      - name: X-Customer-Authorization
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: app-id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: body
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/AddrRegAOReq'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddrRegAORsp'
+      security:
+      - oauth:
+        - account:app
+    delete:
+      tags:
+      - ""
+      summary: Delete Addresses
+      description: Delete registered addresses
+      operationId: account-addr-reg-delete
+      parameters:
+      - name: app-id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: address
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: id
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No Content
+      security:
+      - oauth:
+        - account:admin
+  /api/latest/org:
+    get:
+      tags:
+      - ""
+      summary: Get Org
+      description: Retrieve the authorized User's Org details
+      operationId: account-org-get
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgInfoAO'
+      security:
+      - oauth:
+        - account:admin
 components:
   schemas:
     UserInfoAOUpdate:
@@ -387,26 +447,6 @@ components:
         created:
           type: string
           format: date-time
-    OtpAOStartReq:
-      type: object
-      properties:
-        email:
-          type: string
-        notAnonymous:
-          type: boolean
-    OtpAOStartRsp:
-      type: object
-      properties:
-        deviceId:
-          type: string
-        expires:
-          type: string
-          format: date-time
-    OrgInfoAOReq:
-      type: object
-      properties:
-        email:
-          type: string
     OAuth2AccessToken:
       type: object
       properties:
@@ -452,6 +492,21 @@ components:
       properties:
         value:
           type: string
+    OtpAOStartReq:
+      type: object
+      properties:
+        email:
+          type: string
+        notAnonymous:
+          type: boolean
+    OtpAOStartRsp:
+      type: object
+      properties:
+        deviceId:
+          type: string
+        expires:
+          type: string
+          format: date-time
     AppInfoAOReq:
       type: object
       properties:
@@ -465,6 +520,8 @@ components:
         name:
           type: string
         orgId:
+          type: string
+        pubKey:
           type: string
         modified:
           type: string
@@ -486,6 +543,29 @@ components:
           type: string
         public:
           type: boolean
+    AddrRegAOReq:
+      type: object
+      properties:
+        id:
+          type: string
+        address:
+          type: string
+        pubKey:
+          type: string
+        signature:
+          type: string
+    AddrRegAORsp:
+      type: object
+      properties:
+        id:
+          type: string
+        address:
+          type: string
+        pubKey:
+          type: string
+        created:
+          type: string
+          format: date-time
     OrgInfoAO:
       type: object
       properties:
@@ -526,7 +606,7 @@ components:
       type: oauth2
       flows:
         password:
-          tokenUrl: https://auth.l0.mytiki.com/api/latest/oauth/token
-          refreshUrl: https://auth.l0.mytiki.com/api/latest/oauth/token
+          tokenUrl: https://mytiki.com/api/account/oauth/token
+          refreshUrl: https://mytiki.com/api/account/oauth/token
           scopes:
             auth: this service
