@@ -185,6 +185,8 @@ Resources:
               awslogs-group: /ecs/core-account-service
               awslogs-create-group: true
               awslogs-stream-prefix: ecs
+          Links:
+            - xray-daemon
         -
           Name: xray-daemon
           Essential: true
