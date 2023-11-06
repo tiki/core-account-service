@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.jwks;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@XRayEnabled
 public class JwksService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.api_key;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.app_info.AppInfoDO;
 import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.features.latest.refresh.RefreshService;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@XRayEnabled
 public class ApiKeyService {
     private final ApiKeyRepository repository;
     private final AppInfoService appInfoService;
