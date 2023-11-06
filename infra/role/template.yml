@@ -143,4 +143,6 @@ Resources:
             Resource: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:service/*/*
           - Effect: Allow
             Action: iam:PassRole
-            Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/ecsTaskExecutionRole
+            Resource:
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/ecsTaskExecutionRole
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/TaskRoleCoreAccountService
