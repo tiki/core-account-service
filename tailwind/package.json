@@ -1,0 +1,11 @@
+{
+  "name": "core-account-service-tailwind",
+  "description": "Tailwind style generation for core account service assets",
+  "scripts": {
+    "build": "npx tailwindcss -i ./main.css -o ../src/main/resources/public/assets/styles/main.css",
+    "watch": "npx tailwindcss -i ./main.css -o ../src/main/resources/public/assets/styles/main.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.5"
+  }
+}
