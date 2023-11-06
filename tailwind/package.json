@@ -1,6 +1,5 @@
 {
   "name": "core-account-service-tailwind",
-  "version": "1.0.0",
   "description": "Tailwind style generation for core account service assets",
   "scripts": {
     "build": "npx tailwindcss -i ./main.css -o ../src/main/resources/public/assets/styles/main.css",
