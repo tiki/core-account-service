@@ -6,7 +6,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/tiki-account/blob/main/LICENSE
-  version: 2.3.2
+  version: 2.3.3
 servers:
 - url: https://mytiki.com/api/account
 paths:
