@@ -163,6 +163,8 @@ Resources:
           Environment:
             - Name: SPRING_DATASOURCE_URL
               Value: !Sub [ "jdbc:postgresql://${Endpoint}:5432/account_service", { Endpoint: !GetAtt Database.Endpoint.Address } ]
+            - Name: AWS_XRAY_DAEMON_ADDRESS
+              Value: xray-daemon:2000
           Secrets:
             - Name: SPRING_DATASOURCE_USERNAME
               ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_USERNAME::"
@@ -176,8 +178,6 @@ Resources:
               ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_KID::"
             - Name: ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON
               ValueFrom: !Sub "${Secret}:ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON::"
-            - Name: AWS_XRAY_DAEMON_ADDRESS
-              Value: xray-daemon:2000
           LogConfiguration:
             LogDriver: awslogs
             Options:
