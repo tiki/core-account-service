@@ -194,9 +194,9 @@ Resources:
           Cpu: 32
           MemoryReservation: 256
           PortMappings:
-            HostPort: 0
-            ContainerPort: 2000
-            Protocol: udp
+            - HostPort: 0
+              ContainerPort: 2000
+              Protocol: udp
       Cpu: 512
       Memory: 2048
       NetworkMode: awsvpc
