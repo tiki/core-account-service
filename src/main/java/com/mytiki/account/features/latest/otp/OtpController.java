@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.otp;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.utilities.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

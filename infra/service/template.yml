@@ -114,7 +114,7 @@ Resources:
       BackupRetentionPeriod: 30
       DBInstanceIdentifier: core-account-service
       DBInstanceClass: db.t4g.micro
-      DeletionProtection: false
+      DeletionProtection: true
       Engine: postgres
       EngineVersion: 15.3
       MasterUsername: !Ref Username
@@ -139,6 +139,16 @@ Resources:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: core-account-service
+
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: TaskRoleCoreAccountService
+      Description: ECS Task Role for Core Account Service
+      AssumeRolePolicyDocument: "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ecs-tasks.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
+      Policies:
+        - PolicyName: XRay
+          PolicyDocument: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"xray:PutTraceSegments\",\"xray:PutTelemetryRecords\",\"xray:GetSamplingRules\",\"xray:GetSamplingTargets\",\"xray:GetSamplingStatisticSummaries\"],\"Resource\": \"*\"}]}"
 
   Task:
     Type: AWS::ECS::TaskDefinition
@@ -172,7 +182,20 @@ Resources:
             LogDriver: awslogs
             Options:
               awslogs-region: !Ref AWS::Region
-              awslogs-group: core-account-service
+              awslogs-group: /ecs/core-account-service
+              awslogs-create-group: true
+              awslogs-stream-prefix: ecs
+        -
+          Name: aws-otel-collector
+          Essential: true
+          Image: public.ecr.aws/aws-observability/aws-otel-collector:v0.31.0
+          Command:
+            - "--config=/etc/ecs/otel-instance-metrics-config.yaml"
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: /ecs/ecs-aws-otel-sidecar-collector
               awslogs-create-group: true
               awslogs-stream-prefix: ecs
       Cpu: 512
@@ -181,6 +204,7 @@ Resources:
       RequiresCompatibilities:
         - FARGATE
       ExecutionRoleArn: !Ref ExecutionRole
+      TaskRoleArn: !GetAtt TaskRole.Arn
       RuntimePlatform:
         CpuArchitecture: X86_64
         OperatingSystemFamily: LINUX
