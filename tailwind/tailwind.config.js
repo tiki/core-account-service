@@ -1,12 +1,13 @@
-/** @type {import('tailwindcss').Config} */
-const defaultTheme = require('tailwindcss/defaultTheme')
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
 
 module.exports = {
   content: [
-    "./src/**/*.{html,js}",
-    "./login/*.{html, js}"
+    "../src/main/resources/public/pages/*.{html, js}"
   ],
-  important: true, 
+  important: true,
   theme: {
     colors: {
         'tiki-yellow-xxlight': '#FFF8DD',
@@ -15,7 +16,6 @@ module.exports = {
         'white': '#FFFFFF',
         'yellow-dark': '#FFB822',
         'black': '#1C0000',
-
     },
     fontFamily: {
       sans: ['Space Grotesk, sans-serif']
