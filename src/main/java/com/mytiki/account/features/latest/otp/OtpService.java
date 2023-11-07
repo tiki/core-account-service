@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.otp;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
@@ -34,6 +35,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+@XRayEnabled
 public class OtpService {
     private static final Long CODE_EXPIRY_DURATION_MINUTES = 30L;
     private final OtpRepository repository;
