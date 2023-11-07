@@ -85,26 +85,34 @@
               username = c.substring(name.length, c.length);
             }
           }
-          console.log(username)
+
           const data = new FormData(event.target);
           const dataObject = Object.fromEntries(data.entries());
 
           let headers = new Headers();
           headers.append("accept", "application/json");
           headers.append(
-            "content-type",
+            "Content-Type",
             "application/x-www-form-urlencoded;charset=UTF-8"
           );
 
           const options = {
             method: "POST",
             headers: headers,
+            body: new URLSearchParams({
+              grant_type: "password",
+              username: username,
+              password: dataObject.code,
+              scope: "account admin",
+            }),
           };
 
-          fetch(`https://account.mytiki.com/api/latest/auth/token?grant_type=password&username=${username}&password=${dataObject.code}&scope=account:admin`, options)
+          fetch(`https://account.mytiki.com/api/latest/auth/token`, options)
             .then(async (response) => {
               const data = await response.json();
               console.log(data);
+
+              // Now I must use the JWT that comes from response to redirect to readme
             })
             .catch((error) => {
               console.log("error: ", error);
