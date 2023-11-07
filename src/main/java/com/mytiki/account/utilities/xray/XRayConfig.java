@@ -12,7 +12,10 @@ import org.springframework.context.annotation.Import;
 
 import java.util.List;
 
-@Import(XRayInspector.class)
+@Import({
+        XRayInspector.class,
+        XRaySql.class
+})
 @Configuration
 public class XRayConfig {
 
