@@ -47,7 +47,7 @@
           </div>
           <div class="text-center m-5">or use your email</div>
           <div>
-            <form action="" id="tikiForm">
+            <form action="./otp.html" id="tikiLoginForm">
               <label
                 for="email"
                 class="block text-tiki-black-xlight font-bold text-sm"
@@ -60,17 +60,6 @@
                 class="w-full my-2 p-2 border-2 border-solid border-black rounded-md"
                 placeholder="hello@mytiki.com"
               />
-              <!-- <label
-                for="password"
-                class="block text-tiki-black-xlight font-bold text-sm"
-                >Password</label
-              >
-              <input
-                type="password"
-                name="password"
-                id="password"
-                class="w-full my-2 p-2 border-2 border-solid border-black rounded-md"
-              /> -->
               <button
                 type="submit"
                 class="cursor-pointer p-4 border-none border rounded-md w-full bg-black text-yellow-dark mt-2"
@@ -93,9 +82,8 @@
       </div>
     </div>
     <script>
-      document.getElementById("tikiForm").addEventListener("submit", (event)=>{
+      document.getElementById("tikiLoginForm").addEventListener("submit", (event)=>{
         event.preventDefault();
-        
         const data = new FormData(event.target);
         const dataObject = Object.fromEntries(data.entries());
 
@@ -110,8 +98,9 @@
 
        fetch("https://account.mytiki.com/api/latest/auth/otp", options).then(async (response)=>{
         const data = await response.json()
-
-        document.cookie = `TikiAccountOtpUser=${data.deviceId};expires=${data.expires}`
+        const self = window
+        document.cookie = `TikiAccountOtpUser=${data.deviceId}; expires=${data.expires};`
+        self.location.replace("./otp.html")
        }).catch((error)=>{
         console.log('error: ',error)
        })
