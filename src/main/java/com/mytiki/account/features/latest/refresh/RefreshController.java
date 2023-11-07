@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.refresh;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.utilities.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@XRayEnabled
 @Tag(name = "")
 @RestController
 @RequestMapping(value = Constants.API_LATEST_ROUTE)

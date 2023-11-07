@@ -5,7 +5,6 @@
 
 package com.mytiki.account.features.latest.user_info;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.org_info.OrgInfoService;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -15,7 +14,6 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-@XRayEnabled
 public class UserInfoService {
     private final UserInfoRepository repository;
     private final OrgInfoService orgInfoService;

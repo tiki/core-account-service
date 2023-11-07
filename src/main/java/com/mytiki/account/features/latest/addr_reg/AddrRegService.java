@@ -5,7 +5,6 @@
 
 package com.mytiki.account.features.latest.addr_reg;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.app_info.AppInfoDO;
 import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.features.latest.jwks.JwksDO;
@@ -26,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@XRayEnabled
 public class AddrRegService {
     private final AddrRegRepository repository;
     private final AppInfoService appInfoService;

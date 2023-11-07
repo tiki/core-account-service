@@ -23,7 +23,6 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-@XRayEnabled
 public class AppInfoService {
 
     private final AppInfoRepository repository;

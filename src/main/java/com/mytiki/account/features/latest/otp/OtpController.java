@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.web.bind.annotation.*;
 
+@XRayEnabled
 @Tag(name = "")
 @RestController
 @RequestMapping(value = Constants.API_LATEST_ROUTE)
