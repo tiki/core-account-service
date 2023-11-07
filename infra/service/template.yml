@@ -185,7 +185,7 @@ Resources:
               awslogs-stream-prefix: ecs
         -
           Name: xray-daemon
-          Image: 123456789012.dkr.ecr.us-east-2.amazonaws.com/xray-daemon
+          Image: public.ecr.aws/xray/aws-xray-daemon:latest
           Cpu: 32
           MemoryReservation: 256
           PortMappings:
