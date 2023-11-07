@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.org_info;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.utilities.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+@XRayEnabled
 @Tag(name = "")
 @RestController
 @RequestMapping(value = OrgInfoController.PATH_CONTROLLER)

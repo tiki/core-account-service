@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.app_info;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.security.oauth.OauthScopes;
@@ -22,6 +23,7 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+@XRayEnabled
 public class AppInfoService {
 
     private final AppInfoRepository repository;

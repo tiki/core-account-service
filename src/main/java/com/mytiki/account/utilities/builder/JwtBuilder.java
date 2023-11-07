@@ -1,5 +1,11 @@
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
 package com.mytiki.account.utilities.builder;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.jwks.JwksConfig;
 import com.mytiki.account.security.oauth.OauthDecoder;
 import com.mytiki.account.security.oauth.OauthSub;
@@ -13,6 +19,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+@XRayEnabled
 public class JwtBuilder {
     private String sub;
     private List<String> aud;

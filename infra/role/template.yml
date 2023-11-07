@@ -56,7 +56,9 @@ Resources:
               - iam:DeleteRolePolicy
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
-            Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/core-ocean-sar-*
+            Resource:
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/core-ocean-sar-*
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/TaskRoleCoreAccountService
           - Effect: Allow
             Action:
               - ecr:GetAuthorizationToken
@@ -68,6 +70,9 @@ Resources:
               - ecr:UploadLayerPart
               - ecr:PutImage
               - ecr:BatchCheckLayerAvailability
+              - ecr:DescribeRepositories
+              - ecr:SetRepositoryPolicy
+              - ecr:BatchGetImage
             Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/core-account-service
           - Effect: Allow
             Action:
@@ -113,17 +118,12 @@ Resources:
           - Effect: Allow
             Action:
               - rds:CreateDBInstance
+              - rds:ModifyDBInstance
             Resource: !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:*
           - Effect: Allow
             Action:
               - ecr:CreateRepository
             Resource: "*"
-          - Effect: Allow
-            Action:
-              - ecr:DescribeRepositories
-              - ecr:SetRepositoryPolicy
-              - ecr:BatchGetImage
-            Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/core-account-service
           - Effect: Allow
             Action:
               - ecs:DescribeClusters
@@ -140,4 +140,6 @@ Resources:
             Resource: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:service/*/*
           - Effect: Allow
             Action: iam:PassRole
-            Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/ecsTaskExecutionRole
+            Resource:
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/ecsTaskExecutionRole
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/TaskRoleCoreAccountService

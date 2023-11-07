@@ -699,6 +699,11 @@ video {
   font-weight: 700 !important;
 }
 
+.text-pink-dark{
+  --tw-text-opacity: 1 !important;
+  color: rgb(181 0 108 / var(--tw-text-opacity)) !important;
+}
+
 .text-tiki-black-xlight{
   --tw-text-opacity: 1 !important;
   color: rgb(80 92 89 / var(--tw-text-opacity)) !important;

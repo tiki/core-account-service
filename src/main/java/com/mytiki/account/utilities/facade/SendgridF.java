@@ -5,20 +5,20 @@
 
 package com.mytiki.account.utilities.facade;
 
-import com.sendgrid.Method;
-import com.sendgrid.Request;
-import com.sendgrid.Response;
-import com.sendgrid.SendGrid;
+import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.sendgrid.*;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
+@XRayEnabled
 public class SendgridF {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String FROM_ADDRESS = "no-reply@mytiki.com";
@@ -29,7 +29,7 @@ public class SendgridF {
     private final SendGrid sendGrid;
 
     public SendgridF(String apiKey) {
-        this.sendGrid = new SendGrid(apiKey);
+        this.sendGrid = new SendGrid(apiKey, new Client(HttpClientBuilder.create().build()));
     }
 
     public boolean send(String to, String subject, String htmlContent, String textContent) {

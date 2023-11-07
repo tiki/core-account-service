@@ -1,0 +1,67 @@
+<!--
+  ~ Copyright (c) TIKI Inc.
+  ~ MIT license. See LICENSE file in root directory.
+  -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="../assets/styles/main.css" rel="stylesheet" />
+    <title>Login - OTP</title>
+  </head>
+  <body>
+    <div class="flex h-screen w-screen">
+      <div
+        class="flex items-center justify-center w-screen sm:w-2/5 sm:bg-white bg-tiki-yellow-xxlight"
+      >
+        <div class="w-4/5 sm:w-4/5">
+          <div>
+            <img
+              src="../assets/images/logo.svg"
+              alt="Logo Tiki"
+              class="w-24"
+            />
+            <h1 class="text-4xl text-tiki-dark-blue mt-5 font-bold">
+              Enter Code
+            </h1>
+            <p class="mt-2 text-sm text-tiki-black-xlight">
+              We have emailed you a one-time use code. Enter it below..
+            </p>
+          </div>
+          <div class="mt-5">
+            <form action="">
+              <label for="email" class="block text-tiki-black-xlight font-bold text-sm">Code</label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                class=" w-full my-2 p-2 border-2 border-solid border-black rounded-md"
+                placeholder="ABC123"
+              />
+            <div id="error" class="text-sm my-2 text-pink-dark hidden">That didn't work 🫠 — 
+              double check your email, or go back and request a new code.</div>
+            <button type="submit" class="cursor-pointer p-4 border-none border rounded-md w-full bg-black
+            text-yellow-dark mt-2 hover:">
+              Continue
+            </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div
+        class="hidden sm:w-3/5 bg-tiki-yellow-xxlight sm:flex items-center justify-center"
+      >
+        <div>
+          <img
+            src="../assets/images/pineapple-butt-w-200.png"
+            alt="tiki pineapple"
+          />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

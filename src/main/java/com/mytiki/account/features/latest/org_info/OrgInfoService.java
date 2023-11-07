@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.org_info;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@XRayEnabled
 public class OrgInfoService {
     private final OrgInfoRepository repository;
 

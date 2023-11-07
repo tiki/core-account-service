@@ -5,6 +5,7 @@
 
 package com.mytiki.account.utilities.facade;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
@@ -17,6 +18,7 @@ import org.bouncycastle.crypto.signers.RSADigestSigner;
 
 import java.io.IOException;
 
+@XRayEnabled
 public class RsaF {
     public static RSAPublicKey decodePublicKey(byte[] publicKey) throws IOException {
         try (ASN1InputStream inputStream = new ASN1InputStream(publicKey)) {
