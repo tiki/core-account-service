@@ -20,11 +20,17 @@
         console.log("Encoded JWT ID token: " + response.credential);
         const options = {
           method: "POST",
-          headers: { accept: "application/json" },
+          headers: { accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            grant_type: "urn ietf params oauth grant-type token-exchange",
+            subject_token: response.credential,
+            subject_token_type: "urn mytiki params oauth token-type google"
+          })
         };
 
+
         fetch(
-          encodeURI(`https://mytiki.com/api/account/api/latest/auth/token?grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token=${response.credential}&subject_token_type=urn:mytiki:params:oauth:token-type:google`),options
+          encodeURI(`https://mytiki.com/api/account/api/latest/auth/token`),options
         )
           .then((response) => response.json())
           .then((response) => console.log(response))
