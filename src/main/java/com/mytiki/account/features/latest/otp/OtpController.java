@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.otp;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.utilities.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +19,7 @@ import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.web.bind.annotation.*;
 
+@XRayEnabled
 @Tag(name = "")
 @RestController
 @RequestMapping(value = Constants.API_LATEST_ROUTE)

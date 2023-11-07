@@ -114,7 +114,7 @@ Resources:
       BackupRetentionPeriod: 30
       DBInstanceIdentifier: core-account-service
       DBInstanceClass: db.t4g.micro
-      DeletionProtection: false
+      DeletionProtection: true
       Engine: postgres
       EngineVersion: 15.3
       MasterUsername: !Ref Username
@@ -139,6 +139,16 @@ Resources:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: core-account-service
+
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: TaskRoleCoreAccountService
+      Description: ECS Task Role for Core Account Service
+      AssumeRolePolicyDocument: "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ecs-tasks.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
+      Policies:
+        - PolicyName: XRay
+          PolicyDocument: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"xray:PutTraceSegments\",\"xray:PutTelemetryRecords\",\"xray:GetSamplingRules\",\"xray:GetSamplingTargets\",\"xray:GetSamplingStatisticSummaries\"],\"Resource\": \"*\"}]}"
 
   Task:
     Type: AWS::ECS::TaskDefinition
@@ -166,21 +176,28 @@ Resources:
               ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_KID::"
             - Name: ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON
               ValueFrom: !Sub "${Secret}:ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON::"
-            - Name: SENTRY_DSN
-              ValueFrom: !Sub "${Secret}:SENTRY_DSN::"
           LogConfiguration:
             LogDriver: awslogs
             Options:
               awslogs-region: !Ref AWS::Region
-              awslogs-group: core-account-service
+              awslogs-group: /ecs/core-account-service
               awslogs-create-group: true
               awslogs-stream-prefix: ecs
+        -
+          Name: xray-daemon
+          Image: public.ecr.aws/xray/aws-xray-daemon:latest
+          Cpu: 32
+          MemoryReservation: 256
+          PortMappings:
+            - ContainerPort: 2000
+              Protocol: udp
       Cpu: 512
       Memory: 2048
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
       ExecutionRoleArn: !Ref ExecutionRole
+      TaskRoleArn: !GetAtt TaskRole.Arn
       RuntimePlatform:
         CpuArchitecture: X86_64
         OperatingSystemFamily: LINUX

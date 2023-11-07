@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.addr_reg;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.utilities.Constants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@XRayEnabled
 @Tag(name = "")
 @RestController
 @RequestMapping(value = AddrRegController.PATH_CONTROLLER)

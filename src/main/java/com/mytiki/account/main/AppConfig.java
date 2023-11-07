@@ -23,6 +23,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 
 import java.security.Security;
@@ -36,6 +37,7 @@ import java.util.TimeZone;
         UtilitiesConfig.class,
         FeaturesConfig.class
 })
+@EnableAspectJAutoProxy
 @EnableConfigurationProperties
 public class AppConfig {
     @PostConstruct

@@ -5,6 +5,7 @@
 
 package com.mytiki.account.utilities.facade;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.MustacheFactory;
 import com.github.mustachejava.resolver.ClasspathResolver;
@@ -16,6 +17,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
+@XRayEnabled
 public class MustacheF {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Map<String, com.github.mustachejava.Mustache> templates = new HashMap<>();
