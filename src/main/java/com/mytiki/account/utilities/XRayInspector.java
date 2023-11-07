@@ -5,18 +5,13 @@
 
 package com.mytiki.account.utilities;
 
-import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.spring.aop.AbstractXRayInterceptor;
-import com.amazonaws.xray.spring.aop.XRayInterceptorUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.lang.invoke.MethodHandles;
-import java.util.*;
+import java.util.Map;
 
 @Aspect
 public class XRayInspector extends AbstractXRayInterceptor {

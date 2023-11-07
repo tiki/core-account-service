@@ -5,6 +5,7 @@
 
 package com.mytiki.account.utilities.facade;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
+@XRayEnabled
 public class SendgridF {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String FROM_ADDRESS = "no-reply@mytiki.com";
