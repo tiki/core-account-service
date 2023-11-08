@@ -1,14 +1,19 @@
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
 document.getElementById("tikiLoginForm").addEventListener("submit", (event) => {
   event.preventDefault();
   const data = new FormData(event.target);
   const dataObject = Object.fromEntries(data.entries());
 
-  let headers = new Headers();
+  const headers = new Headers();
   headers.append("content-type", "application/json");
   headers.append("accept", "application/json");
   const options = {
     method: "POST",
-    headers: headers,
+    headers,
     body: JSON.stringify({ email: dataObject.email, notAnonymous: true }),
   };
 
