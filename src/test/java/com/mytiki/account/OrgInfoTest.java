@@ -9,6 +9,7 @@ import com.mytiki.account.features.latest.org_info.OrgInfoAO;
 import com.mytiki.account.features.latest.org_info.OrgInfoDO;
 import com.mytiki.account.features.latest.org_info.OrgInfoService;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
+import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.main.App;
 import org.junit.jupiter.api.MethodOrderer;
@@ -51,11 +52,11 @@ public class OrgInfoTest {
 
     @Test
     public void Test_Get_Success() {
-        UserInfoAO user = userInfoService.createIfNotExists(UUID.randomUUID() + "@test.com");
-        OrgInfoAO org = service.getByUser(user.getUserId());
+        UserInfoDO user = userInfoService.createIfNotExists(UUID.randomUUID() + "@test.com");
+        OrgInfoAO org = service.getByUser(user.getUserId().toString());
 
-        assertTrue(org.getUsers().contains(user.getUserId()));
-        assertEquals(user.getOrgId(), org.getOrgId());
+        assertTrue(org.getUsers().contains(user.getUserId().toString()));
+        assertEquals(user.getOrg().getOrgId().toString(), org.getOrgId());
         assertNull(org.getBillingId());
         assertNotNull(org.getModified());
         assertNotNull(org.getCreated());

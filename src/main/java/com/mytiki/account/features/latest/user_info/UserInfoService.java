@@ -59,7 +59,7 @@ public class UserInfoService {
         }
     }
 
-    public UserInfoAO createIfNotExists(String email) {
+    public UserInfoDO createIfNotExists(String email) {
         Optional<UserInfoDO> found = repository.findByEmail(email);
         UserInfoDO userInfo;
         if (found.isEmpty()) {
@@ -73,7 +73,7 @@ public class UserInfoService {
             userInfo = repository.save(newUser);
         } else
             userInfo = found.get();
-        return toAO(userInfo);
+        return userInfo;
     }
 
     public UserInfoAO update(String subject, UserInfoAOUpdate update){

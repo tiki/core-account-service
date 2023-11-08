@@ -6,8 +6,10 @@
 package com.mytiki.account.features.latest.otp;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
+import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.security.oauth.OauthSub;
@@ -17,9 +19,11 @@ import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.B64F;
 import com.mytiki.account.utilities.facade.MustacheF;
+import com.mytiki.account.utilities.facade.ReadmeF;
 import com.mytiki.account.utilities.facade.SendgridF;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
+import jakarta.transaction.Transactional;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
@@ -46,6 +50,7 @@ public class OtpService {
     private final UserInfoService userInfoService;
     private final OauthScopes allowedScopes;
     private final List<String> anonymousScopes;
+    private final ReadmeF readme;
 
     public OtpService(
             OtpRepository repository,
@@ -55,7 +60,8 @@ public class OtpService {
             RefreshService refreshService,
             UserInfoService userInfoService,
             OauthScopes allowedScopes,
-            List<String> anonymousScopes) {
+            List<String> anonymousScopes,
+            ReadmeF readme) {
         this.repository = repository;
         this.templates = templates;
         this.sendgrid = sendgrid;
@@ -64,6 +70,7 @@ public class OtpService {
         this.userInfoService = userInfoService;
         this.allowedScopes = allowedScopes;
         this.anonymousScopes = anonymousScopes;
+        this.readme = readme;
     }
 
     public OtpAOStartRsp start(OtpAOStartReq req) {
@@ -91,6 +98,7 @@ public class OtpService {
         }
     }
 
+    @Transactional
     public OAuth2AccessTokenResponse authorize(String deviceId, String code, String requestedScope) {
         String hashedOtp = hashedOtp(deviceId, code);
         Optional<OtpDO> found = repository.findByOtpHashed(hashedOtp);
@@ -110,9 +118,11 @@ public class OtpService {
         try {
             OauthSub subject = new OauthSub();
             OauthScopes scopes = allowedScopes.filter(requestedScope);
+            String readmeToken = null;
             if(found.get().getEmail() != null) {
-                UserInfoAO userInfo = userInfoService.createIfNotExists(found.get().getEmail());
-                subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId());
+                UserInfoDO userInfo = userInfoService.createIfNotExists(found.get().getEmail());
+                subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId().toString());
+                readmeToken = readme.sign(userInfo);
             }else scopes = scopes.filter(anonymousScopes);
             return new JwtBuilder()
                     .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
@@ -122,8 +132,9 @@ public class OtpService {
                     .build()
                     .refresh(refreshService.issue(subject, scopes.getAud(), scopes.getScp()))
                     .sign(signer)
+                    .additional("readme_token", readmeToken)
                     .toResponse();
-        } catch (JOSEException e) {
+        } catch (JOSEException | JsonProcessingException e) {
             throw new OAuth2AuthorizationException(new OAuth2Error(
                     OAuth2ErrorCodes.SERVER_ERROR,
                     "Issue with JWT construction",
