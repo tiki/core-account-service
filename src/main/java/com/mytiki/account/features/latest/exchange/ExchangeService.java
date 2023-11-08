@@ -7,6 +7,7 @@ package com.mytiki.account.features.latest.exchange;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mytiki.account.features.latest.exchange.google.GoogleClient;
 import com.mytiki.account.features.latest.exchange.shopify.ShopifyClient;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
@@ -79,6 +80,10 @@ public class ExchangeService {
             case "urn:mytiki:params:oauth:token-type:shopify": {
                 ShopifyClient shopify = new ShopifyClient();
                 return shopify.validate(clientId, subjectToken);
+            }
+            case "urn:mytiki:params:oauth:token-type:google": {
+                GoogleClient google = new GoogleClient();
+                return google.validate(clientId, subjectToken);
             }
             default: {
                 throw new OAuth2AuthorizationException(new OAuth2Error(
