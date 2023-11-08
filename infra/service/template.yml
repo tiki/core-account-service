@@ -176,6 +176,8 @@ Resources:
               ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_KID::"
             - Name: ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON
               ValueFrom: !Sub "${Secret}:ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON::"
+            - Name: README_SECRET
+              ValueFrom: !Sub "${Secret}:README_SECRET::"
           LogConfiguration:
             LogDriver: awslogs
             Options:
