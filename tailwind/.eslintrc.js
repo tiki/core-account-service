@@ -32,6 +32,9 @@ module.exports = {
     sourceType: "module",
     requireConfigFile: false,
   },
+  globals: {
+    google: true,
+  },
   rules: {
     "prettier/prettier": ["error"],
     "no-unused-vars": [
