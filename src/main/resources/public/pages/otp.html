@@ -8,8 +8,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="../assets/styles/main.css" rel="stylesheet" />
     <title>Login - OTP</title>
   </head>
@@ -20,11 +20,7 @@
       >
         <div class="w-4/5 sm:w-4/5">
           <div>
-            <img
-              src="../assets/images/logo.svg"
-              alt="Logo Tiki"
-              class="w-24"
-            />
+            <img src="../assets/images/logo.svg" alt="Logo Tiki" class="w-24" />
             <h1 class="text-4xl text-tiki-dark-blue mt-5 font-bold">
               Enter Code
             </h1>
@@ -33,21 +29,29 @@
             </p>
           </div>
           <div class="mt-5">
-            <form action="">
-              <label for="email" class="block text-tiki-black-xlight font-bold text-sm">Code</label>
+            <form action="" id="tikiOtpForm">
+              <label
+                for="code"
+                class="block text-tiki-black-xlight font-bold text-sm"
+                >Code</label
+              >
               <input
-                type="email"
-                name="email"
-                id="email"
-                class=" w-full my-2 p-2 border-2 border-solid border-black rounded-md"
+                type="text"
+                name="code"
+                id="code"
+                class="w-full my-2 p-2 border-2 border-solid border-black rounded-md"
                 placeholder="ABC123"
               />
-            <div id="error" class="text-sm my-2 text-pink-dark hidden">That didn't work 🫠 — 
-              double check your email, or go back and request a new code.</div>
-            <button type="submit" class="cursor-pointer p-4 border-none border rounded-md w-full bg-black
-            text-yellow-dark mt-2 hover:">
-              Continue
-            </button>
+              <div id="error" class="text-sm my-2 text-pink-dark hidden">
+                That didn't work 🫠 — double check your email, or go back and
+                request a new code.
+              </div>
+              <button
+                type="submit"
+                class="cursor-pointer p-4 border-none border rounded-md w-full bg-black text-yellow-dark mt-2 hover:"
+              >
+                Continue
+              </button>
             </form>
           </div>
         </div>
@@ -63,5 +67,6 @@
         </div>
       </div>
     </div>
+    <script src="../assets/js/otp.js"></script>
   </body>
 </html>

@@ -3,13 +3,13 @@
   ~ MIT license. See LICENSE file in root directory.
   -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="../assets/styles/main.css" rel="stylesheet" />
     <title>Login - Tiki Documentation</title>
   </head>
@@ -20,27 +20,13 @@
       >
         <div class="w-4/5 sm:w-4/5">
           <div>
-            <img
-              src="../assets/images/logo.svg"
-              alt="Logo Tiki"
-              class="w-24"
-            />
+            <img src="../assets/images/logo.svg" alt="Logo Tiki" class="w-24" />
             <h1 class="text-4xl text-tiki-dark-blue mt-5 font-bold">
               Sign in to Tiki Docs
             </h1>
           </div>
           <div
-            class="text-center w-5/5 my-5 flex items-center
-            justify-center
-            border
-            border-solid
-            border-black
-            rounded-md
-            p-2
-            bg-white
-            cursor-pointer
-            hover:border-2
-            "
+            class="text-center w-5/5 my-5 flex items-center justify-center border border-solid border-black rounded-md p-2 bg-white cursor-pointer hover:border-2"
           >
             <img
               src="../assets/images/google-icon.svg"
@@ -49,14 +35,9 @@
             />
             Sign in with Google
           </div>
-          <div class="text-center w-5/5 my-5 flex items-center justify-center border border-solid
-            border-black
-            rounded-md
-            p-2
-            bg-white
-            cursor-pointer
-            hover:border-2"
-            >
+          <div
+            class="text-center flex my-5 w-5/5 items-center justify-center border border-solid border-black rounded-md p-2 bg-white cursor-pointer hover:border-2"
+          >
             <img
               src="../assets/images/github-icon.svg"
               alt="Github Icon"
@@ -66,26 +47,25 @@
           </div>
           <div class="text-center m-5">or use your email</div>
           <div>
-            <form action="">
-              <label for="email" class="block text-tiki-black-xlight font-bold text-sm">Email address</label>
+            <form action="./otp.html" id="tikiLoginForm">
+              <label
+                for="email"
+                class="block text-tiki-black-xlight font-bold text-sm"
+                >Email address</label
+              >
               <input
                 type="email"
                 name="email"
                 id="email"
-                class=" w-full my-2 p-2 border-2 border-solid border-black rounded-md"
+                class="w-full my-2 p-2 border-2 border-solid border-black rounded-md"
                 placeholder="hello@mytiki.com"
               />
-              <label for="password" class="block text-tiki-black-xlight font-bold text-sm">Password</label>
-              <input
-                type="password"
-                name="password"
-                id="password"
-                class="w-full my-2 p-2 border-2 border-solid border-black rounded-md"
-              />
-              <button type="submit" class="cursor-pointer p-4 border-none border rounded-md w-full bg-black
-              text-yellow-dark mt-2 hover:">
-              Log in
-            </button>
+              <button
+                type="submit"
+                class="cursor-pointer p-4 border-none border rounded-md w-full bg-black text-yellow-dark mt-2"
+              >
+                Log in
+              </button>
             </form>
           </div>
         </div>
@@ -101,5 +81,6 @@
         </div>
       </div>
     </div>
+    <script src="../assets/js/login.js"></script>
   </body>
 </html>
