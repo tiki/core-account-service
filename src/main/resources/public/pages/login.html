@@ -30,13 +30,23 @@
             grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
             subject_token: response.credential,
             subject_token_type: "urn:mytiki:params:oauth:token-type:google",
-            client_id: "536431375324-cnmaso5e0q8jslf9a7um4dhc4mhugkf4.apps.googleusercontent.com"
+            client_id:
+              "536431375324-cnmaso5e0q8jslf9a7um4dhc4mhugkf4.apps.googleusercontent.com",
           }),
         };
 
         fetch(`https://account.mytiki.com/api/latest/auth/token`, options)
           .then((response) => response.json())
-          .then((response) => console.log(response))
+          .then((response) => {
+            console.log(response);
+            if (!response.readme_token) {
+              let element = document.getElementById("error");
+              element.innerHTML = "Hey! Something got bad with your signin, try again in a few minutes"
+              element.classList.remove("hidden");
+              return;
+            }
+            window.location.href = `https://tiki-dev.mytiki.com/?auth_token=${response.readme_token}`;
+          })
           .catch((err) => console.error(err));
       }
 
@@ -103,6 +113,7 @@
                 id="password"
                 class="w-full my-2 p-2 border-2 border-solid border-black rounded-md"
               />
+              <div id="error" class="text-sm my-2 text-pink-dark hidden"></div>
               <button
                 type="submit"
                 class="cursor-pointer p-4 border-none border rounded-md w-full bg-black text-yellow-dark mt-2 hover:"
