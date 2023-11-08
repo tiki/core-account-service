@@ -31,6 +31,7 @@ public class JwtBuilder {
     private Map<String, String> custom;
     private JWSObject jws;
     private String refresh;
+    private Map<String, Object> additional;
 
     public JwtBuilder iat(ZonedDateTime datetime){
         iat = Date.from(datetime.toInstant());
@@ -119,6 +120,18 @@ public class JwtBuilder {
         return this;
     }
 
+    public JwtBuilder additional(String key, String value){
+        if(key != null && value != null) {
+            if(additional == null) additional = new HashMap<>(){{ put(key, value); }};
+            else {
+                Map<String, Object> map = new HashMap<>(additional);
+                map.put(key, value);
+                additional = map;
+            }
+        }
+        return this;
+    }
+
     public JwtBuilder build() {
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
         if(iat == null) iat = Date.from(now.toInstant());
@@ -152,6 +165,7 @@ public class JwtBuilder {
     public OAuth2AccessTokenResponse toResponse() {
         OAuth2AccessTokenResponse.Builder builder = OAuth2AccessTokenResponse
                 .withToken(jws.serialize())
+                .additionalParameters(additional)
                 .tokenType(OAuth2AccessToken.TokenType.BEARER);
 
         if(scp != null) builder.scopes(new HashSet<>(scp));
