@@ -11,12 +11,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class OtpAOStartReq {
     private String email;
 
-    private boolean notAnonymous;
-
     @JsonCreator
     public OtpAOStartReq(@JsonProperty(required = true) String email, boolean notAnonymous) {
         this.email = email;
-        this.notAnonymous = notAnonymous;
     }
 
     public String getEmail() {
@@ -25,13 +22,5 @@ public class OtpAOStartReq {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public boolean isNotAnonymous() {
-        return notAnonymous;
-    }
-
-    public void setNotAnonymous(boolean notAnonymous) {
-        this.notAnonymous = notAnonymous;
     }
 }
