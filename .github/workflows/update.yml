@@ -69,6 +69,7 @@ jobs:
       SPRING_DATASOURCE_USERNAME: ${{ vars.SPRING_DATASOURCE_USERNAME }}
       SPRING_DATASOURCE_PASSWORD: ${{ vars.SPRING_DATASOURCE_PASSWORD }}
       SPRING_DATASOURCE_URL: ${{ vars.SPRING_DATASOURCE_URL }}
+      README_SECRET: ${{ secrets.README_SECRET }}
     services:
       postgres:
         image: postgres:14.5
@@ -139,7 +140,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 

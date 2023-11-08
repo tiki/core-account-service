@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
 package com.mytiki.account;
 
 import com.mytiki.account.features.latest.addr_reg.AddrRegAOReq;
@@ -6,6 +11,7 @@ import com.mytiki.account.features.latest.addr_reg.AddrRegService;
 import com.mytiki.account.features.latest.app_info.AppInfoAO;
 import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
+import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.fixtures.AddrFixture;
 import com.mytiki.account.main.App;
@@ -46,8 +52,8 @@ public class AddrRegTest {
 
     @Test
     public void Test_RegisterNew_Success() throws JOSEException, NoSuchAlgorithmException, CryptoException {
-        UserInfoAO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId());
+        UserInfoDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
+        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
 
         String id = UUID.randomUUID().toString();
         AddrRegAOReq req = AddrFixture.req(id);
@@ -61,8 +67,8 @@ public class AddrRegTest {
 
     @Test
     public void Test_RegisterTwo_Success() throws JOSEException, NoSuchAlgorithmException, CryptoException {
-        UserInfoAO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId());
+        UserInfoDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
+        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
 
         String id = UUID.randomUUID().toString();
         AddrRegAOReq req1 = AddrFixture.req(id);
@@ -75,8 +81,8 @@ public class AddrRegTest {
 
     @Test
     public void Test_Get_Success() throws JOSEException, NoSuchAlgorithmException, CryptoException {
-        UserInfoAO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId());
+        UserInfoDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
+        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
 
         String id = UUID.randomUUID().toString();
         AddrRegAOReq req = AddrFixture.req(id);
@@ -91,8 +97,8 @@ public class AddrRegTest {
 
     @Test
     public void Test_GetAll_Success() throws NoSuchAlgorithmException, CryptoException, JOSEException {
-        UserInfoAO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId());
+        UserInfoDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
+        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
 
         String id = UUID.randomUUID().toString();
         service.register(app.getAppId(), AddrFixture.req(id), null);
@@ -105,8 +111,8 @@ public class AddrRegTest {
     @Test
     @Transactional
     public void Test_Delete_Success() throws NoSuchAlgorithmException, CryptoException, JOSEException {
-        UserInfoAO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId());
+        UserInfoDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
+        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
 
         String id = UUID.randomUUID().toString();
         AddrRegAOReq req = AddrFixture.req(id);
@@ -119,8 +125,8 @@ public class AddrRegTest {
     @Test
     @Transactional
     public void Test_DeleteAll_Success() throws NoSuchAlgorithmException, CryptoException, JOSEException {
-        UserInfoAO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId());
+        UserInfoDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
+        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
 
         String id = UUID.randomUUID().toString();
         service.register(app.getAppId(), AddrFixture.req(id), null);

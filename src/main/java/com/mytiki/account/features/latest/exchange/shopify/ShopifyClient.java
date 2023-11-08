@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.exchange.shopify;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.exchange.ExchangeClient;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
@@ -12,6 +13,7 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.web.client.RestTemplate;
 
+@XRayEnabled
 public class ShopifyClient implements ExchangeClient {
 
     @Override
