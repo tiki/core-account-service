@@ -76,20 +76,18 @@ public class ExchangeService {
 
 
     private String validate(String clientId, String subjectToken, String subjectTokenType) {
-        switch (subjectTokenType) {
-            case "urn:mytiki:params:oauth:token-type:shopify": {
+        return switch (subjectTokenType) {
+            case "urn:mytiki:params:oauth:token-type:shopify" -> {
                 ShopifyClient shopify = new ShopifyClient();
-                return shopify.validate(clientId, subjectToken);
+                yield shopify.validate(clientId, subjectToken);
             }
-            case "urn:mytiki:params:oauth:token-type:google": {
+            case "urn:mytiki:params:oauth:token-type:google" -> {
                 GoogleClient google = new GoogleClient();
-                return google.validate(clientId, subjectToken);
+                yield google.validate(clientId, subjectToken);
             }
-            default: {
-                throw new OAuth2AuthorizationException(new OAuth2Error(
-                        OAuth2ErrorCodes.ACCESS_DENIED),
-                        "client_id and/or subject_token_type are invalid");
-            }
-        }
+            default -> throw new OAuth2AuthorizationException(new OAuth2Error(
+                    OAuth2ErrorCodes.ACCESS_DENIED),
+                    "client_id and/or subject_token_type are invalid");
+        };
     }
 }
