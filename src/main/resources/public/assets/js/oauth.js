@@ -50,8 +50,9 @@ function handleGithubSign() {
       }),
     };
     fetch("https://github.com/login/oauth/access_token", options)
-      .then((response) => response.json())
+      .then((response) => response.text())
       .then((response) => {
+        console.log("test", response)
         if (!response.access_token) {
           let element = document.getElementById("error");
           element.innerHTML =
