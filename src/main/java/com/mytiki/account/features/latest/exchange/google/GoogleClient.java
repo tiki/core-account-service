@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.exchange.google;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 
+@XRayEnabled
 public class GoogleClient implements ExchangeClient {
     @Override
     public String validate(String clientId, String token) {

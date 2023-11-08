@@ -21,6 +21,7 @@ import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.ReadmeF;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
+import jakarta.transaction.Transactional;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
@@ -48,6 +49,7 @@ public class ExchangeService {
         this.readme = readme;
     }
 
+    @Transactional
     public OAuth2AccessTokenResponse authorize(
             String requestedScope, String clientId, String subjectToken, String subjectTokenType) {
         String email = validate(clientId, subjectToken, subjectTokenType);
