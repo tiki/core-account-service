@@ -65,8 +65,8 @@
           </div>
 
           <div id="googleBtn" class="mt-5 text-lg"></div>
-
           <div
+            onclick="githubLogin()"
             class="text-center w-5/5 my-5 flex items-center justify-center border border-gray rounded-md p-1.5 bg-white cursor-pointer"
           >
             <img
@@ -123,5 +123,20 @@
         </div>
       </div>
     </div>
+    <script>
+      function githubLogin() {
+        const options = {
+          method: "GET",
+        };
+        fetch(
+          "https://github.com/login/oauth/authorize?client_id=dd6e8fce4228d00ce",
+          options
+        )
+          .then(async (response) => {
+            console.log(await response);
+          })
+          .catch((error) => console.log(error));
+      }
+    </script>
   </body>
 </html>
