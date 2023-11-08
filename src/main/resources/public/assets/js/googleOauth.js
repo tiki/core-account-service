@@ -1,5 +1,4 @@
 function handleCredentialResponse(response) {
-    console.log("Encoded JWT ID token: " + response.credential);
 
     let headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
@@ -20,7 +19,6 @@ function handleCredentialResponse(response) {
     fetch(`https://account.mytiki.com/api/latest/auth/token`, options)
       .then((response) => response.json())
       .then((response) => {
-        console.log(response);
         if (!response.readme_token) {
           let element = document.getElementById("error");
           element.innerHTML = "Hey! Something got bad with your signin, try again in a few minutes"
