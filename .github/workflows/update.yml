@@ -70,6 +70,7 @@ jobs:
       SPRING_DATASOURCE_PASSWORD: ${{ vars.SPRING_DATASOURCE_PASSWORD }}
       SPRING_DATASOURCE_URL: ${{ vars.SPRING_DATASOURCE_URL }}
       README_SECRET: ${{ secrets.README_SECRET }}
+      GITHUB_OAUTH_SECRET: ${{ secrets.GH_OAUTH_SECRET }}
     services:
       postgres:
         image: postgres:14.5
