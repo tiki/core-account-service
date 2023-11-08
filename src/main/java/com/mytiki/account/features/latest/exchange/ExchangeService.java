@@ -7,6 +7,7 @@ package com.mytiki.account.features.latest.exchange;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mytiki.account.features.latest.exchange.google.GoogleClient;
 import com.mytiki.account.features.latest.exchange.shopify.ShopifyClient;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
@@ -20,6 +21,7 @@ import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.ReadmeF;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
+import jakarta.transaction.Transactional;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
@@ -47,6 +49,7 @@ public class ExchangeService {
         this.readme = readme;
     }
 
+    @Transactional
     public OAuth2AccessTokenResponse authorize(
             String requestedScope, String clientId, String subjectToken, String subjectTokenType) {
         String email = validate(clientId, subjectToken, subjectTokenType);
@@ -75,16 +78,18 @@ public class ExchangeService {
 
 
     private String validate(String clientId, String subjectToken, String subjectTokenType) {
-        switch (subjectTokenType) {
-            case "urn:mytiki:params:oauth:token-type:shopify": {
+        return switch (subjectTokenType) {
+            case "urn:mytiki:params:oauth:token-type:shopify" -> {
                 ShopifyClient shopify = new ShopifyClient();
-                return shopify.validate(clientId, subjectToken);
+                yield shopify.validate(clientId, subjectToken);
             }
-            default: {
-                throw new OAuth2AuthorizationException(new OAuth2Error(
-                        OAuth2ErrorCodes.ACCESS_DENIED),
-                        "client_id and/or subject_token_type are invalid");
+            case "urn:mytiki:params:oauth:token-type:google" -> {
+                GoogleClient google = new GoogleClient();
+                yield google.validate(clientId, subjectToken);
             }
-        }
+            default -> throw new OAuth2AuthorizationException(new OAuth2Error(
+                    OAuth2ErrorCodes.ACCESS_DENIED),
+                    "client_id and/or subject_token_type are invalid");
+        };
     }
 }

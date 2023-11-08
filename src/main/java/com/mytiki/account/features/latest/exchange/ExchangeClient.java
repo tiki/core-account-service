@@ -6,5 +6,5 @@
 package com.mytiki.account.features.latest.exchange;
 
 public interface ExchangeClient {
-    String validate(String tokenType, String token);
+    String validate(String clientId, String token);
 }
