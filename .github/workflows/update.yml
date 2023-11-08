@@ -168,6 +168,6 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GH Action"
           git add src/main/resources/public/assets/styles/main.css
-          git commit -m 'version bump'
+          git commit -m 'tailwind update'
           git push
 
