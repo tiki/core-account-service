@@ -126,17 +126,7 @@
     </div>
     <script>
       function githubLogin() {
-        const options = {
-          method: "GET",
-        };
-        fetch(
-          "https://github.com/login/oauth/authorize?client_id=dd6e8fce4228d00ce",
-          options
-        )
-          .then(async (response) => {
-            console.log(await response);
-          })
-          .catch((error) => console.log(error));
+        window.location.href = "https://github.com/login/oauth/authorize?client_id=da2dd6e8fce4228d00ce"
       }
     </script>
   </body>
