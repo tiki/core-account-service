@@ -27,13 +27,14 @@
           method: "POST",
           headers: headers,
           body: new URLSearchParams({
-            grant_type: "urn ietf params oauth grant-type token-exchange",
+            grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
             subject_token: response.credential,
-            subject_token_type: "urn mytiki params oauth token-type google",
+            subject_token_type: "urn:mytiki:params:oauth:token-type:google",
+            client_id: "536431375324-cnmaso5e0q8jslf9a7um4dhc4mhugkf4.apps.googleusercontent.com"
           }),
         };
 
-        fetch(`https://mytiki.com/api/account/api/latest/auth/token`, options)
+        fetch(`https://account.mytiki.com/api/latest/auth/token`, options)
           .then((response) => response.json())
           .then((response) => console.log(response))
           .catch((err) => console.error(err));
