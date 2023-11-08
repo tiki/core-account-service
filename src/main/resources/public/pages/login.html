@@ -93,7 +93,7 @@
         const options = {
          method: "POST",
          headers: headers,
-         body: JSON.stringify({email: dataObject.email})     
+         body: JSON.stringify({email: dataObject.email, notAnonymous: true})     
        }
 
        fetch("https://account.mytiki.com/api/latest/auth/otp", options).then(async (response)=>{
