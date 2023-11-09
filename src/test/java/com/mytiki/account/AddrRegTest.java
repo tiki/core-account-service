@@ -107,33 +107,4 @@ public class AddrRegTest {
         List<AddrRegAORsp> rspList = service.getAll(app.getAppId(), id);
         assertEquals(rspList.size(), 2);
     }
-
-    @Test
-    @Transactional
-    public void Test_Delete_Success() throws NoSuchAlgorithmException, CryptoException, JOSEException {
-        UserInfoDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
-
-        String id = UUID.randomUUID().toString();
-        AddrRegAOReq req = AddrFixture.req(id);
-        service.register(app.getAppId(), req, null);
-        service.delete(app.getAppId(), req.getAddress());
-        AddrRegAORsp rsp = service.get(app.getAppId(), req.getAddress());
-        assertNull(rsp.getId());
-    }
-
-    @Test
-    @Transactional
-    public void Test_DeleteAll_Success() throws NoSuchAlgorithmException, CryptoException, JOSEException {
-        UserInfoDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
-
-        String id = UUID.randomUUID().toString();
-        service.register(app.getAppId(), AddrFixture.req(id), null);
-        service.register(app.getAppId(), AddrFixture.req(id), null);
-
-        service.deleteAll(app.getAppId(), id);
-        List<AddrRegAORsp> rsp = service.getAll(app.getAppId(), id);
-        assertTrue(rsp.isEmpty());
-    }
 }

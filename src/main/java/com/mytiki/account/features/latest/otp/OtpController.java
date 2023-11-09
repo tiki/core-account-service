@@ -32,6 +32,7 @@ public class OtpController {
     }
 
     @Operation(
+            hidden = true,
             operationId = Constants.PROJECT_DASH_PATH +  "-otp-start-post",
             summary = "Request OTP",
             description = "Start a one-time password (email) authorization flow")
@@ -41,6 +42,7 @@ public class OtpController {
     }
 
     @Operation(
+            hidden = true,
             operationId = Constants.PROJECT_DASH_PATH +  "-oauth-token-post",
             summary = "Grant Token",
             description = "Grant a new authorization token (with scope)")

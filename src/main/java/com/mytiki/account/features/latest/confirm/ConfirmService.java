@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.confirm;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoRepository;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@XRayEnabled
 public class ConfirmService {
     private static final String TEMPLATE_TOKEN = "CONFIRMATION_TOKEN";
     private static final long EXPIRY_MINUTES = 30;

@@ -52,7 +52,7 @@ public class AddrRegController {
             summary = "Get Addresses",
             description = "Retrieve and filter registered addresses",
             security = @SecurityRequirement(name = "oauth", scopes = "account:app"))
-    @Secured({"SCOPE_account:app", "SCOPE_account:internal:read"})
+    @Secured({"SCOPE_account:app"})
     @RequestMapping(method = RequestMethod.GET)
     public List<AddrRegAORsp> getAll(
             JwtAuthenticationToken token,
@@ -63,22 +63,5 @@ public class AddrRegController {
         if(address != null) return List.of(service.get(appId, address));
         else if(id != null) return service.getAll(appId, id);
         else return List.of();
-    }
-
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-addr-reg-delete",
-            summary = "Delete Addresses",
-            description = "Delete registered addresses",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
-    @Secured("SCOPE_account:admin")
-    @RequestMapping(method = RequestMethod.DELETE)
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void deleteAll(
-            JwtAuthenticationToken token,
-            @PathVariable(name = "app-id") String appId,
-            @RequestParam(name = "address", required = false) String address,
-            @RequestParam(name = "id", required = false) String id) {
-        appInfo.guard(token, appId);
-        if(address != null) service.delete(appId, address);
-        else if(id != null) service.deleteAll(appId, id);
     }
 }

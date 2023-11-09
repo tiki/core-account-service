@@ -30,10 +30,15 @@ public class ConfirmController {
         this.service = service;
     }
 
-    @Operation(hidden = true)
+    @Operation(
+            hidden = true,
+            operationId = Constants.PROJECT_DASH_PATH +  "-confirm-get",
+            summary = "Confirm a change request",
+            description = "Process a change request that requires additional confirmation"
+    )
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
-    public void update(@RequestParam String token) {
+    public void confirm(@RequestParam String token) {
         service.confirm(token);
     }
 }

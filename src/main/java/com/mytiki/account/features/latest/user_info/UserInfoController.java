@@ -29,6 +29,16 @@ public class UserInfoController {
         this.service = service;
     }
 
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-get",
+            summary = "Get User",
+            description = "Get the authorized user's profile",
+            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @Secured("SCOPE_account:admin")
+    @RequestMapping(method = RequestMethod.GET)
+    public UserInfoAO get(JwtAuthenticationToken token) {
+        return service.get(token.getName());
+    }
+
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-post",
             summary = "Update User",
             description = "Update the authorized User's profile",
@@ -40,16 +50,6 @@ public class UserInfoController {
         service.update(token.getName(), body);
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-get",
-            summary = "Get User",
-            description = "Get the authorized user's profile",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
-    @Secured("SCOPE_account:admin")
-    @RequestMapping(method = RequestMethod.GET)
-    public UserInfoAO get(JwtAuthenticationToken token) {
-        return service.get(token.getName());
-    }
-
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-delete",
             summary = "Delete User",
             description = "Delete the authorized user",
@@ -59,12 +59,5 @@ public class UserInfoController {
     @ResponseStatus(code = HttpStatus.ACCEPTED)
     public void delete(JwtAuthenticationToken token) {
         service.get(token.getName());
-    }
-
-    @Operation(hidden = true)
-    @Secured("SCOPE_account:internal:read")
-    @RequestMapping(method = RequestMethod.GET, path =  "/{userId}")
-    public UserInfoAO getById(@PathVariable String userId) {
-        return service.get(userId);
     }
 }

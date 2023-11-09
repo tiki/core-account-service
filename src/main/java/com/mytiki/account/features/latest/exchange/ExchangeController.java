@@ -7,6 +7,7 @@ package com.mytiki.account.features.latest.exchange;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.utilities.Constants;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -31,6 +32,7 @@ public class ExchangeController {
         this.service = service;
     }
 
+    @Operation(hidden = true)
     @RequestMapping(
             method = RequestMethod.POST,
             path = Constants.AUTH_TOKEN_PATH,

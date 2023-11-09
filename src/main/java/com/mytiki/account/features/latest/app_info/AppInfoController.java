@@ -34,9 +34,7 @@ public class AppInfoController {
             security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
     @RequestMapping(method = RequestMethod.GET, path = "/{app-id}")
     @Secured({"SCOPE_account:admin", "SCOPE_account:internal:read"})
-    public AppInfoAO get(
-            JwtAuthenticationToken token,
-            @PathVariable(name = "app-id") String appId) {
+    public AppInfoAO get(JwtAuthenticationToken token, @PathVariable(name = "app-id") String appId) {
         service.guard(token, appId);
         return service.get(appId);
     }
@@ -47,9 +45,7 @@ public class AppInfoController {
             security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.POST)
-    public AppInfoAO create(
-            JwtAuthenticationToken token,
-            @RequestBody AppInfoAOReq body) {
+    public AppInfoAO create(JwtAuthenticationToken token, @RequestBody AppInfoAOReq body) {
         return service.create(body.getName(), token.getName());
     }
 
@@ -73,9 +69,7 @@ public class AppInfoController {
             security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.DELETE, path = "/{app-id}")
-    public void delete(
-            JwtAuthenticationToken token,
-            @PathVariable(name = "app-id") String appId) {
+    public void delete(JwtAuthenticationToken token, @PathVariable(name = "app-id") String appId) {
         service.guard(token, appId);
         service.delete(appId);
     }

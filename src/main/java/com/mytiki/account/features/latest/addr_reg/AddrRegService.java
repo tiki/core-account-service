@@ -84,17 +84,6 @@ public class AddrRegService {
         return found.stream().map(this::toRsp).toList();
     }
 
-    public void delete(String appId, String address){
-        UUID app = UUID.fromString(appId);
-        byte[] addr = B64F.decode(address, true);
-        repository.deleteByAppAppIdAndAddress(app, addr);
-    }
-
-    public void deleteAll(String appId, String id){
-        UUID app = UUID.fromString(appId);
-        repository.deleteByAppAppIdAndCid(app, id);
-    }
-
     private void guardSignature(AddrRegAOReq req) {
         try {
             byte[] message = Utf8.encode(req.getId() + "." + req.getAddress());

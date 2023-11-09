@@ -44,9 +44,7 @@ public class ApiKeyController {
             security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.GET, path = PATH_CONTROLLER)
-    public List<ApiKeyAO> get(
-            JwtAuthenticationToken token,
-            @PathVariable(name = "app-id") String appId) {
+    public List<ApiKeyAO> get(JwtAuthenticationToken token, @PathVariable(name = "app-id") String appId) {
         appInfo.guard(token, appId);
         return service.getByAppId(appId);
     }
@@ -79,6 +77,7 @@ public class ApiKeyController {
         service.revoke(appId, keyId);
     }
 
+    @Operation(hidden = true)
     @RequestMapping(
             method = RequestMethod.POST,
             path = Constants.AUTH_TOKEN_PATH,

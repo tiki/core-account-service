@@ -33,7 +33,9 @@ public class RefreshController {
         this.service = service;
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-oauth-revoke-post",
+    @Operation(
+            hidden = true,
+            operationId = Constants.PROJECT_DASH_PATH +  "-oauth-revoke-post",
             summary = "Revoke Token",
             description = "Revoke a Refresh token.")
     @ApiResponse(responseCode = "200")
@@ -45,6 +47,7 @@ public class RefreshController {
         service.revoke(token);
     }
 
+    @Operation(hidden = true)
     @RequestMapping(
             method = RequestMethod.POST,
             path = Constants.AUTH_TOKEN_PATH,

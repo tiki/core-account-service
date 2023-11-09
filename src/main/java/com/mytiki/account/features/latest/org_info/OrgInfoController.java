@@ -30,7 +30,9 @@ public class OrgInfoController {
         this.service = service;
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-org-get",
+    @Operation(
+            hidden = true,
+            operationId = Constants.PROJECT_DASH_PATH +  "-org-get",
             summary = "Get Org",
             description = "Retrieve the authorized User's Org details",
             security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
@@ -38,12 +40,5 @@ public class OrgInfoController {
     @RequestMapping(method = RequestMethod.GET)
     public OrgInfoAO get(JwtAuthenticationToken token) {
         return service.getByUser(token.getName());
-    }
-
-    @Operation(hidden = true)
-    @RequestMapping(method = RequestMethod.GET, path = "/{org-id}")
-    @Secured("SCOPE_account:internal:read")
-    public OrgInfoAO get(@PathVariable(name = "org-id") String orgId) {
-        return service.get(orgId);
     }
 }
