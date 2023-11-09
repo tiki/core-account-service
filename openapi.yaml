@@ -6,7 +6,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/tiki-account/blob/main/LICENSE
-  version: 2.5.0
+  version: 2.6.0
 servers:
 - url: https://mytiki.com/api/account
 paths:
@@ -40,112 +40,23 @@ paths:
               $ref: '#/components/schemas/UserInfoAOUpdate'
         required: true
       responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserInfoAO'
+        "202":
+          description: Accepted
       security:
       - oauth:
         - account:admin
-  /api/latest/auth/token:
-    post:
+    delete:
       tags:
       - ""
-      summary: Grant Token
-      description: Grant a new authorization token (with scope)
-      operationId: account-oauth-token-post_1_1_1
-      parameters:
-      - name: grant_type
-        in: query
-        description: "(password, refresh_token, client_credentials, urn:ietf:params:oauth:grant-type:token-exchange)"
-        required: true
-        schema:
-          type: string
-      - name: scope
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: username
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: password
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: client_id
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: subject_token
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: subject_token_type
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: refresh_token
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: client_secret
-        in: query
-        required: false
-        schema:
-          type: string
+      summary: Delete User
+      description: Delete the authorized user
+      operationId: account-user-delete
       responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuth2AccessTokenResponse'
-  /api/latest/auth/revoke:
-    post:
-      tags:
-      - ""
-      summary: Revoke Token
-      description: Revoke a Refresh token.
-      operationId: account-oauth-revoke-post
-      parameters:
-      - name: token
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-  /api/latest/auth/otp:
-    post:
-      tags:
-      - ""
-      summary: Request OTP
-      description: Start a one-time password (email) authorization flow
-      operationId: account-otp-start-post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OtpAOStartReq'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OtpAOStartRsp'
+        "202":
+          description: Accepted
+      security:
+      - oauth:
+        - account:admin
   /api/latest/app:
     post:
       tags:
@@ -380,51 +291,6 @@ paths:
       security:
       - oauth:
         - account:app
-    delete:
-      tags:
-      - ""
-      summary: Delete Addresses
-      description: Delete registered addresses
-      operationId: account-addr-reg-delete
-      parameters:
-      - name: app-id
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: address
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: id
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        "204":
-          description: No Content
-      security:
-      - oauth:
-        - account:admin
-  /api/latest/org:
-    get:
-      tags:
-      - ""
-      summary: Get Org
-      description: Retrieve the authorized User's Org details
-      operationId: account-org-get
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrgInfoAO'
-      security:
-      - oauth:
-        - account:admin
 components:
   schemas:
     UserInfoAOUpdate:
@@ -432,79 +298,6 @@ components:
       properties:
         email:
           type: string
-    UserInfoAO:
-      type: object
-      properties:
-        userId:
-          type: string
-        email:
-          type: string
-        orgId:
-          type: string
-        modified:
-          type: string
-          format: date-time
-        created:
-          type: string
-          format: date-time
-    OAuth2AccessToken:
-      type: object
-      properties:
-        tokenValue:
-          type: string
-        issuedAt:
-          type: string
-          format: date-time
-        expiresAt:
-          type: string
-          format: date-time
-        tokenType:
-          $ref: '#/components/schemas/TokenType'
-        scopes:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
-    OAuth2AccessTokenResponse:
-      type: object
-      properties:
-        accessToken:
-          $ref: '#/components/schemas/OAuth2AccessToken'
-        refreshToken:
-          $ref: '#/components/schemas/OAuth2RefreshToken'
-        additionalParameters:
-          type: object
-          additionalProperties:
-            type: object
-    OAuth2RefreshToken:
-      type: object
-      properties:
-        tokenValue:
-          type: string
-        issuedAt:
-          type: string
-          format: date-time
-        expiresAt:
-          type: string
-          format: date-time
-    TokenType:
-      type: object
-      properties:
-        value:
-          type: string
-    OtpAOStartReq:
-      type: object
-      properties:
-        email:
-          type: string
-    OtpAOStartRsp:
-      type: object
-      properties:
-        deviceId:
-          type: string
-        expires:
-          type: string
-          format: date-time
     AppInfoAOReq:
       type: object
       properties:
@@ -564,23 +357,15 @@ components:
         created:
           type: string
           format: date-time
-    OrgInfoAO:
+    UserInfoAO:
       type: object
       properties:
+        userId:
+          type: string
+        email:
+          type: string
         orgId:
           type: string
-        billingId:
-          type: string
-        users:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
-        apps:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
         modified:
           type: string
           format: date-time
