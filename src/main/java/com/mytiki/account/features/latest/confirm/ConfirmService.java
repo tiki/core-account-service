@@ -19,10 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class ConfirmService {
-    //send email w/ token & template
-    //we need to record the token + properties in a json KV + the action enum
-    //we need a controller that takes a GET w/ the token
-
     private static final String TEMPLATE_TOKEN = "CONFIRMATION_TOKEN";
     private static final long EXPIRY_MINUTES = 30;
 
@@ -74,7 +70,8 @@ public class ConfirmService {
     private void process(ConfirmAction action, Map<String, String> properties) {
         switch (action){
             case DELETE_USER -> {
-
+                Long id = Long.parseLong(properties.get("id"));
+                userInfoRepository.deleteById(id);
             }
             case UPDATE_USER -> {
                 String subject = properties.get("subject");

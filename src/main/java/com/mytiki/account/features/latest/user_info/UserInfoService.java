@@ -100,10 +100,29 @@ public class UserInfoService {
         req.setEmail(found.get().getEmail());
         req.setAction(ConfirmAction.UPDATE_USER);
         req.setTemplate("user-update");
-        req.setInputs(new HashMap<>());
         req.setOutputs(new HashMap<>(){{
             put("subject", found.get().getEmail());
             put("email", update.getEmail());
+        }});
+        if(!confirmService.send(req))
+            throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
+                    .message("Failed to send confirmation email.")
+                    .properties("email", found.get().getEmail())
+                    .exception();
+    }
+
+    public void delete(String subject) {
+        Optional<UserInfoDO> found = repository.findByUserId(UUID.fromString(subject));
+        if(found.isEmpty())
+            throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
+                    .message("Invalid sub claim")
+                    .exception();
+        ConfirmAO req = new ConfirmAO();
+        req.setEmail(found.get().getEmail());
+        req.setAction(ConfirmAction.DELETE_USER);
+        req.setTemplate("user-delete");
+        req.setOutputs(new HashMap<>(){{
+            put("id", found.get().getId().toString());
         }});
         if(!confirmService.send(req))
             throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)

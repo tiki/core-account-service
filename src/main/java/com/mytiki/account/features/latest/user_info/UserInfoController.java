@@ -50,6 +50,17 @@ public class UserInfoController {
         return service.get(token.getName());
     }
 
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-delete",
+            summary = "Delete User",
+            description = "Delete the authorized user",
+            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @Secured("SCOPE_account:admin")
+    @RequestMapping(method = RequestMethod.DELETE)
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
+    public void delete(JwtAuthenticationToken token) {
+        service.get(token.getName());
+    }
+
     @Operation(hidden = true)
     @Secured("SCOPE_account:internal:read")
     @RequestMapping(method = RequestMethod.GET, path =  "/{userId}")
