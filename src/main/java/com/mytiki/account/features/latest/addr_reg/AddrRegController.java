@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @XRayEnabled
-@Tag(name = "")
+@Tag(name = "User")
 @RestController
 @RequestMapping(value = AddrRegController.PATH_CONTROLLER)
 public class AddrRegController {

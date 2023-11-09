@@ -51,21 +51,25 @@ public class AppConfig {
     public OpenAPI openAPI(@Value("${springdoc.version}") String appVersion) {
         return new OpenAPI()
                 .info(new Info()
-                        .title("TIKI Account")
-                        .description("TIKI's account management service —configure and provision access to the data platform")
+                        .title("Account")
+                        .description("Account management service —configure and provision access to the platform")
                         .version(appVersion)
                         .license(new License()
                                 .name("MIT")
-                                .url("https://github.com/tiki/tiki-account/blob/main/LICENSE")))
+                                .url("https://github.com/tiki/core-account-service/blob/main/LICENSE")))
                 .servers(Collections.singletonList(new Server()
-                        .url("https://mytiki.com/api/account")))
+                        .url("https://account.mytiki.com")))
                 .components(new Components()
                         .addSecuritySchemes("oauth", new SecurityScheme()
                                 .type(SecurityScheme.Type.OAUTH2)
                                 .flows(new OAuthFlows()
+                                        .clientCredentials(new OAuthFlow()
+                                                .tokenUrl("https://account.mytiki.com/api/latest/auth/token")
+                                                .refreshUrl("https://account.mytiki.com/api/latest/auth/token")
+                                                .scopes(new Scopes().addString("account","account:app")))
                                         .password(new OAuthFlow()
-                                                .tokenUrl("https://mytiki.com/api/account/oauth/token")
-                                                .refreshUrl("https://mytiki.com/api/account/oauth/token")
-                                                .scopes(new Scopes().addString("auth","this service")))))); //TODO fix scopes
+                                                .tokenUrl("https://account.mytiki.com/api/latest/auth/token")
+                                                .refreshUrl("https://account.mytiki.com/api/latest/auth/token")
+                                                .scopes(new Scopes().addString("account","account:admin"))))));
     }
 }

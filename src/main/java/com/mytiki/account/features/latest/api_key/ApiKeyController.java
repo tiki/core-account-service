@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @XRayEnabled
-@Tag(name = "")
+@Tag(name = "App")
 @RestController
 @RequestMapping(value = Constants.API_LATEST_ROUTE)
 public class ApiKeyController {

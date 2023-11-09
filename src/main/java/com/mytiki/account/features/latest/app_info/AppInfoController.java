@@ -15,7 +15,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 
 @XRayEnabled
-@Tag(name = "")
+@Tag(name = "App")
 @RestController
 @RequestMapping(value = AppInfoController.PATH_CONTROLLER)
 public class AppInfoController {
