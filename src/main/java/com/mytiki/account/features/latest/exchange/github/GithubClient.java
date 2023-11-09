@@ -46,7 +46,7 @@ public class GithubClient implements ExchangeClient {
                     tokenRsp.getBody().getAccessToken() != null) {
                 HttpHeaders userHeaders = new HttpHeaders();
                 userHeaders.setBearerAuth(tokenRsp.getBody().getAccessToken());
-                ResponseEntity<GithubAOEmail[]> userRsp = client.exchange("https://api.github.com/user/email",
+                ResponseEntity<GithubAOEmail[]> userRsp = client.exchange("https://api.github.com/user/emails",
                         HttpMethod.GET, new HttpEntity<>(userHeaders), GithubAOEmail[].class);
                 if (userRsp.getStatusCode().is2xxSuccessful() && userRsp.getBody() != null)
                     return Arrays
