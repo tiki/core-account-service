@@ -1,3 +1,7 @@
+function githubLogin() {
+  window.location.href = "https://github.com/login/oauth/authorize?client_id=ebbf90361bcb8c527416&scope=user:email"
+}
+
 function handleCredentialResponse(response) {
   let headers = new Headers();
   headers.append("Content-Type", "application/x-www-form-urlencoded");
@@ -11,7 +15,7 @@ function handleCredentialResponse(response) {
       subject_token: response.credential,
       subject_token_type: "urn:mytiki:params:oauth:token-type:google",
       client_id:
-        "536431375324-cnmaso5e0q8jslf9a7um4dhc4mhugkf4.apps.googleusercontent.com",
+        "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googleusercontent.com",
     }),
   };
 
@@ -34,7 +38,6 @@ function handleGithubSign() {
   const url_string = window.location.href.toLowerCase();
   const url = new URL(url_string);
   const code = url.searchParams.get("code");
-  console.log(code);
   if (code) {
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
@@ -55,7 +58,6 @@ function handleGithubSign() {
     fetch(`https://account.mytiki.com/api/latest/auth/token`, options)
       .then((response) => response.json())
       .then((response) => {
-        console.log(response)
         if (!response.readme_token) {
           let element = document.getElementById("error");
           element.innerHTML =
@@ -74,7 +76,7 @@ window.onload = function () {
 
   google.accounts.id.initialize({
     client_id:
-      "536431375324-cnmaso5e0q8jslf9a7um4dhc4mhugkf4.apps.googleusercontent.com",
+      "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googleusercontent.com",
     callback: handleCredentialResponse,
   });
   google.accounts.id.renderButton(document.getElementById("googleBtn"), {
@@ -83,7 +85,3 @@ window.onload = function () {
     logo_alignment: "center",
   });
 };
-
-function githubLogin() {
-  window.location.href = "https://github.com/login/oauth/authorize?client_id=ebbf90361bcb8c527416&scope=user:email"
-}
