@@ -19,7 +19,6 @@ public class OtpDO implements Serializable {
     private String otpHashed;
     private ZonedDateTime issued;
     private ZonedDateTime expires;
-
     private String email;
 
     @Id

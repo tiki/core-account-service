@@ -10,6 +10,7 @@ import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.facade.MustacheF;
+import com.mytiki.account.utilities.facade.ReadmeF;
 import com.mytiki.account.utilities.facade.SendgridF;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +39,9 @@ public class OtpConfig {
             @Autowired RefreshService refreshService,
             @Autowired UserInfoService userInfoService,
             @Autowired OauthScopes allowedScopes,
-            @Value("${com.mytiki.account.oauth.password.anonymous.scopes}") List<String> anonymousScopes) {
+            @Autowired ReadmeF readme) {
         return new OtpService(otpRepository, templates, sendgrid, signer, refreshService, userInfoService,
-                allowedScopes, anonymousScopes);
+                allowedScopes, readme);
     }
 
     @Bean

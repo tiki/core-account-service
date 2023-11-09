@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS otp(
     otp_hashed TEXT PRIMARY KEY,
     issued_utc TIMESTAMP WITH TIME ZONE NOT NULL,
     expires_utc TIMESTAMP WITH TIME ZONE NOT NULL,
-    email TEXT
+    email TEXT NOT NULL
 );
 
 -- -----------------------------------------------------------------------

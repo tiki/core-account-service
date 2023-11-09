@@ -3,7 +3,7 @@
   ~ MIT license. See LICENSE file in root directory.
   -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -25,7 +25,6 @@
               Sign in to Tiki Docs
             </h1>
           </div>
-
           <div id="googleBtn" class="mt-5 text-lg"></div>
           <div
             onclick="githubLogin()"
@@ -40,7 +39,7 @@
           </div>
           <div class="text-center m-5">or use your email</div>
           <div>
-            <form action="">
+            <form action="./otp.html" id="tikiLoginForm">
               <label
                 for="email"
                 class="block text-tiki-black-xlight font-bold text-sm"
@@ -75,5 +74,6 @@
         </div>
       </div>
     </div>
+    <script src="../assets/js/login.js"></script>
   </body>
 </html>
