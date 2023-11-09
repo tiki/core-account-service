@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.user_info;
 
+import com.mytiki.account.features.latest.confirm.ConfirmService;
 import com.mytiki.account.features.latest.org_info.OrgInfoService;
 import com.mytiki.account.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,8 @@ public class UserInfoConfig {
 
     @Bean
     public UserInfoService userInfoService(@Autowired UserInfoRepository repository,
-                                           @Autowired OrgInfoService orgInfoService){
-        return new UserInfoService(repository, orgInfoService);
+                                           @Autowired OrgInfoService orgInfoService,
+                                           @Autowired ConfirmService confirm){
+        return new UserInfoService(repository, orgInfoService, confirm);
     }
 }

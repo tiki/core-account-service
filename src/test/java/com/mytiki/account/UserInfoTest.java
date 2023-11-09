@@ -66,23 +66,4 @@ public class UserInfoTest {
         assertNull(user.getOrgId());
         assertEquals(sub, user.getUserId());
     }
-
-    @Test
-    @Transactional
-    public void Test_Update_Success() {
-        String email = "test+" + UUID.randomUUID() + "@test.com";
-        UserInfoDO saved = new UserInfoDO();
-        saved.setEmail(email);
-        saved.setUserId(UUID.randomUUID());
-        saved.setCreated(ZonedDateTime.now());
-        saved.setModified(ZonedDateTime.now());
-        saved.setOrg(orgInfoService.create());
-        saved = repository.save(saved);
-
-        UserInfoAOUpdate update = new UserInfoAOUpdate();
-        update.setEmail("updated+" + email);
-
-        UserInfoAO user = service.update(saved.getUserId().toString(), update);
-        assertEquals("updated+" + email, user.getEmail());
-    }
 }

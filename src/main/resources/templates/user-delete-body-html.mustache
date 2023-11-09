@@ -15,7 +15,7 @@
     <meta name="x-apple-disable-message-reformatting" />
     <link href="https://fonts.googleapis.com/css?family=Space+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Fira+Sans:ital,wght@0,100;1,100;0,200;1,200;0,300;1,300;0,400;1,400;0,500;1,500;0,600;1,600;0,700;1,700;0,800;1,800;0,900;1,900" rel="stylesheet" />
-    <title>OTP</title>
+    <title>Confirm</title>
     <!-- Made with Postcards by Designmodo https://designmodo.com/postcards -->
     <!--[if !mso]><!-->
     <style>
@@ -217,7 +217,7 @@
                                                                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" align="center" style="margin-right: auto; margin-left: auto;">
                                                                             <tr>
                                                                                 <td valign="top" class="pc-font-alt pc-w620-fontSize-30 pc-w620-lineHeight-40" align="center" style="mso-line-height: exactly;line-height: 128%;letter-spacing: -0.6px;font-family: 'Space Grotesk', Helvetica, Arial, sans-serif;font-size: 36px;font-weight: normal;color: #1c0000;text-align: center;text-align-last: center;">
-                                                                                    <div><span>{{{OTP}}}</span>
+                                                                                    <div><span>We received a request to delete your account.</span>
                                                                                     </div>
                                                                                 </td>
                                                                             </tr>
@@ -231,7 +231,7 @@
                                                                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" align="center" style="margin-right: auto; margin-left: auto;">
                                                                             <tr>
                                                                                 <td valign="top" class="pc-font-alt pc-w620-fontSize-18 pc-w620-lineHeight-28" align="center" style="mso-line-height: exactly;line-height: 150%;letter-spacing: -0.2px;font-family: 'Space Grotesk', Helvetica, Arial, sans-serif;font-size: 20px;font-weight: normal;color: #505c59;text-align: center;text-align-last: center;">
-                                                                                    <div><span>This one-time password expires in 30 minutes. Please login or simply ignore this email if you&#39;ve changed your mind. </span>
+                                                                                    <div><span>This request expires in 30 minutes. Please confirm the request or simply ignore this email if you&#39;ve changed your mind. </span>
                                                                                     </div>
                                                                                 </td>
                                                                             </tr>
@@ -258,12 +258,12 @@
                                                                                                                         <table  border="0" cellpadding="0" cellspacing="0" role="presentation" align="center" width="250" style="border-collapse: separate;">
                                                                                                                             <tr>
                                                                                                                                 <td valign="middle" align="center" style="text-align: center;color: #ffffff;border-radius: 8px;background-color: #00b272;padding: 14px 19px 14px 19px;box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.05);width: 250px;" bgcolor="#00b272">
-                                                                                                                                    <a class="pc-font-alt" style="display: inline-block;text-decoration: none;white-space: nowrap;font-family: 'Space Grotesk', Helvetica, Arial, sans-serif;font-weight: 500;font-size: 16px;line-height: 150%;letter-spacing: -0.2px;color: #ffffff;" href="https://account.mytiki.com/pages/otp?code={{{OTP}}}" target="_blank"><span><span style="white-space: pre-wrap;">Login</span></span></a>
+                                                                                                                                    <a class="pc-font-alt" style="display: inline-block;text-decoration: none;white-space: nowrap;font-family: 'Space Grotesk', Helvetica, Arial, sans-serif;font-weight: 500;font-size: 16px;line-height: 150%;letter-spacing: -0.2px;color: #ffffff;" href="https://account.mytiki.com/api/latest/confirm?token={{{CONFIRMATION_TOKEN}}}" target="_blank"><span><span style="white-space: pre-wrap;">Confirm</span></span></a>
                                                                                                                                 </td>
                                                                                                                             </tr>
                                                                                                                         </table>
                                                                                                                         <![endif]-->
-                                                                                                                        <!--[if !mso]><!-- --><a style="border-radius: 8px;background-color: #00b272;padding: 14px 19px 14px 19px;box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.05);width: 250px;font-family: 'Space Grotesk', Helvetica, Arial, sans-serif;font-weight: 500;font-size: 16px;line-height: 150%;letter-spacing: -0.2px;color: #ffffff;display: inline-block;vertical-align: top;text-align: center;text-decoration: none;white-space: nowrap;-webkit-text-size-adjust: none;" href="https://account.mytiki.com/pages/otp?code={{{OTP}}}" target="_blank"><span><span style="white-space: pre-wrap;">Login</span></span></a>
+                                                                                                                        <!--[if !mso]><!-- --><a style="border-radius: 8px;background-color: #00b272;padding: 14px 19px 14px 19px;box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.05);width: 250px;font-family: 'Space Grotesk', Helvetica, Arial, sans-serif;font-weight: 500;font-size: 16px;line-height: 150%;letter-spacing: -0.2px;color: #ffffff;display: inline-block;vertical-align: top;text-align: center;text-decoration: none;white-space: nowrap;-webkit-text-size-adjust: none;" href="https://account.mytiki.com/api/latest/confirm?token={{{CONFIRMATION_TOKEN}}}" target="_blank"><span><span style="white-space: pre-wrap;">Confirm</span></span></a>
                                                                                                                         <!--<![endif]-->
                                                                                                                     </th>
                                                                                                                 </tr>
@@ -299,7 +299,7 @@
                                                                     <td valign="top" class="pc-font-alt" align="center" style="mso-line-height: exactly;line-height: 21px;font-family: 'Space Grotesk', Helvetica, Arial, sans-serif;font-size: 15px;font-weight: normal;color: #505c59;text-align: center;text-align-last: center;">
                                                                         <div><span>Try this link if the button does not work:</span>
                                                                         </div>
-                                                                        <div><span>https://account.mytiki.com/pages/otp?code={{{OTP}}}</span>
+                                                                        <div><span>https://account.mytiki.com/api/latest/confirm?token={{{CONFIRMATION_TOKEN}}}</span>
                                                                         </div>
                                                                     </td>
                                                                 </tr>

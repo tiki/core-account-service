@@ -6,12 +6,16 @@
 package com.mytiki.account.features.latest.user_info;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.mytiki.account.features.latest.confirm.ConfirmAO;
+import com.mytiki.account.features.latest.confirm.ConfirmAction;
+import com.mytiki.account.features.latest.confirm.ConfirmService;
 import com.mytiki.account.features.latest.org_info.OrgInfoService;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
 
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,12 +23,15 @@ import java.util.UUID;
 public class UserInfoService {
     private final UserInfoRepository repository;
     private final OrgInfoService orgInfoService;
+    private final ConfirmService confirmService;
 
     public UserInfoService(
             UserInfoRepository repository,
-            OrgInfoService orgInfoService) {
+            OrgInfoService orgInfoService,
+            ConfirmService confirmService) {
         this.repository = repository;
         this.orgInfoService = orgInfoService;
+        this.confirmService = confirmService;
     }
 
     public UserInfoAO get(String userId){
@@ -76,26 +83,52 @@ public class UserInfoService {
         return userInfo;
     }
 
-    public UserInfoAO update(String subject, UserInfoAOUpdate update){
+    public void update(String subject, UserInfoAOUpdate update){
         if(update.getEmail() != null) {
             if (!EmailValidator.getInstance().isValid(update.getEmail()))
                 throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
                         .message("Invalid email")
                         .exception();
         }
-
         Optional<UserInfoDO> found = repository.findByUserId(UUID.fromString(subject));
         if(found.isEmpty())
             throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
                     .message("Invalid sub claim")
                     .exception();
 
-        UserInfoDO saved = found.get();
-        if(update.getEmail() != null)
-            saved.setEmail(update.getEmail().toLowerCase());
-        saved.setModified(ZonedDateTime.now());
-        saved = repository.save(saved);
-        return toAO(saved);
+        ConfirmAO req = new ConfirmAO();
+        req.setEmail(found.get().getEmail());
+        req.setAction(ConfirmAction.UPDATE_USER);
+        req.setTemplate("user-update");
+        req.setOutputs(new HashMap<>(){{
+            put("subject", found.get().getEmail());
+            put("email", update.getEmail());
+        }});
+        if(!confirmService.send(req))
+            throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
+                    .message("Failed to send confirmation email.")
+                    .properties("email", found.get().getEmail())
+                    .exception();
+    }
+
+    public void delete(String subject) {
+        Optional<UserInfoDO> found = repository.findByUserId(UUID.fromString(subject));
+        if(found.isEmpty())
+            throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
+                    .message("Invalid sub claim")
+                    .exception();
+        ConfirmAO req = new ConfirmAO();
+        req.setEmail(found.get().getEmail());
+        req.setAction(ConfirmAction.DELETE_USER);
+        req.setTemplate("user-delete");
+        req.setOutputs(new HashMap<>(){{
+            put("id", found.get().getId().toString());
+        }});
+        if(!confirmService.send(req))
+            throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
+                    .message("Failed to send confirmation email.")
+                    .properties("email", found.get().getEmail())
+                    .exception();
     }
 
     private UserInfoAO toAO(UserInfoDO src){

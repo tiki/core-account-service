@@ -96,3 +96,19 @@ CREATE TABLE IF NOT EXISTS addr_reg(
 );
 CREATE INDEX ON addr_reg (app_info_id, custom_id);
 CREATE INDEX ON addr_reg (app_info_id, address);
+
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
+-- -----------------------------------------------------------------------
+-- CONFIRM
+-- -----------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS confirm(
+    confirm_id BIGSERIAL PRIMARY KEY,
+    token TEXT UNIQUE NOT NULL,
+    action TEXT NOT NULL,
+    properties TEXT,
+    created_utc TIMESTAMP WITH TIME ZONE NOT NULL
+);
