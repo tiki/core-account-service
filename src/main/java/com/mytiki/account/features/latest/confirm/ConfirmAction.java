@@ -7,7 +7,7 @@ package com.mytiki.account.features.latest.confirm;
 
 public enum ConfirmAction {
     DELETE_USER("delete_user"),
-    UPDATE_EMAIL("update_email");
+    UPDATE_USER("update_user");
 
     private final String value;
 

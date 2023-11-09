@@ -5,6 +5,8 @@
 
 package com.mytiki.account.features.latest.confirm;
 
+import com.mytiki.account.features.latest.user_info.UserInfoDO;
+import com.mytiki.account.features.latest.user_info.UserInfoRepository;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.facade.RandF;
 import com.mytiki.account.utilities.facade.SendgridF;
@@ -27,11 +29,17 @@ public class ConfirmService {
     private final SendgridF sendgrid;
     private final TemplateF template;
     private final ConfirmRepository repository;
+    private final UserInfoRepository userInfoRepository;
 
-    public ConfirmService(SendgridF sendgrid, TemplateF template, ConfirmRepository repository) {
+    public ConfirmService(
+            SendgridF sendgrid,
+            TemplateF template,
+            ConfirmRepository repository,
+            UserInfoRepository userInfoRepository) {
         this.sendgrid = sendgrid;
         this.template = template;
         this.repository = repository;
+        this.userInfoRepository = userInfoRepository;
     }
 
     public boolean send(ConfirmAO req) {
@@ -65,8 +73,20 @@ public class ConfirmService {
 
     private void process(ConfirmAction action, Map<String, String> properties) {
         switch (action){
-            case DELETE_USER -> {}
-            case UPDATE_EMAIL -> {}
+            case DELETE_USER -> {
+
+            }
+            case UPDATE_USER -> {
+                String subject = properties.get("subject");
+                String email = properties.get("email");
+                Optional<UserInfoDO> found = userInfoRepository.findByEmail(subject);
+                if(found.isPresent()){
+                    UserInfoDO update = found.get();
+                    update.setEmail(email);
+                    update.setModified(ZonedDateTime.now());
+                    userInfoRepository.save(update);
+                }
+            }
         }
     }
 }
