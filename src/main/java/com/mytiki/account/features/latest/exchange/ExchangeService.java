@@ -7,6 +7,7 @@ package com.mytiki.account.features.latest.exchange;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mytiki.account.features.latest.exchange.github.GithubClient;
 import com.mytiki.account.features.latest.exchange.google.GoogleClient;
 import com.mytiki.account.features.latest.exchange.shopify.ShopifyClient;
 import com.mytiki.account.features.latest.refresh.RefreshService;
@@ -35,18 +36,27 @@ public class ExchangeService {
     private final OauthScopes allowedScopes;
     private final JWSSigner signer;
     private final ReadmeF readme;
+    private final GoogleClient google;
+    private final GithubClient github;
+    private final ShopifyClient shopify;
 
     public ExchangeService(
             UserInfoService userInfoService,
             RefreshService refreshService,
             JWSSigner signer,
             OauthScopes allowedScopes,
-            ReadmeF readme) {
+            ReadmeF readme,
+            GoogleClient google,
+            GithubClient github,
+            ShopifyClient shopify) {
         this.userInfoService = userInfoService;
         this.refreshService = refreshService;
         this.signer = signer;
         this.allowedScopes = allowedScopes;
         this.readme = readme;
+        this.google = google;
+        this.github = github;
+        this.shopify = shopify;
     }
 
     @Transactional
@@ -79,14 +89,9 @@ public class ExchangeService {
 
     private String validate(String clientId, String subjectToken, String subjectTokenType) {
         return switch (subjectTokenType) {
-            case "urn:mytiki:params:oauth:token-type:shopify" -> {
-                ShopifyClient shopify = new ShopifyClient();
-                yield shopify.validate(clientId, subjectToken);
-            }
-            case "urn:mytiki:params:oauth:token-type:google" -> {
-                GoogleClient google = new GoogleClient();
-                yield google.validate(clientId, subjectToken);
-            }
+            case "urn:mytiki:params:oauth:token-type:shopify" -> shopify.validate(clientId, subjectToken);
+            case "urn:mytiki:params:oauth:token-type:google" -> google.validate(clientId, subjectToken);
+            case "urn:mytiki:params:oauth:token-type:github" -> github.validate(clientId, subjectToken);
             default -> throw new OAuth2AuthorizationException(new OAuth2Error(
                     OAuth2ErrorCodes.ACCESS_DENIED),
                     "client_id and/or subject_token_type are invalid");
