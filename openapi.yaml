@@ -497,8 +497,6 @@ components:
       properties:
         email:
           type: string
-        notAnonymous:
-          type: boolean
     OtpAOStartRsp:
       type: object
       properties:
