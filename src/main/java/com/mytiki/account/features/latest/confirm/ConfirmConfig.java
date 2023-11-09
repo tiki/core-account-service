@@ -41,7 +41,7 @@ public class ConfirmConfig {
     @Bean(name = "confirmMustache")
     public TemplateF confirmMustache() {
         TemplateF mustache = new TemplateF();
-        mustache.load("user-update");
+        mustache.load("user-update", "user-delete");
         return mustache;
     }
 }
