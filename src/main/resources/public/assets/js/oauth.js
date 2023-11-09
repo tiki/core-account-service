@@ -2,7 +2,7 @@ function githubLogin() {
   window.location.href = "https://github.com/login/oauth/authorize?client_id=ebbf90361bcb8c527416&scope=user:email"
 }
 
-function handleCredentialResponse(response) {
+function handleGoogleSignin(response) {
   let headers = new Headers();
   headers.append("Content-Type", "application/x-www-form-urlencoded");
   headers.append("Accept", "application/json");
@@ -16,6 +16,7 @@ function handleCredentialResponse(response) {
       subject_token_type: "urn:mytiki:params:oauth:token-type:google",
       client_id:
         "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googleusercontent.com",
+      scope: "account:admin"
     }),
   };
 
@@ -77,7 +78,7 @@ window.onload = function () {
   google.accounts.id.initialize({
     client_id:
       "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googleusercontent.com",
-    callback: handleCredentialResponse,
+    callback: handleGoogleSignin,
   });
   google.accounts.id.renderButton(document.getElementById("googleBtn"), {
     theme: "outline",
