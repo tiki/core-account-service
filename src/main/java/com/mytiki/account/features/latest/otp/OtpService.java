@@ -112,11 +112,10 @@ public class OtpService {
                     null
             ));
         try {
-            OauthSub subject = new OauthSub();
             OauthScopes scopes = allowedScopes.filter(requestedScope);
             UserInfoDO userInfo = userInfoService.createIfNotExists(found.get().getEmail());
-            subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId().toString());
-            return new JwtBuilder()
+            OauthSub subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId().toString());
+            OAuth2AccessTokenResponse token = new JwtBuilder()
                     .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
                     .aud(scopes.getAud())
@@ -124,8 +123,14 @@ public class OtpService {
                     .build()
                     .refresh(refreshService.issue(subject, scopes.getAud(), scopes.getScp()))
                     .sign(signer)
-                    .additional("readme_token", readme.sign(userInfo))
                     .toResponse();
+            return OAuth2AccessTokenResponse
+                    .withResponse(token)
+                    .additionalParameters(
+                            new HashMap<>(){{
+                                put("readme_token", readme.sign(userInfo, token.getAccessToken().getTokenValue()));
+                            }})
+                    .build();
         } catch (JOSEException | JsonProcessingException e) {
             throw new OAuth2AuthorizationException(new OAuth2Error(
                     OAuth2ErrorCodes.SERVER_ERROR,

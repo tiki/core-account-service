@@ -21,9 +21,9 @@ import java.util.List;
 @XRayEnabled
 @Tag(name = "User")
 @RestController
-@RequestMapping(value = AddrRegController.PATH_CONTROLLER)
+@RequestMapping(value = AddrRegController.ROUTE)
 public class AddrRegController {
-    public static final String PATH_CONTROLLER = Constants.API_LATEST_ROUTE + "app/{app-id}/address";
+    public static final String ROUTE = Constants.API_LATEST_ROUTE + "app/{app-id}/address";
 
     private final AddrRegService service;
     private final AppInfoService appInfo;
@@ -36,7 +36,7 @@ public class AddrRegController {
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-addr-reg-post",
             summary = "Register Address",
             description = "Register an end user address",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:app"))
+            security = @SecurityRequirement(name = "apiKey", scopes = "account:app"))
     @Secured("SCOPE_account:app")
     @RequestMapping(method = RequestMethod.POST)
     public AddrRegAORsp post(
@@ -51,7 +51,7 @@ public class AddrRegController {
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-addr-reg-get",
             summary = "Get Addresses",
             description = "Retrieve and filter registered addresses",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:app"))
+            security = @SecurityRequirement(name = "apiKey", scopes = "account:app"))
     @Secured({"SCOPE_account:app"})
     @RequestMapping(method = RequestMethod.GET)
     public List<AddrRegAORsp> getAll(

@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.*;
 @XRayEnabled
 @Tag(name = "User")
 @RestController
-@RequestMapping(value = UserInfoController.PATH_CONTROLLER)
+@RequestMapping(value = UserInfoController.ROUTE)
 public class UserInfoController {
-    public static final String PATH_CONTROLLER = Constants.API_LATEST_ROUTE + "user";
+    public static final String ROUTE = Constants.API_LATEST_ROUTE + "user";
     private final UserInfoService service;
 
     public UserInfoController(UserInfoService service) {

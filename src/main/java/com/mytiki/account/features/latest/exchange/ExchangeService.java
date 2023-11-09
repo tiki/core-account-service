@@ -28,6 +28,8 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 
+import java.util.HashMap;
+
 @XRayEnabled
 public class ExchangeService {
 
@@ -67,7 +69,7 @@ public class ExchangeService {
         OauthSub subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId().toString());
         OauthScopes scopes = allowedScopes.filter(requestedScope);
         try {
-            return new JwtBuilder()
+            OAuth2AccessTokenResponse token = new JwtBuilder()
                     .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
                     .aud(scopes.getAud())
@@ -75,8 +77,14 @@ public class ExchangeService {
                     .refresh(refreshService.issue(subject, scopes.getAud(), scopes.getScp()))
                     .build()
                     .sign(signer)
-                    .additional("readme_token", readme.sign(userInfo))
                     .toResponse();
+            return OAuth2AccessTokenResponse
+                    .withResponse(token)
+                    .additionalParameters(
+                            new HashMap<>(){{
+                                put("readme_token", readme.sign(userInfo, token.getAccessToken().getTokenValue()));
+                            }})
+                    .build();
         } catch (JOSEException | JsonProcessingException e) {
             throw new OAuth2AuthorizationException(new OAuth2Error(
                     OAuth2ErrorCodes.SERVER_ERROR,

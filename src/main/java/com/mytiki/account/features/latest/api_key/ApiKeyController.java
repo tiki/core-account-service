@@ -28,7 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = Constants.API_LATEST_ROUTE)
 public class ApiKeyController {
-    public static final String PATH_CONTROLLER = "app/{app-id}/key";
+    public static final String ROUTE = "app/{app-id}/key";
 
     private final ApiKeyService service;
     private final AppInfoService appInfo;
@@ -43,7 +43,7 @@ public class ApiKeyController {
             description = "Retrieve the API Keys for an App",
             security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
-    @RequestMapping(method = RequestMethod.GET, path = PATH_CONTROLLER)
+    @RequestMapping(method = RequestMethod.GET, path = ROUTE)
     public List<ApiKeyAO> get(JwtAuthenticationToken token, @PathVariable(name = "app-id") String appId) {
         appInfo.guard(token, appId);
         return service.getByAppId(appId);
@@ -54,7 +54,7 @@ public class ApiKeyController {
             description = "Create a new API Key for an App",
             security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
-    @RequestMapping(method = RequestMethod.POST, path = PATH_CONTROLLER)
+    @RequestMapping(method = RequestMethod.POST, path = ROUTE)
     public ApiKeyAOCreate createAppKey(
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,
@@ -68,7 +68,7 @@ public class ApiKeyController {
             description = "Permanently revoke an API Key",
             security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
-    @RequestMapping(method = RequestMethod.DELETE, path = PATH_CONTROLLER)
+    @RequestMapping(method = RequestMethod.DELETE, path = ROUTE)
     public void revoke(
             JwtAuthenticationToken token,
             @PathVariable(name = "app-id") String appId,

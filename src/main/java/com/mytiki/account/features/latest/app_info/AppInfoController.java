@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @XRayEnabled
 @Tag(name = "App")
 @RestController
-@RequestMapping(value = AppInfoController.PATH_CONTROLLER)
+@RequestMapping(value = AppInfoController.ROUTE)
 public class AppInfoController {
-    public static final String PATH_CONTROLLER = Constants.API_LATEST_ROUTE + "app";
+    public static final String ROUTE = Constants.API_LATEST_ROUTE + "app";
 
     private final AppInfoService service;
 
@@ -33,7 +33,7 @@ public class AppInfoController {
             description = "Retrieve the details about an App",
             security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
     @RequestMapping(method = RequestMethod.GET, path = "/{app-id}")
-    @Secured({"SCOPE_account:admin", "SCOPE_account:internal:read"})
+    @Secured("SCOPE_account:admin")
     public AppInfoAO get(JwtAuthenticationToken token, @PathVariable(name = "app-id") String appId) {
         service.guard(token, appId);
         return service.get(appId);

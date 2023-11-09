@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 @XRayEnabled
 @Tag(name = "")
 @RestController
-@RequestMapping(value = OrgInfoController.PATH_CONTROLLER)
+@RequestMapping(value = OrgInfoController.ROUTE)
 public class OrgInfoController {
-    public static final String PATH_CONTROLLER = Constants.API_LATEST_ROUTE + "org";
+    public static final String ROUTE = Constants.API_LATEST_ROUTE + "org";
 
     private final OrgInfoService service;
 

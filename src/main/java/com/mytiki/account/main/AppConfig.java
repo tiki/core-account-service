@@ -60,16 +60,9 @@ public class AppConfig {
                 .servers(Collections.singletonList(new Server()
                         .url("https://account.mytiki.com")))
                 .components(new Components()
+                        .addSecuritySchemes("apiKey", new SecurityScheme()
+                                .type(SecurityScheme.Type.APIKEY))
                         .addSecuritySchemes("oauth", new SecurityScheme()
-                                .type(SecurityScheme.Type.OAUTH2)
-                                .flows(new OAuthFlows()
-                                        .clientCredentials(new OAuthFlow()
-                                                .tokenUrl("https://account.mytiki.com/api/latest/auth/token")
-                                                .refreshUrl("https://account.mytiki.com/api/latest/auth/token")
-                                                .scopes(new Scopes().addString("account","account:app")))
-                                        .password(new OAuthFlow()
-                                                .tokenUrl("https://account.mytiki.com/api/latest/auth/token")
-                                                .refreshUrl("https://account.mytiki.com/api/latest/auth/token")
-                                                .scopes(new Scopes().addString("account","account:admin"))))));
+                                .type(SecurityScheme.Type.OAUTH2)));
     }
 }

@@ -28,14 +28,14 @@ public class ReadmeF {
         }
     }
 
-    public String sign(UserInfoDO user) throws JOSEException, JsonProcessingException {
+    public String sign(UserInfoDO user, String apiKey) throws JOSEException, JsonProcessingException {
         String appId = user.getOrg().getApps() != null && !user.getOrg().getApps().isEmpty() ?
                 user.getOrg().getApps().get(0).getAppId().toString() : null;
         String payload = mapper.writeValueAsString(new HashMap<>(){{
             put("name", user.getEmail());
             put("email", user.getEmail());
             put("version", 1);
-            put("apiKey", "MIKE-FIX-ME");
+            put("apiKey", apiKey);
             put("parameters", new HashMap<>(){{
                 put("app-id", appId);
                 put("user-id", user.getUserId().toString());
