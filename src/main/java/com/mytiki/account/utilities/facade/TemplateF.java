@@ -25,8 +25,8 @@ public class TemplateF {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String DEFAULT_DIR = "templates";
     private static final String SUBJECT_SUFFIX = "-subject.mustache";
-    private static final String BODY_HTML_SUFFIX = "-body-txt.mustache";
-    private static final String BODY_TEXT_SUFFIX = "-body-html.mustache";
+    private static final String BODY_HTML_SUFFIX = "-body-html.mustache";
+    private static final String BODY_TEXT_SUFFIX = "-body-txt.mustache";
     private final Map<String, com.github.mustachejava.Mustache> templates = new HashMap<>();
     private final String dir;
 
