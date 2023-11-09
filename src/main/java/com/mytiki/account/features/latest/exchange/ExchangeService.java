@@ -89,15 +89,9 @@ public class ExchangeService {
 
     private String validate(String clientId, String subjectToken, String subjectTokenType) {
         return switch (subjectTokenType) {
-            case "urn:mytiki:params:oauth:token-type:shopify" -> {
-                yield shopify.validate(clientId, subjectToken);
-            }
-            case "urn:mytiki:params:oauth:token-type:google" -> {
-                yield google.validate(clientId, subjectToken);
-            }
-            case "urn:mytiki:params:oauth:token-type:github" -> {
-                yield github.validate(clientId, subjectToken);
-            }
+            case "urn:mytiki:params:oauth:token-type:shopify" -> shopify.validate(clientId, subjectToken);
+            case "urn:mytiki:params:oauth:token-type:google" -> google.validate(clientId, subjectToken);
+            case "urn:mytiki:params:oauth:token-type:github" -> github.validate(clientId, subjectToken);
             default -> throw new OAuth2AuthorizationException(new OAuth2Error(
                     OAuth2ErrorCodes.ACCESS_DENIED),
                     "client_id and/or subject_token_type are invalid");

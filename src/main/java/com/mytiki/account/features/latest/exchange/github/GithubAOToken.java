@@ -13,7 +13,7 @@ public class GithubAOToken {
     @JsonProperty("access_token")
     private String accessToken;
     private String scope;
-    @JsonProperty("access_token")
+    @JsonProperty("token_type")
     private String tokenType;
 
     public String getAccessToken() {

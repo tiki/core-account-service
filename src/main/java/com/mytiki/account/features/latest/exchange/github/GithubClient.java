@@ -13,8 +13,11 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 public class GithubClient implements ExchangeClient {
     private final String secret;
@@ -43,10 +46,15 @@ public class GithubClient implements ExchangeClient {
                     tokenRsp.getBody().getAccessToken() != null) {
                 HttpHeaders userHeaders = new HttpHeaders();
                 userHeaders.setBearerAuth(tokenRsp.getBody().getAccessToken());
-                ResponseEntity<GithubAOUser> userRsp = client.exchange("https://api.github.com/user",
-                        HttpMethod.GET, new HttpEntity<>(userHeaders), GithubAOUser.class);
+                ResponseEntity<GithubAOEmail[]> userRsp = client.exchange("https://api.github.com/user/email",
+                        HttpMethod.GET, new HttpEntity<>(userHeaders), GithubAOEmail[].class);
                 if (userRsp.getStatusCode().is2xxSuccessful() && userRsp.getBody() != null)
-                    return userRsp.getBody().getEmail();
+                    return Arrays
+                            .stream(userRsp.getBody())
+                            .filter(GithubAOEmail::getPrimary)
+                            .findFirst()
+                            .map(GithubAOEmail::getEmail)
+                            .orElse(null);
             }
             throw new OAuth2AuthorizationException(new OAuth2Error(
                     OAuth2ErrorCodes.ACCESS_DENIED),
