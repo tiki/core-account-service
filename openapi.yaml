@@ -1,19 +1,18 @@
 openapi: 3.0.1
 info:
-  title: TIKI Account
-  description: TIKI's account management service —configure and provision access to
-    the data platform
+  title: Account
+  description: Account management service —configure and provision access to the platform
   license:
     name: MIT
-    url: https://github.com/tiki/tiki-account/blob/main/LICENSE
+    url: https://github.com/tiki/core-account-service/blob/main/LICENSE
   version: 2.6.0
 servers:
-- url: https://mytiki.com/api/account
+- url: https://account.mytiki.com
 paths:
   /api/latest/user:
     get:
       tags:
-      - ""
+      - User
       summary: Get User
       description: Get the authorized user's profile
       operationId: account-user-get
@@ -29,7 +28,7 @@ paths:
         - account:admin
     post:
       tags:
-      - ""
+      - User
       summary: Update User
       description: Update the authorized User's profile
       operationId: account-user-post
@@ -47,7 +46,7 @@ paths:
         - account:admin
     delete:
       tags:
-      - ""
+      - User
       summary: Delete User
       description: Delete the authorized user
       operationId: account-user-delete
@@ -60,7 +59,7 @@ paths:
   /api/latest/app:
     post:
       tags:
-      - ""
+      - App
       summary: Create App
       description: Create a new App
       operationId: account-app-create
@@ -83,7 +82,7 @@ paths:
   /api/latest/app/{app-id}:
     get:
       tags:
-      - ""
+      - App
       summary: Get App
       description: Retrieve the details about an App
       operationId: account-app-get
@@ -105,7 +104,7 @@ paths:
         - account:admin
     post:
       tags:
-      - ""
+      - App
       summary: Update App
       description: Update the details for an App
       operationId: account-app-update
@@ -133,7 +132,7 @@ paths:
         - account:admin
     delete:
       tags:
-      - ""
+      - App
       summary: Delete App
       description: Permanently delete an App
       operationId: account-app-delete
@@ -152,7 +151,7 @@ paths:
   /api/latest/app/{app-id}/key:
     get:
       tags:
-      - ""
+      - App
       summary: Get API Keys
       description: Retrieve the API Keys for an App
       operationId: account-api-keys-get
@@ -176,7 +175,7 @@ paths:
         - account:admin
     post:
       tags:
-      - ""
+      - App
       summary: Create API Key
       description: Create a new API Key for an App
       operationId: account-api-keys-create
@@ -203,7 +202,7 @@ paths:
         - account:admin
     delete:
       tags:
-      - ""
+      - App
       summary: Delete Key
       description: Permanently revoke an API Key
       operationId: account-api-keys-delete
@@ -227,7 +226,7 @@ paths:
   /api/latest/app/{app-id}/address:
     get:
       tags:
-      - ""
+      - User
       summary: Get Addresses
       description: Retrieve and filter registered addresses
       operationId: account-addr-reg-get
@@ -261,7 +260,7 @@ paths:
         - account:app
     post:
       tags:
-      - ""
+      - User
       summary: Register Address
       description: Register an end user address
       operationId: account-addr-reg-post
@@ -389,7 +388,12 @@ components:
       type: oauth2
       flows:
         password:
-          tokenUrl: https://mytiki.com/api/account/oauth/token
-          refreshUrl: https://mytiki.com/api/account/oauth/token
+          tokenUrl: https://account.mytiki.com/api/latest/auth/token
+          refreshUrl: https://account.mytiki.com/api/latest/auth/token
           scopes:
-            auth: this service
+            account: account:admin
+        clientCredentials:
+          tokenUrl: https://account.mytiki.com/api/latest/auth/token
+          refreshUrl: https://account.mytiki.com/api/latest/auth/token
+          scopes:
+            account: account:app
