@@ -17,6 +17,7 @@ import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.B64F;
+import com.mytiki.account.utilities.facade.RandF;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.http.HttpStatus;
@@ -79,7 +80,7 @@ public class ApiKeyService {
         apiKey.setCreated(ZonedDateTime.now());
 
         if(!isPublic) {
-            secret = generateSecret(32);
+            secret = RandF.create(32);
             apiKey.setHashedSecret(secretEncoder.encode(secret));
         }
 
@@ -171,12 +172,5 @@ public class ApiKeyService {
                     null
             ), e);
         }
-    }
-
-    private String generateSecret(int len){
-        byte[] secret = new byte[len];
-        SecureRandom secureRandom = new SecureRandom();
-        secureRandom.nextBytes(secret);
-        return B64F.encode(secret);
     }
 }

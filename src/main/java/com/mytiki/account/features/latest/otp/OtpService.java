@@ -8,7 +8,6 @@ package com.mytiki.account.features.latest.otp;
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mytiki.account.features.latest.refresh.RefreshService;
-import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.security.oauth.OauthScopes;
@@ -18,7 +17,7 @@ import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.B64F;
-import com.mytiki.account.utilities.facade.MustacheF;
+import com.mytiki.account.utilities.facade.TemplateF;
 import com.mytiki.account.utilities.facade.ReadmeF;
 import com.mytiki.account.utilities.facade.SendgridF;
 import com.nimbusds.jose.JOSEException;
@@ -43,7 +42,7 @@ import java.util.*;
 public class OtpService {
     private static final Long CODE_EXPIRY_DURATION_MINUTES = 30L;
     private final OtpRepository repository;
-    private final MustacheF templates;
+    private final TemplateF template;
     private final SendgridF sendgrid;
     private final JWSSigner signer;
     private final RefreshService refreshService;
@@ -53,7 +52,7 @@ public class OtpService {
 
     public OtpService(
             OtpRepository repository,
-            MustacheF templates,
+            TemplateF template,
             SendgridF sendgrid,
             JWSSigner signer,
             RefreshService refreshService,
@@ -61,7 +60,7 @@ public class OtpService {
             OauthScopes allowedScopes,
             ReadmeF readme) {
         this.repository = repository;
-        this.templates = templates;
+        this.template = template;
         this.sendgrid = sendgrid;
         this.signer = signer;
         this.refreshService = refreshService;
@@ -146,9 +145,9 @@ public class OtpService {
         input.put("OTP", code);
 
         return sendgrid.send(email,
-                templates.resovle(OtpConfig.TEMPLATE_SUBJECT, null),
-                templates.resovle(OtpConfig.TEMPLATE_BODY_HTML, input),
-                templates.resovle(OtpConfig.TEMPLATE_BODY_TXT, input));
+                template.subject(OtpConfig.TEMPLATE, null),
+                template.html(OtpConfig.TEMPLATE, input),
+                template.text(OtpConfig.TEMPLATE, input));
     }
 
     private String hashedOtp(String deviceId, String code) {
