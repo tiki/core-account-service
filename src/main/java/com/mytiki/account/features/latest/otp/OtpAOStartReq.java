@@ -12,7 +12,7 @@ public class OtpAOStartReq {
     private String email;
 
     @JsonCreator
-    public OtpAOStartReq(@JsonProperty(required = true) String email, boolean notAnonymous) {
+    public OtpAOStartReq(@JsonProperty(required = true) String email) {
         this.email = email;
     }
 
