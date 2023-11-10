@@ -15,14 +15,23 @@ import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.fixtures.AddrFixture;
 import com.mytiki.account.main.App;
+import com.mytiki.account.utilities.facade.B64F;
+import com.mytiki.account.utilities.facade.RsaF;
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
+import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.bouncycastle.crypto.CryptoException;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.params.RSAKeyParameters;
+import org.bouncycastle.crypto.signers.RSADigestSigner;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -135,5 +144,40 @@ public class AddrRegTest {
         service.deleteAll(app.getAppId(), id);
         List<AddrRegAORsp> rsp = service.getAll(app.getAppId(), id);
         assertTrue(rsp.isEmpty());
+    }
+
+    @Test
+    @Transactional
+    public void Test_Authorize_Success() throws NoSuchAlgorithmException, CryptoException, JOSEException {
+        UserInfoDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
+        AppInfoAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
+
+        RSAKey keypair = new RSAKeyGenerator(RSAKeyGenerator.MIN_KEY_SIZE_BITS).generate();
+
+        String id = UUID.randomUUID().toString();
+        AddrRegAOReq req = AddrFixture.req(id, keypair);
+        AddrRegAORsp addr = service.register(app.getAppId(), req, null);
+
+        RSAPrivateKey key = new RSAPrivateKey(
+                keypair.getModulus().decodeToBigInteger(),
+                keypair.getPublicExponent().decodeToBigInteger(),
+                keypair.getPrivateExponent().decodeToBigInteger(),
+                keypair.getFirstPrimeFactor().decodeToBigInteger(),
+                keypair.getSecondPrimeFactor().decodeToBigInteger(),
+                keypair.getFirstFactorCRTExponent().decodeToBigInteger(),
+                keypair.getSecondFactorCRTExponent().decodeToBigInteger(),
+                keypair.getFirstCRTCoefficient().decodeToBigInteger());
+
+        RSADigestSigner signer = new RSADigestSigner(new SHA256Digest());
+        RSAKeyParameters keyParams =
+                new RSAKeyParameters(true, key.getModulus(), key.getPrivateExponent());
+        signer.init(true, keyParams);
+        byte[] message = addr.getAddress().getBytes();
+        signer.update(message, 0, message.length);
+        byte[] sig = signer.generateSignature();
+        OAuth2AccessTokenResponse token = service.authorize(
+                "trail", app.getAppId(), addr.getAddress(), B64F.encode(sig));
+
+        assertNotNull(token.getAccessToken().getTokenValue());
     }
 }

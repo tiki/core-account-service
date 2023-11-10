@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
 package com.mytiki.account.fixtures;
 
 import com.mytiki.account.features.latest.addr_reg.AddrRegAOReq;
@@ -19,6 +24,10 @@ public interface AddrFixture {
 
     static AddrRegAOReq req(String id) throws JOSEException, NoSuchAlgorithmException, CryptoException {
         RSAKey keypair = new RSAKeyGenerator(RSAKeyGenerator.MIN_KEY_SIZE_BITS).generate();
+        return req(id, keypair);
+    }
+
+    static AddrRegAOReq req(String id, RSAKey keypair) throws JOSEException, NoSuchAlgorithmException, CryptoException {
         RSAPublicKey publicKey = keypair.toRSAPublicKey();
         String address = B64F.encode(Sha3F.h256(publicKey.getEncoded()), true);
         byte[] message = Utf8.encode(id + "." + address);
