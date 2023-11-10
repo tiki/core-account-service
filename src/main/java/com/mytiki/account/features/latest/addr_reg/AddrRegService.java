@@ -10,17 +10,31 @@ import com.mytiki.account.features.latest.app_info.AppInfoDO;
 import com.mytiki.account.features.latest.app_info.AppInfoService;
 import com.mytiki.account.features.latest.jwks.JwksDO;
 import com.mytiki.account.features.latest.jwks.JwksService;
+import com.mytiki.account.features.latest.refresh.RefreshService;
+import com.mytiki.account.security.oauth.OauthScopes;
+import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.security.oauth.OauthSubNamespace;
+import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
+import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.B64F;
 import com.mytiki.account.utilities.facade.RsaF;
 import com.mytiki.account.utilities.facade.Sha3F;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSSigner;
 import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.codec.Utf8;
+import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Ref;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -31,14 +45,26 @@ public class AddrRegService {
     private final AddrRegRepository repository;
     private final AppInfoService appInfoService;
     private final JwksService jwksService;
+    private final RefreshService refreshService;
+    private final JWSSigner signer;
+    private final OauthScopes allowedScopes;
+    private final List<String> publicScopes;
 
     public AddrRegService(
             AddrRegRepository repository,
             AppInfoService appInfoService,
-            JwksService jwksService) {
+            JwksService jwksService,
+            RefreshService refreshService,
+            JWSSigner signer,
+            OauthScopes allowedScopes,
+            List<String> publicScopes) {
         this.repository = repository;
         this.appInfoService = appInfoService;
         this.jwksService = jwksService;
+        this.allowedScopes = allowedScopes;
+        this.publicScopes = publicScopes;
+        this.refreshService = refreshService;
+        this.signer = signer;
     }
 
     public AddrRegAORsp register(String appId, AddrRegAOReq req, String custAuth) {
@@ -93,6 +119,53 @@ public class AddrRegService {
     public void deleteAll(String appId, String id){
         UUID app = UUID.fromString(appId);
         repository.deleteByAppAppIdAndCid(app, id);
+    }
+
+    public OAuth2AccessTokenResponse authorize(
+            String requestScopes, String appId, String address, String signature) {
+        byte[] addr = B64F.decode(address, true);
+        UUID app = UUID.fromString(appId);
+        Optional<AddrRegDO> found = repository.findByAppAppIdAndAddress(app, addr);
+        if(found.isPresent()){
+            try {
+                RSAPublicKey pubKey = RsaF.decodePublicKey(found.get().getPubKey());
+                boolean isValid = RsaF.verify(
+                        pubKey,
+                        address.getBytes(StandardCharsets.UTF_8),
+                        B64F.decode(signature));
+                if(isValid){
+                    OauthScopes scopes = allowedScopes.filter(requestScopes);
+                    scopes = scopes.filter(publicScopes);
+                    OauthSub subject = new OauthSub(OauthSubNamespace.ADDRESS, appId + ":" + address);
+                    return new JwtBuilder()
+                            .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
+                            .sub(subject)
+                            .aud(scopes.getAud())
+                            .scp(scopes.getScp())
+                            .refresh(refreshService.issue(subject, scopes.getAud(), scopes.getScp()))
+                            .build()
+                            .sign(signer)
+                            .toResponse();
+                } else {
+                    throw new OAuth2AuthorizationException(new OAuth2Error(
+                            OAuth2ErrorCodes.ACCESS_DENIED,
+                            "invalid signature",
+                            null
+                    ));
+                }
+            } catch (IOException | JOSEException e) {
+                throw new OAuth2AuthorizationException(new OAuth2Error(
+                        OAuth2ErrorCodes.SERVER_ERROR,
+                        "Issue with JWT construction",
+                        null
+                ));
+            }
+        }else
+            throw new OAuth2AuthorizationException(new OAuth2Error(
+                    OAuth2ErrorCodes.ACCESS_DENIED,
+                    "app-id and/or address are invalid",
+                    null
+            ));
     }
 
     private void guardSignature(AddrRegAOReq req) {
