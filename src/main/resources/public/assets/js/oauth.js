@@ -6,11 +6,6 @@ function githubLogin() {
 }
 
 function googleLogin(){
-  document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  google.accounts.id.prompt();
-}
-
-function googleLogin2(){
   window.location.href = "https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?"
     + "access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email"
     + "&prompt=select_account&redirect_uri=https://account.mytiki.com/pages/login&response_type=code&client_id=" + googleCliendId
@@ -92,6 +87,5 @@ window.onload = function () {
     callback: handleGoogleSignin,
   });
   document.getElementById('google-sign-in-btn').addEventListener('click', (e) => googleLogin())
-  document.getElementById('google-sign-in-btn2').addEventListener('click', (e) => googleLogin2())
   document.getElementById('github-sign-in-btn').addEventListener('click', (e) => githubLogin())
 };
