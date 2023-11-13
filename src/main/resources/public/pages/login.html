@@ -14,7 +14,15 @@
   <body>
     <script src="https://accounts.google.com/gsi/client" async></script>
     <script src="../assets/js/oauth.js"></script>
-    <div class="flex h-screen w-screen">
+    <div class="flex h-screen w-screen relative">
+
+      <div id="loading-container" class="absolute bg-white bg-opacity-90 z-10 h-full w-full flex items-center justify-center hidden">
+        <div class="flex items-center flex-col">
+          <img src="../assets/images/logo.svg" alt="Logo Tiki" class="w-24 animate-spin" />
+          <p id="loading-text" class="text-xl text-center mt-5 text-orange">Wait a second, We're redirecting you to the docs</p>
+        </div>
+      </div>
+
       <div
         class="flex items-start mt-12 sm:mt-0 sm:items-center justify-center w-screen sm:w-2/5 bg-white"
       >

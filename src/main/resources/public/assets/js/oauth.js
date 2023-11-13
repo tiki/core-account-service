@@ -48,6 +48,7 @@ function handleGithubSign() {
   const url = new URL(url_string);
   const code = url.searchParams.get("code");
   if (code) {
+    document.getElementById("loading-container").classList.remove("hidden")
     const headers = new Headers();
     headers.append("Content-Type", "application/x-www-form-urlencoded");
     headers.append("Accept", "application/json");
@@ -72,6 +73,7 @@ function handleGithubSign() {
           element.innerHTML =
             "Hey! Something got bad with your signin, try again in a few minutes";
           element.classList.remove("hidden");
+          document.getElementById("loading-container").classList.add("hidden");
           return;
         }
         window.location.href = `https://tiki-dev.mytiki.com/?auth_token=${response.readme_token}`;
