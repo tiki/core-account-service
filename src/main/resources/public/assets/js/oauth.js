@@ -2,6 +2,11 @@ function githubLogin() {
   window.location.href = "https://github.com/login/oauth/authorize?client_id=ebbf90361bcb8c527416&scope=user:email"
 }
 
+function googleLogin(){
+  document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  google.accounts.id.prompt();
+}
+
 function handleGoogleSignin(response) {
   let headers = new Headers();
   headers.append("Content-Type", "application/x-www-form-urlencoded");
@@ -79,10 +84,5 @@ window.onload = function () {
     client_id:
       "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googleusercontent.com",
     callback: handleGoogleSignin,
-  });
-  google.accounts.id.renderButton(document.getElementById("googleBtn"), {
-    theme: "outline",
-    size: "large",
-    logo_alignment: "center",
   });
 };

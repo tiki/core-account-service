@@ -30,7 +30,17 @@
               Don’t worry if you don’t already have an account. We’ll create a free one for you.
             </p>
           </div>
-          <div id="googleBtn" class="mt-8"></div>
+          <div
+          onclick="googleLogin()"
+          class="text-center w-5/5 my-5 flex items-center justify-center border border-black rounded-md p-2.5 bg-white cursor-pointer"
+        >
+          <img
+            src="../assets/images/google-icon.svg"
+            alt="Github Icon"
+            class="w-6 mr-3"
+          />
+          Google
+        </div>
           <div
             onclick="githubLogin()"
             class="text-center w-5/5 my-5 flex items-center justify-center border border-black rounded-md p-2.5 bg-white cursor-pointer"
@@ -40,7 +50,7 @@
               alt="Github Icon"
               class="w-6 mr-3"
             />
-            Sign in with GitHub
+            GitHub
           </div>
           <div class="text-center my-5 text-gray font-light">or</div>
           <div>
