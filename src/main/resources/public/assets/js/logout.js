@@ -4,6 +4,7 @@ window.onload = function () {
   const options = {
     method: "POST",
     headers,
+    credentials: "include"
   };
   fetch("https://account.mytiki.com/api/latest/auth/revoke", options)
     .then(async (response) => {
