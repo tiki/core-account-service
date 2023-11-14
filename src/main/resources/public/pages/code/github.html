@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Github Redirect</title>
+    <script>
+      window.onload = function () {
+        const url_string = window.location.href.toLowerCase();
+        const url = new URL(url_string);
+        const code = url.searchParams.get("code");
+
+        if (code) {
+          const headers = new Headers();
+          headers.append("Content-Type", "application/x-www-form-urlencoded");
+          headers.append("Accept", "application/json");
+
+          const options = {
+            method: "POST",
+            headers: headers,
+            body: new URLSearchParams({
+              grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
+              subject_token: code,
+              subject_token_type: "urn:mytiki:params:oauth:token-type:github",
+              client_id: "ebbf90361bcb8c527416",
+              scope: "account admin",
+            }),
+          };
+
+          fetch(`https://account.mytiki.com/api/latest/auth/token`, options)
+            .then((response) => response.json())
+            .then((response) => {
+              if (!response.readme_token) {
+                let element = document.getElementById("error");
+                element.innerHTML =
+                  "Hey! Something got bad with your signin, try again in a few minutes";
+                element.classList.remove("hidden");
+                return;
+              }
+              window.location.href = `https://tiki-dev.mytiki.com/?auth_token=${response.readme_token}`;
+            })
+            .catch((err) => console.error(err));
+        }
+      };
+    </script>
+  </head>
+  <body></body>
+</html>
