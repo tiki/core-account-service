@@ -18,7 +18,7 @@ import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.B64F;
 import com.mytiki.account.utilities.facade.TemplateF;
-import com.mytiki.account.utilities.facade.ReadmeF;
+import com.mytiki.account.utilities.facade.readme.ReadmeF;
 import com.mytiki.account.utilities.facade.SendgridF;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
@@ -95,7 +95,7 @@ public class OtpService {
     }
 
     @Transactional
-    public OAuth2AccessTokenResponse authorize(String deviceId, String code, String requestedScope) {
+    public OAuth2AccessTokenResponse authorize(String deviceId, String code, OauthScopes scopes) {
         String hashedOtp = hashedOtp(deviceId, code);
         Optional<OtpDO> found = repository.findByOtpHashed(hashedOtp);
         if (found.isEmpty())
@@ -113,7 +113,6 @@ public class OtpService {
             ));
         try {
             OauthSub subject = new OauthSub();
-            OauthScopes scopes = allowedScopes.filter(requestedScope);
             UserInfoDO userInfo = userInfoService.createIfNotExists(found.get().getEmail());
             subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId().toString());
             return new JwtBuilder()

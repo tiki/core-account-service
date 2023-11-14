@@ -8,6 +8,7 @@ package com.mytiki.account.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.account.features.latest.jwks.JwksController;
 import com.mytiki.account.health.HealthController;
+import com.mytiki.account.security.oauth.OauthController;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.PublicResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,14 +91,14 @@ public class SecurityFilter {
                })
                .csrf((csrf) -> csrf
                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                       .ignoringRequestMatchers(Constants.API_LATEST_ROUTE + Constants.AUTH_PATH + "/**"))
+                       .ignoringRequestMatchers(OauthController.ROUTE + "/token"))
                .authorizeHttpRequests((req) -> req
                        .requestMatchers(HttpMethod.GET, HealthController.ROUTE).permitAll()
                        .requestMatchers(HttpMethod.GET, Constants.API_DOCS_ROUTE).permitAll()
                        .requestMatchers(HttpMethod.GET, JwksController.ROUTE).permitAll()
                        .requestMatchers(HttpMethod.GET, PublicResolver.PAGES + "/**", PublicResolver.ASSETS + "/**").permitAll()
                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                       .requestMatchers(HttpMethod.POST, Constants.API_LATEST_ROUTE + Constants.AUTH_PATH + "/**").permitAll()
+                       .requestMatchers(HttpMethod.POST, OauthController.ROUTE + "/token").permitAll()
                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.decoder(jwtDecoder))

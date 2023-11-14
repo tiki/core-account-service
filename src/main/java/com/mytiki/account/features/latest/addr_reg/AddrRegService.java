@@ -122,7 +122,12 @@ public class AddrRegService {
     }
 
     public OAuth2AccessTokenResponse authorize(
-            String requestScopes, String appId, String address, String signature) {
+            OauthScopes scopes, OauthSub sub, String clientSecret) {
+        String[] split = sub.getId().split(":");
+        if(split.length != 2)
+            throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT));
+        String appId = split[0];
+        String address = split[1];
         byte[] addr = B64F.decode(address, true);
         UUID app = UUID.fromString(appId);
         Optional<AddrRegDO> found = repository.findByAppAppIdAndAddress(app, addr);
@@ -132,9 +137,8 @@ public class AddrRegService {
                 boolean isValid = RsaF.verify(
                         pubKey,
                         address.getBytes(StandardCharsets.UTF_8),
-                        B64F.decode(signature));
+                        B64F.decode(clientSecret));
                 if(isValid){
-                    OauthScopes scopes = allowedScopes.filter(requestScopes);
                     scopes = scopes.filter(publicScopes);
                     OauthSub subject = new OauthSub(OauthSubNamespace.ADDRESS, appId + ":" + address);
                     return new JwtBuilder()

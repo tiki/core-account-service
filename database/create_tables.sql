@@ -76,9 +76,9 @@ CREATE TABLE IF NOT EXISTS user_info(
 -- API KEY
 -- -----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS api_key(
-    api_key_id UUID PRIMARY KEY,
-    secret_hash TEXT,
-    app_info_id BIGINT REFERENCES app_info(app_info_id) ON DELETE CASCADE,
+    api_key_id BIGSERIAL PRIMARY KEY,
+    token TEXT NOT NULL UNIQUE,
+    user_info_id BIGINT REFERENCES user_info(user_info_id) ON DELETE CASCADE,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );
 

@@ -6,171 +6,90 @@
 package com.mytiki.account.features.latest.api_key;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.mytiki.account.features.latest.app_info.AppInfoDO;
-import com.mytiki.account.features.latest.app_info.AppInfoService;
-import com.mytiki.account.features.latest.refresh.RefreshService;
-import com.mytiki.account.security.oauth.OauthInternal;
+import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.security.oauth.OauthSub;
 import com.mytiki.account.security.oauth.OauthSubNamespace;
-import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
-import com.mytiki.account.utilities.facade.B64F;
-import com.mytiki.account.utilities.facade.RandF;
+import com.mytiki.account.utilities.facade.readme.ReadmeF;
+import com.mytiki.account.utilities.facade.readme.ReadmeReq;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.SecureRandom;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @XRayEnabled
 public class ApiKeyService {
     private final ApiKeyRepository repository;
-    private final AppInfoService appInfoService;
-    private final RefreshService refreshService;
     private final JWSSigner signer;
-    private final PasswordEncoder secretEncoder;
-    private final OauthScopes allowedScopes;
-    private final List<String> publicScopes;
-    private final OauthInternal oauthInternal;
+    private final ReadmeF readme;
 
-    public ApiKeyService(
-            ApiKeyRepository repository,
-            AppInfoService appInfoService,
-            RefreshService refreshService,
-            JWSSigner signer,
-            OauthScopes allowedScopes,
-            List<String> publicScopes,
-            OauthInternal oauthInternal) {
+    public ApiKeyService(ApiKeyRepository repository, JWSSigner signer, ReadmeF readme) {
         this.repository = repository;
-        this.appInfoService = appInfoService;
-        this.refreshService = refreshService;
         this.signer = signer;
-        this.secretEncoder = new BCryptPasswordEncoder(12);
-        this.allowedScopes = allowedScopes;
-        this.publicScopes = publicScopes;
-        this.oauthInternal = oauthInternal;
+        this.readme = readme;
     }
 
-    @Transactional
-    public ApiKeyAOCreate create(String appId, boolean isPublic){
-        String secret = null;
-        Optional<AppInfoDO> app = appInfoService.getDO(appId);
-        if(app.isEmpty())
-            throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
-                    .message("Invalid App")
-                    .help("Get valid appIds from ../oauth/userinfo")
-                    .exception();
-
-        ApiKeyDO apiKey = new ApiKeyDO();
-        apiKey.setId(UUID.randomUUID());
-        apiKey.setApp(app.get());
-        apiKey.setCreated(ZonedDateTime.now());
-
-        if(!isPublic) {
-            secret = RandF.create(32);
-            apiKey.setHashedSecret(secretEncoder.encode(secret));
-        }
-
-        repository.save(apiKey);
-
-        ApiKeyAOCreate rsp = new ApiKeyAOCreate();
-        rsp.setId(apiKey.getId().toString());
-        rsp.setCreated(apiKey.getCreated());
-        rsp.setSecret(secret);
+    public Map<String, String> readme(ReadmeReq req, String signature){
+        if(!readme.verify(req, signature))
+            throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
+        Map<String, String> rsp = new HashMap<>();
+        List<ApiKeyDO> keys = repository.findAllByUserEmail(req.getEmail());
+        keys.forEach((key) -> rsp.put(key.getLabel(), key.getToken()));
         return rsp;
     }
 
-    public List<ApiKeyAO> getByAppId(String appId){
-        List<ApiKeyDO> keys = repository.findAllByAppAppId(UUID.fromString(appId));
-        return keys.stream().map(key -> {
-            ApiKeyAO rsp = new ApiKeyAO();
-            rsp.setId(key.getId().toString());
-            rsp.setCreated(key.getCreated());
-            rsp.setPublic(key.getHashedSecret() == null);
-            return rsp;
-        }).toList();
+    public void revoke(String token){
+        repository.deleteByToken(token);
     }
 
     @Transactional
-    public void revoke(String appId, String keyId){
-        Optional<ApiKeyDO> found = repository.findByAppAppIdAndId(
-                UUID.fromString(appId),
-                UUID.fromString(keyId));
-        found.ifPresent(repository::delete);
-    }
-
-    public OAuth2AccessTokenResponse authorize(String clientId, String clientSecret, String requestScopes){
-        OauthSub subject = new OauthSub();
-        OauthScopes scopes = allowedScopes.filter(requestScopes);
-        OauthScopes internal = scopes.filter(oauthInternal.getScopes());
-
-        if(!internal.getScopes().isEmpty()){
-            String hashedSecret = oauthInternal.getKeys().get(clientId);
-            if(!secretEncoder.matches(clientSecret, hashedSecret))
-                throw new OAuth2AuthorizationException(new OAuth2Error(
-                        OAuth2ErrorCodes.ACCESS_DENIED),
-                        "client_id and/or client_secret are invalid");
-            subject = new OauthSub(OauthSubNamespace.APP, clientId);
-        }else {
-            UUID clientUUID;
-            try {
-                 clientUUID = UUID.fromString(clientId);
-            }catch (IllegalArgumentException ex){
-                throw new OAuth2AuthorizationException(new OAuth2Error(
-                        OAuth2ErrorCodes.ACCESS_DENIED,
-                        "client_id and/or client_secret are invalid",
-                        null
-                ));
-            }
-            Optional<ApiKeyDO> found = repository.findById(clientUUID);
-            if (found.isEmpty())
-                throw new OAuth2AuthorizationException(new OAuth2Error(
-                        OAuth2ErrorCodes.ACCESS_DENIED,
-                        "client_id and/or client_secret are invalid",
-                        null
-                ));
-            if (found.get().getHashedSecret() == null && clientSecret == null) {
-                scopes = scopes.filter(publicScopes);
-            } else {
-                if (!secretEncoder.matches(clientSecret, found.get().getHashedSecret())) {
-                    throw new OAuth2AuthorizationException(new OAuth2Error(
-                            OAuth2ErrorCodes.ACCESS_DENIED),
-                            "client_id and/or client_secret are invalid");
-                }
-            }
-            AppInfoDO app = found.get().getApp();
-            if (app != null)
-                subject = new OauthSub(OauthSubNamespace.APP, app.getAppId().toString());
-        }
-        try{
-            return new JwtBuilder()
-                    .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
+    public OAuth2AccessTokenResponse authorize(
+            OauthSub sub,
+            String clientSecret,
+            OauthScopes scopes,
+            Long expires){
+        String[] split = sub.getId().split(":");
+        String label = split.length < 2 ? "default" : split[1];
+        Optional<ApiKeyDO> found = repository.findByTokenAndUserUserId(clientSecret, UUID.fromString(split[0]));
+        if(found.isEmpty())
+            throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT));
+        UserInfoDO user = found.get().getUser();
+        OauthSub subject = new OauthSub(OauthSubNamespace.USER, user.getUserId().toString());
+        try {
+            String token = new JwtBuilder()
+                    .exp(expires)
                     .sub(subject)
                     .aud(scopes.getAud())
                     .scp(scopes.getScp())
-                    .refresh(refreshService.issue(subject, scopes.getAud(), scopes.getScp()))
                     .build()
                     .sign(signer)
-                    .toResponse();
+                    .toToken();
+            ApiKeyDO apiKey = new ApiKeyDO();
+            apiKey.setUser(user);
+            apiKey.setLabel(label);
+            apiKey.setToken(token);
+            apiKey.setCreated(ZonedDateTime.now());
+            repository.save(apiKey);
+            return OAuth2AccessTokenResponse
+                    .withToken(token)
+                    .tokenType(OAuth2AccessToken.TokenType.BEARER)
+                    .scopes(new HashSet<>(scopes.getScp()))
+                    .expiresIn(expires * 1000)
+                    .build();
         } catch (JOSEException e) {
-            throw new OAuth2AuthorizationException(new OAuth2Error(
-                    OAuth2ErrorCodes.SERVER_ERROR,
-                    "Issue with JWT construction",
-                    null
-            ), e);
+            throw new RuntimeException(e);
         }
     }
 }

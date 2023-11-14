@@ -12,7 +12,7 @@ import com.mytiki.account.features.latest.exchange.shopify.ShopifyClient;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.security.oauth.OauthScopes;
-import com.mytiki.account.utilities.facade.ReadmeF;
+import com.mytiki.account.utilities.facade.readme.ReadmeF;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -38,10 +38,5 @@ public class ExchangeConfig {
             @Autowired ShopifyClient shopify) {
         return new ExchangeService(userInfoService, refreshService, signer,
                 allowedScopes, readme, google, github, shopify);
-    }
-
-    @Bean
-    public ExchangeController exchangeController(@Autowired ExchangeService service) {
-        return new ExchangeController(service);
     }
 }

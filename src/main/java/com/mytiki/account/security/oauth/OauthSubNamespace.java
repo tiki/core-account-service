@@ -11,6 +11,7 @@ import java.util.Map;
 public enum OauthSubNamespace {
     USER("user"),
     APP("app"),
+    INTERNAL("internal"),
     ADDRESS("addr");
 
     public final String namespace;

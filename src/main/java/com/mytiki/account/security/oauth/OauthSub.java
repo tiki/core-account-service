@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
 package com.mytiki.account.security.oauth;
 
 public class OauthSub {
@@ -18,7 +23,7 @@ public class OauthSub {
 
     public OauthSub(String sub) {
         if(sub != null) {
-            String[] split = sub.split(":");
+            String[] split = sub.split(":", 1);
             if (split.length != 2) {
                 id = sub;
             } else {
@@ -50,6 +55,14 @@ public class OauthSub {
 
     public boolean isApp() {
         return namespace.equals(OauthSubNamespace.APP);
+    }
+
+    public boolean isInternal() {
+        return namespace.equals(OauthSubNamespace.INTERNAL);
+    }
+
+    public boolean isAddress() {
+        return namespace.equals(OauthSubNamespace.ADDRESS);
     }
 
     @Override

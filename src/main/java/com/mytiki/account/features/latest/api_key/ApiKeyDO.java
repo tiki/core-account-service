@@ -6,6 +6,7 @@
 package com.mytiki.account.features.latest.api_key;
 
 import com.mytiki.account.features.latest.app_info.AppInfoDO;
+import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -15,38 +16,48 @@ import java.util.UUID;
 @Entity
 @Table(name = "api_key")
 public class ApiKeyDO implements Serializable {
-    private UUID id;
-    private String hashedSecret;
-    private AppInfoDO app;
+    private Long id;
+    private String label;
+    private String token;
+    private UserInfoDO user;
     private ZonedDateTime created;
 
     @Id
     @Column(name = "api_key_id")
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    @Column(name = "secret_hash")
-    public String getHashedSecret() {
-        return hashedSecret;
+    @Column(name = "token")
+    public String getToken() {
+        return token;
     }
 
-    public void setHashedSecret(String hashedSecret) {
-        this.hashedSecret = hashedSecret;
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    @Column(name = "label")
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     @ManyToOne
-    @JoinColumn(name = "app_info_id")
-    public AppInfoDO getApp() {
-        return app;
+    @JoinColumn(name = "user_info_id")
+    public UserInfoDO getUser() {
+        return user;
     }
 
-    public void setApp(AppInfoDO app) {
-        this.app = app;
+    public void setUser(UserInfoDO user) {
+        this.user = user;
     }
 
     @Column(name = "created_utc")

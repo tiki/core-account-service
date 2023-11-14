@@ -82,9 +82,9 @@ public class RefreshService {
     public void revoke(String token) {
         try {
             Jwt jwt = jwtDecoder.decode(token);
-            repository.deleteByJti(UUID.fromString(jwt.getId()));
+            if(jwt.getId() != null) repository.deleteByJti(UUID.fromString(jwt.getId()));
         } catch (JwtException e) {
-            throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_GRANT), e);
+            throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN), e);
         }
     }
 }
