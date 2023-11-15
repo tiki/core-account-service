@@ -1,5 +1,12 @@
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
+// eslint-disable-next-line no-unused-vars
 function githubLogin() {
-  window.location.href = "https://github.com/login/oauth/authorize?client_id=ebbf90361bcb8c527416&scope=user:email"
+  window.location.href =
+    "https://github.com/login/oauth/authorize?client_id=ebbf90361bcb8c527416&scope=user:email";
 }
 
 function handleGoogleSignin(response) {
@@ -16,7 +23,7 @@ function handleGoogleSignin(response) {
       subject_token_type: "urn:mytiki:params:oauth:token-type:google",
       client_id:
         "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googleusercontent.com",
-      scope: "account:admin"
+      scope: "account:admin",
     }),
   };
 
@@ -52,7 +59,7 @@ function handleGithubSign() {
         subject_token: code,
         subject_token_type: "urn:mytiki:params:oauth:token-type:github",
         client_id: "ebbf90361bcb8c527416",
-        scope: "account admin"
+        scope: "account admin",
       }),
     };
 

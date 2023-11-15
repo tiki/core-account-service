@@ -17,4 +17,6 @@ public interface AppInfoRepository extends JpaRepository<AppInfoDO, Long> {
     void deleteByAppId(UUID appId);
     @Query("SELECT a FROM AppInfoDO a INNER JOIN a.org o INNER JOIN o.users u WHERE a.appId = :appId AND u.userId = :userId")
     Optional<AppInfoDO> findByAppIdAndUserId(@Param("appId") UUID appId, @Param("userId") UUID userId);
+
+    Optional<AppInfoDO> findByPubKeyAndAppId(String pubKey, UUID appId);
 }

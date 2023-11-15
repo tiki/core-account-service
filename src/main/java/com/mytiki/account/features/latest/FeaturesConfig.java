@@ -9,9 +9,9 @@ import com.mytiki.account.features.latest.addr_reg.AddrRegConfig;
 import com.mytiki.account.features.latest.api_key.ApiKeyConfig;
 import com.mytiki.account.features.latest.app_info.AppInfoConfig;
 import com.mytiki.account.features.latest.confirm.ConfirmConfig;
-import com.mytiki.account.features.latest.confirm.ConfirmService;
 import com.mytiki.account.features.latest.exchange.ExchangeConfig;
 import com.mytiki.account.features.latest.jwks.JwksConfig;
+import com.mytiki.account.features.latest.oauth.OauthConfig;
 import com.mytiki.account.features.latest.org_info.OrgInfoConfig;
 import com.mytiki.account.features.latest.otp.OtpConfig;
 import com.mytiki.account.features.latest.refresh.RefreshConfig;
@@ -28,7 +28,8 @@ import org.springframework.context.annotation.Import;
         ExchangeConfig.class,
         AddrRegConfig.class,
         JwksConfig.class,
-        ConfirmConfig.class
+        ConfirmConfig.class,
+        OauthConfig.class
 })
 public class FeaturesConfig {
 }

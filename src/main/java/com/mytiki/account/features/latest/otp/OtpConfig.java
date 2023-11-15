@@ -7,10 +7,9 @@ package com.mytiki.account.features.latest.otp;
 
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.facade.TemplateF;
-import com.mytiki.account.utilities.facade.ReadmeF;
+import com.mytiki.account.utilities.facade.readme.ReadmeF;
 import com.mytiki.account.utilities.facade.SendgridF;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +17,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
-import java.util.List;
 
 @EnableJpaRepositories(OtpConfig.PACKAGE_PATH)
 @EntityScan(OtpConfig.PACKAGE_PATH)
@@ -35,10 +32,8 @@ public class OtpConfig {
             @Autowired JWSSigner signer,
             @Autowired RefreshService refreshService,
             @Autowired UserInfoService userInfoService,
-            @Autowired OauthScopes allowedScopes,
             @Autowired ReadmeF readme) {
-        return new OtpService(otpRepository, mustache, sendgrid, signer, refreshService, userInfoService,
-                allowedScopes, readme);
+        return new OtpService(otpRepository, mustache, sendgrid, signer, refreshService, userInfoService, readme);
     }
 
     @Bean

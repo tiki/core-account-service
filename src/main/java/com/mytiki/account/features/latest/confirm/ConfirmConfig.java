@@ -5,19 +5,15 @@
 
 package com.mytiki.account.features.latest.confirm;
 
-import com.mytiki.account.features.latest.api_key.ApiKeyConfig;
 import com.mytiki.account.features.latest.user_info.UserInfoRepository;
-import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.utilities.Constants;
-import com.mytiki.account.utilities.facade.TemplateF;
 import com.mytiki.account.utilities.facade.SendgridF;
+import com.mytiki.account.utilities.facade.TemplateF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
-import java.util.List;
 
 @EnableJpaRepositories(ConfirmConfig.PACKAGE_PATH)
 @EntityScan(ConfirmConfig.PACKAGE_PATH)

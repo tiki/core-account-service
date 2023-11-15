@@ -5,7 +5,6 @@
 
 package com.mytiki.account.features.latest.exchange.github;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GithubAOToken {

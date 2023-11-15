@@ -28,9 +28,4 @@ public class RefreshConfig {
         return new RefreshService(
                 repository, signer, new NimbusJwtDecoder(jwtProcessor));
     }
-
-    @Bean
-    public RefreshController refreshController(@Autowired RefreshService service){
-        return new RefreshController(service);
-    }
 }
