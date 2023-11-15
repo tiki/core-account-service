@@ -6,7 +6,7 @@
 package com.mytiki.account.features.latest.refresh;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.nimbusds.jose.JOSEException;
@@ -82,9 +82,9 @@ public class RefreshService {
     public void revoke(String token) {
         try {
             Jwt jwt = jwtDecoder.decode(token);
-            repository.deleteByJti(UUID.fromString(jwt.getId()));
+            if(jwt.getId() != null) repository.deleteByJti(UUID.fromString(jwt.getId()));
         } catch (JwtException e) {
-            throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_GRANT), e);
+            throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN), e);
         }
     }
 }
