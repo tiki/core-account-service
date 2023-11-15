@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+<!--
+  ~ Copyright (c) TIKI Inc.
+  ~ MIT license. See LICENSE file in root directory.
+  -->
+
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -32,8 +37,7 @@
             .then((response) => {
               if (!response.readme_token) {
                 let element = document.getElementById("error");
-                element.innerHTML =
-                  "Hey! Something got bad with your signin, try again in a few minutes";
+                element.innerHTML = "Error: Failed to log in. Try again.";
                 element.classList.remove("hidden");
                 return;
               }

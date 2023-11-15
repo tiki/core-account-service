@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+<!--
+  ~ Copyright (c) TIKI Inc.
+  ~ MIT license. See LICENSE file in root directory.
+  -->
+
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -6,7 +11,6 @@
     <title>Google Redirect</title>
     <script>
       window.onload = function () {
-
         const url_string = window.location.href.toLowerCase();
         const url = new URL(url_string);
         const code = url.searchParams.get("code");
@@ -22,9 +26,9 @@
             body: new URLSearchParams({
               grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
               subject_token: code,
-              subject_token_type:
-                "urn:mytiki:params:oauth:token-type:google",
-              client_id: "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googleusercontent.com",
+              subject_token_type: "urn:mytiki:params:oauth:token-type:google",
+              client_id:
+                "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googleusercontent.com",
               scope: "account admin",
             }),
           };
@@ -34,8 +38,7 @@
             .then((response) => {
               if (!response.readme_token) {
                 let element = document.getElementById("error");
-                element.innerHTML =
-                  "Hey! Something got bad with your signin, try again in a few minutes";
+                element.innerHTML = "Error: Failed to log in. Try again.";
                 element.classList.remove("hidden");
                 return;
               }
