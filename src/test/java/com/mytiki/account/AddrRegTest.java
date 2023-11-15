@@ -10,6 +10,9 @@ import com.mytiki.account.features.latest.addr_reg.AddrRegAORsp;
 import com.mytiki.account.features.latest.addr_reg.AddrRegService;
 import com.mytiki.account.features.latest.app_info.AppInfoAO;
 import com.mytiki.account.features.latest.app_info.AppInfoService;
+import com.mytiki.account.features.latest.oauth.OauthScopes;
+import com.mytiki.account.features.latest.oauth.OauthSub;
+import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
 import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
@@ -58,6 +61,9 @@ public class AddrRegTest {
 
     @Autowired
     private UserInfoService userInfo;
+
+    @Autowired
+    private OauthScopes allowedScopes;
 
     @Test
     public void Test_RegisterNew_Success() throws JOSEException, NoSuchAlgorithmException, CryptoException {
@@ -175,8 +181,11 @@ public class AddrRegTest {
         byte[] message = addr.getAddress().getBytes();
         signer.update(message, 0, message.length);
         byte[] sig = signer.generateSignature();
+
         OAuth2AccessTokenResponse token = service.authorize(
-                "trail", app.getAppId(), addr.getAddress(), B64F.encode(sig));
+                allowedScopes.filter("trail"),
+                new OauthSub(OauthSubNamespace.ADDRESS, app.getAppId() + ":" + addr.getAddress()),
+                B64F.encode(sig));
 
         assertNotNull(token.getAccessToken().getTokenValue());
     }

@@ -1,4 +1,9 @@
-package com.mytiki.account.security.oauth;
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
+package com.mytiki.account.features.latest.oauth;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
