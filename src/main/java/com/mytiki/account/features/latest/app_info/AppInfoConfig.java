@@ -7,6 +7,7 @@ package com.mytiki.account.features.latest.app_info;
 
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.utilities.Constants;
+import com.nimbusds.jose.JWSSigner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -20,8 +21,9 @@ public class AppInfoConfig {
     @Bean
     public AppInfoService appInfoService(
             @Autowired AppInfoRepository repository,
-            @Autowired UserInfoService userInfoService){
-        return new AppInfoService(repository, userInfoService);
+            @Autowired UserInfoService userInfoService,
+            @Autowired JWSSigner signer){
+        return new AppInfoService(repository, userInfoService, signer);
     }
 
     @Bean

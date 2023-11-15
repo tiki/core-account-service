@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ApiKeyRepository extends JpaRepository<ApiKeyDO, UUID> {
-    List<ApiKeyDO> findAllByAppAppId(UUID appId);
-    Optional<ApiKeyDO> findByAppAppIdAndId(UUID appId, UUID id);
+public interface ApiKeyRepository extends JpaRepository<ApiKeyDO, Long> {
+    void deleteByToken(String token);
+    Optional<ApiKeyDO> findByTokenAndUserUserId(String token, UUID userId);
+    List<ApiKeyDO> findAllByUserEmail(String email);
 }

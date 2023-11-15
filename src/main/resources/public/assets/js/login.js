@@ -25,6 +25,6 @@ document.getElementById("tikiLoginForm").addEventListener("submit", (event) => {
       self.location.replace("./otp.html");
     })
     .catch((error) => {
-      console.log("error: ", error);
+      console.log("Error: ", error);
     });
 });

@@ -87,21 +87,4 @@ public class AddrRegController {
         if(address != null) service.delete(appId, address);
         else if(id != null) service.deleteAll(appId, id);
     }
-
-    @Operation(hidden = true)
-    @RequestMapping(
-            method = RequestMethod.POST,
-            path = Constants.AUTH_TOKEN_PATH,
-            consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE},
-            params = {"address", "signature"})
-    public OAuth2AccessTokenResponse grant(
-            @RequestParam(name = "grant_type") AuthorizationGrantType grantType,
-            @RequestParam(required = false) String scope,
-            @RequestParam(name = "app-id", required = false) String appId,
-            @RequestParam(name = "address", required = false) String address,
-            @RequestParam(name = "signature", required = false) String signature) {
-        if (!grantType.equals(new AuthorizationGrantType("urn:mytiki:params:oauth:grant-type:rsa")))
-            throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.UNSUPPORTED_GRANT_TYPE));
-        return service.authorize(scope, appId, address, signature);
-    }
 }

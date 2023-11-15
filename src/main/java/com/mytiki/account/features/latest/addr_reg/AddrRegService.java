@@ -8,12 +8,10 @@ package com.mytiki.account.features.latest.addr_reg;
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.app_info.AppInfoDO;
 import com.mytiki.account.features.latest.app_info.AppInfoService;
-import com.mytiki.account.features.latest.jwks.JwksDO;
-import com.mytiki.account.features.latest.jwks.JwksService;
 import com.mytiki.account.features.latest.refresh.RefreshService;
-import com.mytiki.account.security.oauth.OauthScopes;
-import com.mytiki.account.security.oauth.OauthSub;
-import com.mytiki.account.security.oauth.OauthSubNamespace;
+import com.mytiki.account.features.latest.oauth.OauthScopes;
+import com.mytiki.account.features.latest.oauth.OauthSub;
+import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
@@ -34,7 +32,6 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenRespon
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Ref;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -44,24 +41,18 @@ import java.util.UUID;
 public class AddrRegService {
     private final AddrRegRepository repository;
     private final AppInfoService appInfoService;
-    private final JwksService jwksService;
     private final RefreshService refreshService;
     private final JWSSigner signer;
-    private final OauthScopes allowedScopes;
     private final List<String> publicScopes;
 
     public AddrRegService(
             AddrRegRepository repository,
             AppInfoService appInfoService,
-            JwksService jwksService,
             RefreshService refreshService,
             JWSSigner signer,
-            OauthScopes allowedScopes,
             List<String> publicScopes) {
         this.repository = repository;
         this.appInfoService = appInfoService;
-        this.jwksService = jwksService;
-        this.allowedScopes = allowedScopes;
         this.publicScopes = publicScopes;
         this.refreshService = refreshService;
         this.signer = signer;
@@ -77,7 +68,6 @@ public class AddrRegService {
                     .detail("Invalid App ID")
                     .help("Check your Authorization token")
                     .exception();
-        guardCustomerToken(custAuth, app.get().getJwks(), req);
 
         AddrRegDO reg = new AddrRegDO();
         reg.setCid(req.getId());
@@ -122,7 +112,12 @@ public class AddrRegService {
     }
 
     public OAuth2AccessTokenResponse authorize(
-            String requestScopes, String appId, String address, String signature) {
+            OauthScopes scopes, OauthSub sub, String clientSecret) {
+        String[] split = sub.getId().split(":");
+        if(split.length != 2)
+            throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT));
+        String appId = split[0];
+        String address = split[1];
         byte[] addr = B64F.decode(address, true);
         UUID app = UUID.fromString(appId);
         Optional<AddrRegDO> found = repository.findByAppAppIdAndAddress(app, addr);
@@ -132,9 +127,8 @@ public class AddrRegService {
                 boolean isValid = RsaF.verify(
                         pubKey,
                         address.getBytes(StandardCharsets.UTF_8),
-                        B64F.decode(signature));
+                        B64F.decode(clientSecret));
                 if(isValid){
-                    OauthScopes scopes = allowedScopes.filter(requestScopes);
                     scopes = scopes.filter(publicScopes);
                     OauthSub subject = new OauthSub(OauthSubNamespace.ADDRESS, appId + ":" + address);
                     return new JwtBuilder()
@@ -203,13 +197,6 @@ public class AddrRegService {
                     .help("Contact support")
                     .cause(e.getCause())
                     .exception();
-        }
-    }
-
-    private void guardCustomerToken(String authorization, JwksDO jwks, AddrRegAOReq req){
-        if(jwks != null) {
-            String token = authorization.replace("Bearer ", "");
-            jwksService.guard(jwks.getEndpoint(), token, req.getId());
         }
     }
 

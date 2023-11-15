@@ -2,7 +2,9 @@ const googleCliendId = "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googl
 const githubClientId = "ebbf90361bcb8c527416"
 
 function githubLogin() {
-  window.location.href = "https://github.com/login/oauth/authorize?scope=user:email&client_id=" + githubClientId
+  window.location.href =
+    "https://github.com/login/oauth/authorize?scope=user:email&client_id=" +
+    githubClientId;
 }
 
 function googleLogin(){
@@ -15,6 +17,10 @@ window.onload = function () {
   google.accounts.id.initialize({
     client_id: googleCliendId,
   });
-  document.getElementById('google-sign-in-btn').addEventListener('click', (e) => googleLogin())
-  document.getElementById('github-sign-in-btn').addEventListener('click', (e) => githubLogin())
+  document
+    .getElementById("google-sign-in-btn")
+    .addEventListener("click", (_e) => googleLogin());
+  document
+    .getElementById("github-sign-in-btn")
+    .addEventListener("click", (_e) => githubLogin());
 };
