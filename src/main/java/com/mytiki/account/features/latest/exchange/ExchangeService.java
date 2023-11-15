@@ -11,15 +11,14 @@ import com.mytiki.account.features.latest.exchange.github.GithubClient;
 import com.mytiki.account.features.latest.exchange.google.GoogleClient;
 import com.mytiki.account.features.latest.exchange.shopify.ShopifyClient;
 import com.mytiki.account.features.latest.refresh.RefreshService;
-import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.oauth.OauthScopes;
-import com.mytiki.account.security.oauth.OauthSub;
-import com.mytiki.account.security.oauth.OauthSubNamespace;
+import com.mytiki.account.features.latest.oauth.OauthScopes;
+import com.mytiki.account.features.latest.oauth.OauthSub;
+import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.JwtBuilder;
-import com.mytiki.account.utilities.facade.ReadmeF;
+import com.mytiki.account.utilities.facade.readme.ReadmeF;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import jakarta.transaction.Transactional;
@@ -61,11 +60,10 @@ public class ExchangeService {
 
     @Transactional
     public OAuth2AccessTokenResponse authorize(
-            String requestedScope, String clientId, String subjectToken, String subjectTokenType) {
+            OauthScopes scopes, String clientId, String subjectToken, String subjectTokenType) {
         String email = validate(clientId, subjectToken, subjectTokenType);
         UserInfoDO userInfo = userInfoService.createIfNotExists(email);
         OauthSub subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId().toString());
-        OauthScopes scopes = allowedScopes.filter(requestedScope);
         try {
             return new JwtBuilder()
                     .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)

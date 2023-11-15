@@ -3,20 +3,28 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.security.oauth;
+package com.mytiki.account.features.latest.oauth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mytiki.account.features.latest.refresh.RefreshService;
+import com.mytiki.account.utilities.builder.JwtBuilder;
+import com.nimbusds.jose.JOSEException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 
 import java.util.List;
 import java.util.Map;
 
 @Configuration
 @ConfigurationProperties(value = "com.mytiki.account.oauth.client-credentials.internal")
-public class OauthInternal {
+public class OauthInternalCreds {
     private List<String> scopes;
     private String json;
 

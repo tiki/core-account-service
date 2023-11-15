@@ -25,14 +25,14 @@ const authenticateReadme = (otp) => {
     "Content-Type",
     "application/x-www-form-urlencoded;charset=UTF-8",
   );
-
+  
   const options = {
     method: "POST",
     headers,
     body: new URLSearchParams({
       grant_type: "password",
-      username,
-      password: otp,
+      username, 
+      password: otp.toUpperCase(),
       scope: "account admin",
     }),
   };

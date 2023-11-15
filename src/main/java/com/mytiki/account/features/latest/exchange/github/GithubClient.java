@@ -16,8 +16,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 public class GithubClient implements ExchangeClient {
     private final String secret;

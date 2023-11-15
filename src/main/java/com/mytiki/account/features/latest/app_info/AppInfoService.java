@@ -8,14 +8,21 @@ package com.mytiki.account.features.latest.app_info;
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.oauth.OauthScopes;
-import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.features.latest.oauth.OauthScopes;
+import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
+import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.B64F;
 import com.mytiki.account.utilities.facade.RsaF;
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSSigner;
+import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.io.IOException;
@@ -28,10 +35,12 @@ public class AppInfoService {
 
     private final AppInfoRepository repository;
     private final UserInfoService userInfoService;
+    private final JWSSigner signer;
 
-    public AppInfoService(AppInfoRepository repository, UserInfoService userInfoService) {
+    public AppInfoService(AppInfoRepository repository, UserInfoService userInfoService, JWSSigner signer) {
         this.repository = repository;
         this.userInfoService = userInfoService;
+        this.signer = signer;
     }
 
     public AppInfoAO create(String name, String userId){
@@ -42,13 +51,16 @@ public class AppInfoService {
            ZonedDateTime now = ZonedDateTime.now();
            AppInfoDO app = new AppInfoDO();
            app.setName(name);
-           app.setOrg(user.get().getOrg());
            app.setAppId(UUID.randomUUID());
+           app.setOrg(user.get().getOrg());
            app.setCreated(now);
            app.setModified(now);
            try {
-               app.setSignKey(RsaF.generate());
-           } catch (JOSEException e) {
+               RSAPrivateKey privateKey = RsaF.generate();
+               app.setSignKey(privateKey);
+               RSAPublicKey publicKey = RsaF.toPublic(privateKey);
+               app.setPubKey(B64F.encode(publicKey.getEncoded()));
+           } catch (JOSEException | IOException e) {
                throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
                        .message("Issue with Sign Key")
                        .detail(e.getMessage())
@@ -80,6 +92,28 @@ public class AppInfoService {
         repository.deleteByAppId(UUID.fromString(appId));
     }
 
+    public OAuth2AccessTokenResponse authorize(OauthScopes scopes, OauthSub sub, String clientSecret, Long expires) {
+        Optional<AppInfoDO> found = repository.findByPubKeyAndAppId(clientSecret, UUID.fromString(sub.getId()));
+        if(found.isEmpty())
+            throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT));
+        try {
+            return new JwtBuilder()
+                    .exp(expires)
+                    .sub(sub)
+                    .aud(scopes.getAud())
+                    .scp(scopes.getScp())
+                    .build()
+                    .sign(signer)
+                    .toResponse();
+        } catch (JOSEException e) {
+            throw new OAuth2AuthorizationException(new OAuth2Error(
+                    OAuth2ErrorCodes.SERVER_ERROR,
+                    "Issue with JWT construction",
+                    null
+            ), e);
+        }
+    }
+
     public Optional<AppInfoDO> getDO(String appId){
         return repository.findByAppId(UUID.fromString(appId));
     }
@@ -91,19 +125,11 @@ public class AppInfoService {
         rsp.setModified(src.getModified());
         rsp.setCreated(src.getCreated());
         rsp.setOrgId(src.getOrg().getOrgId().toString());
-        try{
-            RSAPublicKey pubkey = RsaF.toPublic(src.getSignKey());
-            rsp.setPubKey(B64F.encode(pubkey.getEncoded()));
-        } catch (IOException e) {
-            throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
-                    .message("Issue with Sign Key")
-                    .detail(e.getMessage())
-                    .help("Please contact support")
-                    .exception();
-        }
+        rsp.setPubKey(src.getPubKey());
         return rsp;
     }
 
+    @Deprecated
     public void guard(JwtAuthenticationToken token, String appId){
         if(OauthScopes.hasScope(token,"account:internal:read")) return;
         OauthSub sub = new OauthSub(token.getName());

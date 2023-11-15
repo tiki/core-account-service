@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.security.oauth;
+package com.mytiki.account.features.latest.oauth;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +11,7 @@ import java.util.Map;
 public enum OauthSubNamespace {
     USER("user"),
     APP("app"),
+    INTERNAL("internal"),
     ADDRESS("addr");
 
     public final String namespace;

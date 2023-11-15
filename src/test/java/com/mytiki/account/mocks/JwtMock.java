@@ -17,9 +17,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 public class JwtMock {
-
-    @Bean(name = "mockJwtDecoder")
-    public JwtDecoder mockJwtDecoder(@Autowired JWKSet jwkSet){
+    public static JwtDecoder mockJwtDecoder(JWKSet jwkSet){
         DefaultJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
         ImmutableJWKSet<SecurityContext> immutableJWKSet = new ImmutableJWKSet<>(jwkSet);
         jwtProcessor.setJWSKeySelector(
