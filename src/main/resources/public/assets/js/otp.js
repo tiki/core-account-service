@@ -29,6 +29,7 @@ const authenticateReadme = (otp) => {
   const options = {
     method: "POST",
     headers,
+    credentials: "include",
     body: new URLSearchParams({
       grant_type: "password",
       username,

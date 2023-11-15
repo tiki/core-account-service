@@ -95,6 +95,7 @@ public class SecurityFilter {
                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                        .ignoringRequestMatchers(
                                OauthController.ROUTE + "/token",
+                               OauthController.ROUTE + "/revoke",
                                OtpController.ROUTE,
                                ApiKeyController.ROUTE + "/readme"))
                .authorizeHttpRequests((req) -> req
@@ -105,6 +106,7 @@ public class SecurityFilter {
                        .requestMatchers(HttpMethod.GET, PublicResolver.ASSETS + "/**").permitAll()
                        .requestMatchers(HttpMethod.POST, ApiKeyController.ROUTE + "/readme").permitAll()
                        .requestMatchers(HttpMethod.POST, OauthController.ROUTE + "/token").permitAll()
+                       .requestMatchers(HttpMethod.POST, OauthController.ROUTE + "/revoke").permitAll()
                        .requestMatchers(HttpMethod.POST, OtpController.ROUTE).permitAll()
                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                        .anyRequest().authenticated()
