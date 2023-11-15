@@ -23,6 +23,7 @@ public class ApiKeyDO implements Serializable {
     private ZonedDateTime created;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "api_key_id")
     public Long getId() {
         return id;

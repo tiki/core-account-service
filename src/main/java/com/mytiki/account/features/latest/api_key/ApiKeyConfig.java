@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 @EnableJpaRepositories(ApiKeyConfig.PACKAGE_PATH)
 @EntityScan(ApiKeyConfig.PACKAGE_PATH)
@@ -22,8 +23,9 @@ public class ApiKeyConfig {
     public ApiKeyService apiKeyService(
             @Autowired ApiKeyRepository repository,
             @Autowired JWSSigner signer,
-            @Autowired ReadmeF readme){
-        return new ApiKeyService(repository, signer, readme);
+            @Autowired ReadmeF readme,
+            @Autowired JwtDecoder decoder){
+        return new ApiKeyService(repository, signer, readme, decoder);
     }
 
     @Bean

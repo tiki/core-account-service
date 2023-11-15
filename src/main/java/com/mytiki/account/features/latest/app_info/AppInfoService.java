@@ -6,11 +6,10 @@
 package com.mytiki.account.features.latest.app_info;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.mytiki.account.features.latest.api_key.ApiKeyDO;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.oauth.OauthScopes;
-import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.features.latest.oauth.OauthScopes;
+import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.B64F;
@@ -20,7 +19,6 @@ import com.nimbusds.jose.JWSSigner;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
@@ -29,7 +27,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 

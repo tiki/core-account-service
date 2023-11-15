@@ -7,7 +7,6 @@ package com.mytiki.account.features.latest.otp;
 
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.facade.TemplateF;
 import com.mytiki.account.utilities.facade.readme.ReadmeF;

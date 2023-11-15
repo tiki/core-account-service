@@ -7,9 +7,9 @@ package com.mytiki.account.features.latest.api_key;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
-import com.mytiki.account.security.oauth.OauthScopes;
-import com.mytiki.account.security.oauth.OauthSub;
-import com.mytiki.account.security.oauth.OauthSubNamespace;
+import com.mytiki.account.features.latest.oauth.OauthScopes;
+import com.mytiki.account.features.latest.oauth.OauthSub;
+import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.readme.ReadmeF;
@@ -22,6 +22,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -32,11 +33,13 @@ public class ApiKeyService {
     private final ApiKeyRepository repository;
     private final JWSSigner signer;
     private final ReadmeF readme;
+    private final JwtDecoder decoder;
 
-    public ApiKeyService(ApiKeyRepository repository, JWSSigner signer, ReadmeF readme) {
+    public ApiKeyService(ApiKeyRepository repository, JWSSigner signer, ReadmeF readme, JwtDecoder decoder) {
         this.repository = repository;
         this.signer = signer;
         this.readme = readme;
+        this.decoder = decoder;
     }
 
     public Map<String, String> readme(ReadmeReq req, String signature){
@@ -64,6 +67,9 @@ public class ApiKeyService {
         if(found.isEmpty())
             throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT));
         UserInfoDO user = found.get().getUser();
+        List<String> tokenScopes = decoder.decode(found.get().getToken()).getClaim("scp");
+        if(!tokenScopes.contains("account:admin"))
+            throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INSUFFICIENT_SCOPE));
         try{
             ApiKeyDO key = create(user, label, scopes, expires);
             return OAuth2AccessTokenResponse

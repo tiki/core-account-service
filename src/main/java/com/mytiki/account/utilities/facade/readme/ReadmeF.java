@@ -48,7 +48,6 @@ public class ReadmeF {
             put("name", user.getEmail());
             put("email", user.getEmail());
             put("version", 1);
-            put("apiKey", "MIKE-FIX-ME");
             put("parameters", new HashMap<>(){{
                 put("app-id", appId);
                 put("user-id", user.getUserId().toString());

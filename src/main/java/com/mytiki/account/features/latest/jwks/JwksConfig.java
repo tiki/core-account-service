@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.security.jwks;
+package com.mytiki.account.features.latest.jwks;
 
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.facade.B64F;

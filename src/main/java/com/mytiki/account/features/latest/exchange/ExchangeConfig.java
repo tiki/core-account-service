@@ -11,7 +11,7 @@ import com.mytiki.account.features.latest.exchange.google.GoogleClient;
 import com.mytiki.account.features.latest.exchange.shopify.ShopifyClient;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.oauth.OauthScopes;
+import com.mytiki.account.features.latest.oauth.OauthScopes;
 import com.mytiki.account.utilities.facade.readme.ReadmeF;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.beans.factory.annotation.Autowired;

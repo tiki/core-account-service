@@ -13,7 +13,7 @@ import com.mytiki.account.features.latest.user_info.UserInfoAO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
 import com.mytiki.account.main.App;
 import com.mytiki.account.mocks.JwtMock;
-import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.utilities.error.ApiException;
 import com.mytiki.account.utilities.facade.SendgridF;
 import org.junit.jupiter.api.MethodOrderer;

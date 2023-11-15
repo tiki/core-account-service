@@ -10,9 +10,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.features.latest.user_info.UserInfoDO;
 import com.mytiki.account.features.latest.user_info.UserInfoService;
-import com.mytiki.account.security.oauth.OauthScopes;
-import com.mytiki.account.security.oauth.OauthSub;
-import com.mytiki.account.security.oauth.OauthSubNamespace;
+import com.mytiki.account.features.latest.oauth.OauthScopes;
+import com.mytiki.account.features.latest.oauth.OauthSub;
+import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
@@ -109,9 +109,8 @@ public class OtpService {
                     null
             ));
         try {
-            OauthSub subject = new OauthSub();
             UserInfoDO userInfo = userInfoService.createIfNotExists(found.get().getEmail());
-            subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId().toString());
+            OauthSub subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId().toString());
             return new JwtBuilder()
                     .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)

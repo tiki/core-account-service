@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.security.jwks;
+package com.mytiki.account.features.latest.jwks;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.nimbusds.jose.jwk.JWKSet;

@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.security.oauth;
+package com.mytiki.account.features.latest.oauth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

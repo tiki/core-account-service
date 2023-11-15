@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.security.oauth;
+package com.mytiki.account.features.latest.oauth;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.addr_reg.AddrRegService;
@@ -33,7 +33,7 @@ import static com.mytiki.account.utilities.Constants.TOKEN_EXPIRY_DURATION_SECON
 @RestController
 @RequestMapping(value = OauthController.ROUTE)
 public class OauthController {
-    public static final String ROUTE = Constants.API_LATEST_ROUTE + "oauth";
+    public static final String ROUTE = Constants.API_LATEST_ROUTE + "auth";
     public static final String REFRESH_COOKIE = "tiki-refresh-token";
 
     private final RefreshService refreshService;
@@ -109,14 +109,8 @@ public class OauthController {
                             oauthInternal.authorize(sub, clientSecret, scopes, exp);
                     case USER ->
                             apiKeyService.authorize(sub, clientSecret, scopes, exp);
-//                    case APP -> {
-//                        clienId is the appId
-//                        clientSecret is the publishing Id
-//                        appInfoService.authorize(scopes, clientId, clientSecret);
-//                    }
+                    case APP -> appInfoService.authorize(scopes, sub, clientSecret, exp);
                     case ADDRESS -> addrRegService.authorize(scopes, sub, clientSecret);
-                    default -> throw new OAuth2AuthorizationException(
-                            new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT));
                 };
             }
             case "refresh_token" ->

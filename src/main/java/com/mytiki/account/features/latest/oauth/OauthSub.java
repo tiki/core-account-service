@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.security.oauth;
+package com.mytiki.account.features.latest.oauth;
 
 public class OauthSub {
     private String id;
@@ -23,10 +23,9 @@ public class OauthSub {
 
     public OauthSub(String sub) {
         if(sub != null) {
-            String[] split = sub.split(":", 1);
-            if (split.length != 2) {
-                id = sub;
-            } else {
+            String[] split = sub.split(":", 2);
+            if (split.length != 2) id = sub;
+            else {
                 namespace = OauthSubNamespace.from(split[0]);
                 id = split[1];
             }

@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.security.oauth;
+package com.mytiki.account.features.latest.oauth;
 
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.utilities.builder.JwtBuilder;

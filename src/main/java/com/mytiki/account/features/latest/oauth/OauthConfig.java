@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.security.oauth;
+package com.mytiki.account.features.latest.oauth;
 
 import com.mytiki.account.features.latest.addr_reg.AddrRegService;
 import com.mytiki.account.features.latest.api_key.ApiKeyService;

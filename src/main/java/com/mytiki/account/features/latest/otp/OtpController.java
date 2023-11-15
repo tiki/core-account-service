@@ -17,20 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 @XRayEnabled
 @Tag(name = "")
 @RestController
-@RequestMapping(value = Constants.API_LATEST_ROUTE)
+@RequestMapping(value = OtpController.ROUTE)
 public class OtpController {
-
+    public static final String ROUTE = Constants.API_LATEST_ROUTE + "auth/otp";
     private final OtpService service;
 
     public OtpController(OtpService service) {
         this.service = service;
     }
 
-    @Operation(
-            operationId = Constants.PROJECT_DASH_PATH +  "-otp-start-post",
-            summary = "Request OTP",
-            description = "Start a one-time password (email) authorization flow")
-    @RequestMapping(method = RequestMethod.POST, path = "auth/otp")
+    @Operation(hidden = true)
+    @RequestMapping(method = RequestMethod.POST)
     public OtpAOStartRsp issue(@RequestBody OtpAOStartReq body) {
         return service.start(body);
     }

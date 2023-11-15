@@ -6,7 +6,7 @@
 package com.mytiki.account.features.latest.refresh;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.mytiki.account.security.oauth.OauthSub;
+import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.nimbusds.jose.JOSEException;
