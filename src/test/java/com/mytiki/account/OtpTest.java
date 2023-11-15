@@ -5,6 +5,7 @@
 
 package com.mytiki.account;
 
+import com.mytiki.account.features.latest.oauth.OauthScopes;
 import com.mytiki.account.features.latest.otp.OtpAOStartReq;
 import com.mytiki.account.features.latest.otp.OtpAOStartRsp;
 import com.mytiki.account.features.latest.otp.OtpRepository;
@@ -16,6 +17,7 @@ import com.mytiki.account.mocks.JwtMock;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.utilities.error.ApiException;
 import com.mytiki.account.utilities.facade.SendgridF;
+import com.nimbusds.jose.jwk.JWKSet;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -62,10 +64,11 @@ public class OtpTest {
     @Autowired
     private UserInfoService userInfoService;
 
+    @Autowired
+    private OauthScopes allowedScopes;
 
     @Autowired
-    @Qualifier("mockJwtDecoder")
-    private JwtDecoder jwtDecoder;
+    private JWKSet jwkSet;
 
     @Test
     public void Test_Start_Success() {
@@ -124,7 +127,7 @@ public class OtpTest {
         OtpAOStartRsp rsp = service.start(req);
 
         String code = param.getValue().substring(0, 6);
-        OAuth2AccessTokenResponse token = service.authorize(rsp.getDeviceId(), code, null);
+        OAuth2AccessTokenResponse token = service.authorize(rsp.getDeviceId(), code, allowedScopes);
 
         assertNotNull(token.getAccessToken().getTokenValue());
         assertEquals(OAuth2AccessToken.TokenType.BEARER, token.getAccessToken().getTokenType());
@@ -133,7 +136,7 @@ public class OtpTest {
         assertNotNull(token.getAccessToken().getExpiresAt());
         assertTrue(token.getAccessToken().getExpiresAt().isAfter(Instant.now()));
 
-        Jwt jwt = jwtDecoder.decode(token.getAccessToken().getTokenValue());
+        Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(token.getAccessToken().getTokenValue());
         OauthSub sub = new OauthSub(jwt.getSubject());
         assertTrue(sub.isUser());
         UserInfoAO userInfo = userInfoService.get(sub.getId());
@@ -150,15 +153,9 @@ public class OtpTest {
         OtpAOStartRsp rsp = service.start(req);
 
         String code = param.getValue().substring(0, 6);
-        OAuth2AccessTokenResponse token = service.authorize(rsp.getDeviceId(), code, null);
+        OAuth2AccessTokenResponse token = service.authorize(rsp.getDeviceId(), code, allowedScopes);
 
-        req = new OtpAOStartReq(testEmail);
-        rsp = service.start(req);
-
-        code = param.getValue().substring(0, 6);
-        token = service.authorize(rsp.getDeviceId(), code, null);
-
-        Jwt jwt = jwtDecoder.decode(token.getAccessToken().getTokenValue());
+        Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(token.getAccessToken().getTokenValue());
         OauthSub sub = new OauthSub(jwt.getSubject());
         assertTrue(sub.isUser());
         UserInfoAO userInfo = userInfoService.get(sub.getId());
@@ -173,12 +170,12 @@ public class OtpTest {
         OtpAOStartReq req = new OtpAOStartReq(testEmail);
         OtpAOStartRsp rsp = service.start(req);
 
-        String scope = "trail";
         String code = param.getValue().substring(0, 6);
-        OAuth2AccessTokenResponse token = service.authorize(rsp.getDeviceId(), code, scope);
+        OAuth2AccessTokenResponse token = service.authorize(
+                rsp.getDeviceId(), code, allowedScopes.filter("trail"));
 
-        Jwt jwt = jwtDecoder.decode(token.getAccessToken().getTokenValue());
+        Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(token.getAccessToken().getTokenValue());
         assertTrue(jwt.getAudience().contains("trail.mytiki.com"));
-        assertTrue(token.getAccessToken().getScopes().contains(scope));
+        assertTrue(token.getAccessToken().getScopes().contains("trail"));
     }
 }

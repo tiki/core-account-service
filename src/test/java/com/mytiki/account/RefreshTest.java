@@ -14,6 +14,7 @@ import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
 import com.mytiki.account.utilities.Constants;
 import com.nimbusds.jose.*;
+import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -59,15 +60,14 @@ public class RefreshTest {
     private JWSSigner signer;
 
     @Autowired
-    @Qualifier("mockJwtDecoder")
-    private JwtDecoder jwtDecoder;
+    private JWKSet jwkSet;
 
     @Test
     public void Test_Token_Success() throws JOSEException {
         String token = service.issue(null, null, null);
         assertNotNull(token);
 
-        Jwt jwt = jwtDecoder.decode(token);
+        Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(token);
         Optional<RefreshDO> found = repository.findByJti(UUID.fromString(jwt.getId()));
 
         assertTrue(found.isPresent());
@@ -80,7 +80,7 @@ public class RefreshTest {
         String token = service.issue(null, null, null);
         service.revoke(token);
 
-        Jwt jwt = jwtDecoder.decode(token);
+        Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(token);
         Optional<RefreshDO> found = repository.findByJti(UUID.fromString(jwt.getId()));
         assertTrue(found.isEmpty());
     }
@@ -91,7 +91,7 @@ public class RefreshTest {
         service.revoke(token);
         service.revoke(token);
 
-        Jwt jwt = jwtDecoder.decode(token);
+        Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(token);
         Optional<RefreshDO> found = repository.findByJti(UUID.fromString(jwt.getId()));
         assertTrue(found.isEmpty());
     }
@@ -108,7 +108,7 @@ public class RefreshTest {
         assertNotNull(rsp.getAccessToken().getExpiresAt());
         assertTrue(rsp.getAccessToken().getExpiresAt().isAfter(Instant.now()));
 
-        Jwt jwt = jwtDecoder.decode(token);
+        Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(token);
         Optional<RefreshDO> found = repository.findByJti(UUID.fromString(jwt.getId()));
         assertTrue(found.isEmpty());
     }
@@ -153,7 +153,7 @@ public class RefreshTest {
         String token = service.issue(null, List.of(audience), null);
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
-        Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());
+        Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(rsp.getAccessToken().getTokenValue());
         assertTrue(jwt.getAudience().contains(audience));
     }
 
@@ -163,7 +163,7 @@ public class RefreshTest {
         String token = service.issue(subject, null, null);
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
-        Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());
+        Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(rsp.getAccessToken().getTokenValue());
         assertEquals(subject.toString(), jwt.getSubject());
     }
 
@@ -173,7 +173,7 @@ public class RefreshTest {
         String token = service.issue(null, null, List.of(scp));
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
-        Jwt jwt = jwtDecoder.decode(rsp.getAccessToken().getTokenValue());
+        Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(rsp.getAccessToken().getTokenValue());
         List<String> claim = jwt.getClaim("scp");
         assertTrue(claim.contains(scp));
     }

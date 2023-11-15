@@ -51,6 +51,7 @@ public class AppInfoService {
            ZonedDateTime now = ZonedDateTime.now();
            AppInfoDO app = new AppInfoDO();
            app.setName(name);
+           app.setAppId(UUID.randomUUID());
            app.setOrg(user.get().getOrg());
            app.setCreated(now);
            app.setModified(now);
