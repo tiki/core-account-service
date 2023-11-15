@@ -20,10 +20,6 @@ public interface Constants {
     Long TOKEN_EXPIRY_DURATION_SECONDS = 600L;
     Long REFRESH_EXPIRY_DURATION_SECONDS = 2592000L;
 
-    String AUTH_PATH = "auth";
-    String AUTH_TOKEN_PATH = AUTH_PATH + "/token";
-    String AUTH_REVOKE_PATH = AUTH_PATH + "/revoke";
-
     String API = "api";
     String LATEST = "latest";
     String API_LATEST_ROUTE = "/" + API + "/" + LATEST + "/";

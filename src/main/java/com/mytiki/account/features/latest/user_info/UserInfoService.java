@@ -6,11 +6,15 @@
 package com.mytiki.account.features.latest.user_info;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.mytiki.account.features.latest.api_key.ApiKeyService;
 import com.mytiki.account.features.latest.confirm.ConfirmAO;
 import com.mytiki.account.features.latest.confirm.ConfirmAction;
 import com.mytiki.account.features.latest.confirm.ConfirmService;
 import com.mytiki.account.features.latest.org_info.OrgInfoService;
+import com.mytiki.account.features.latest.oauth.OauthScopes;
+import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
+import com.nimbusds.jose.JOSEException;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
 
@@ -24,14 +28,20 @@ public class UserInfoService {
     private final UserInfoRepository repository;
     private final OrgInfoService orgInfoService;
     private final ConfirmService confirmService;
+    private final ApiKeyService apiKeyService;
+    private final OauthScopes allowedScopes;
 
     public UserInfoService(
             UserInfoRepository repository,
             OrgInfoService orgInfoService,
-            ConfirmService confirmService) {
+            ConfirmService confirmService,
+            ApiKeyService apiKeyService,
+            OauthScopes allowedScopes) {
         this.repository = repository;
         this.orgInfoService = orgInfoService;
         this.confirmService = confirmService;
+        this.apiKeyService = apiKeyService;
+        this.allowedScopes = allowedScopes;
     }
 
     public UserInfoAO get(String userId){
@@ -78,6 +88,12 @@ public class UserInfoService {
             newUser.setCreated(now);
             newUser.setModified(now);
             userInfo = repository.save(newUser);
+            try {
+                OauthScopes scopes = allowedScopes.filter("account:admin trail publish");
+                apiKeyService.create(userInfo, "default", scopes, Constants.REFRESH_EXPIRY_DURATION_SECONDS);
+            } catch (JOSEException e) {
+                throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED).cause(e).exception();
+            }
         } else
             userInfo = found.get();
         return userInfo;

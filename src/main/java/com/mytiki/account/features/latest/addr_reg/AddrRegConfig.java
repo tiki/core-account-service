@@ -6,9 +6,7 @@
 package com.mytiki.account.features.latest.addr_reg;
 
 import com.mytiki.account.features.latest.app_info.AppInfoService;
-import com.mytiki.account.features.latest.jwks.JwksService;
 import com.mytiki.account.features.latest.refresh.RefreshService;
-import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.utilities.Constants;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +26,10 @@ public class AddrRegConfig {
     AddrRegService addrRegService(
             @Autowired AddrRegRepository repository,
             @Autowired AppInfoService appInfoService,
-            @Autowired JwksService jwksService,
             @Autowired RefreshService refreshService,
             @Autowired JWSSigner signer,
-            @Autowired OauthScopes allowedScopes,
             @Value("${com.mytiki.account.oauth.client_credentials.public.scopes}") List<String> publicScopes) {
-        return new AddrRegService(repository, appInfoService, jwksService,
-                refreshService, signer, allowedScopes, publicScopes);
+        return new AddrRegService(repository, appInfoService, refreshService, signer, publicScopes);
     }
 
     @Bean

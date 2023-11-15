@@ -18,6 +18,7 @@ for (let i = 0; i < ca.length; i++) {
 }
 
 const authenticateReadme = (otp) => {
+  document.getElementById("loading-container").classList.remove("hidden");
   const headers = new Headers();
   headers.append("accept", "application/json");
   headers.append(
@@ -28,10 +29,11 @@ const authenticateReadme = (otp) => {
   const options = {
     method: "POST",
     headers,
+    credentials: "include",
     body: new URLSearchParams({
       grant_type: "password",
       username,
-      password: otp,
+      password: otp.toUpperCase(),
       scope: "account admin",
     }),
   };
@@ -42,6 +44,7 @@ const authenticateReadme = (otp) => {
       if (!data.readme_token) {
         const element = document.getElementById("error");
         element.classList.remove("hidden");
+        document.getElementById("loading-container").classList.add("hidden");
         return;
       }
       window.location.href = `https://tiki-dev.mytiki.com/?auth_token=${data.readme_token}`;
