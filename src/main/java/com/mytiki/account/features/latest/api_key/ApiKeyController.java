@@ -28,8 +28,8 @@ public class ApiKeyController {
     }
 
     @Operation(hidden = true)
-    @RequestMapping(method = RequestMethod.GET)
-    public Map<String, String> get(
+    @RequestMapping(method = RequestMethod.POST, path = "readme")
+    public Map<String, String> list(
             @RequestHeader(name = "readme-signature") String signature,
             @RequestBody ReadmeReq body) {
         return service.readme(body, signature);

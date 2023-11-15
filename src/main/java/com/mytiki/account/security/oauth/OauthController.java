@@ -26,8 +26,6 @@ import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 import static com.mytiki.account.utilities.Constants.TOKEN_EXPIRY_DURATION_SECONDS;
 
 @XRayEnabled

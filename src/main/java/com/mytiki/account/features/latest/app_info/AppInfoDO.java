@@ -5,7 +5,6 @@
 
 package com.mytiki.account.features.latest.app_info;
 
-import com.mytiki.account.features.latest.jwks.JwksDO;
 import com.mytiki.account.features.latest.org_info.OrgInfoDO;
 import com.mytiki.account.utilities.converter.RsaPrivateConvert;
 import jakarta.persistence.*;
@@ -22,7 +21,7 @@ public class AppInfoDO implements Serializable {
     private UUID appId;
     private String name;
     private OrgInfoDO org;
-    private JwksDO jwks;
+    private String pubKey;
     private RSAPrivateKey signKey;
     private ZonedDateTime created;
     private ZonedDateTime modified;
@@ -65,14 +64,13 @@ public class AppInfoDO implements Serializable {
         this.org = org;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "jwks_id")
-    public JwksDO getJwks() {
-        return jwks;
+    @Column(name = "pub_key")
+    public String getPubKey() {
+        return pubKey;
     }
 
-    public void setJwks(JwksDO jwks) {
-        this.jwks = jwks;
+    public void setPubKey(String pubId) {
+        this.pubKey = pubId;
     }
 
     @Column(name = "sign_key")

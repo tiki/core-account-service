@@ -5,6 +5,7 @@
 
 package com.mytiki.account.security;
 
+import com.mytiki.account.security.jwks.JwksConfig;
 import com.mytiki.account.security.oauth.OauthConfig;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @Import({
         SecurityFilter.class,
         OauthConfig.class,
+        JwksConfig.class
 })
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)

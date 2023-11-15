@@ -33,10 +33,8 @@ public class OtpConfig {
             @Autowired JWSSigner signer,
             @Autowired RefreshService refreshService,
             @Autowired UserInfoService userInfoService,
-            @Autowired OauthScopes allowedScopes,
             @Autowired ReadmeF readme) {
-        return new OtpService(otpRepository, mustache, sendgrid, signer, refreshService, userInfoService,
-                allowedScopes, readme);
+        return new OtpService(otpRepository, mustache, sendgrid, signer, refreshService, userInfoService, readme);
     }
 
     @Bean

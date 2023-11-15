@@ -8,8 +8,6 @@ package com.mytiki.account.features.latest.addr_reg;
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.app_info.AppInfoDO;
 import com.mytiki.account.features.latest.app_info.AppInfoService;
-import com.mytiki.account.features.latest.jwks.JwksDO;
-import com.mytiki.account.features.latest.jwks.JwksService;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.security.oauth.OauthScopes;
 import com.mytiki.account.security.oauth.OauthSub;
@@ -44,24 +42,18 @@ import java.util.UUID;
 public class AddrRegService {
     private final AddrRegRepository repository;
     private final AppInfoService appInfoService;
-    private final JwksService jwksService;
     private final RefreshService refreshService;
     private final JWSSigner signer;
-    private final OauthScopes allowedScopes;
     private final List<String> publicScopes;
 
     public AddrRegService(
             AddrRegRepository repository,
             AppInfoService appInfoService,
-            JwksService jwksService,
             RefreshService refreshService,
             JWSSigner signer,
-            OauthScopes allowedScopes,
             List<String> publicScopes) {
         this.repository = repository;
         this.appInfoService = appInfoService;
-        this.jwksService = jwksService;
-        this.allowedScopes = allowedScopes;
         this.publicScopes = publicScopes;
         this.refreshService = refreshService;
         this.signer = signer;
@@ -77,7 +69,6 @@ public class AddrRegService {
                     .detail("Invalid App ID")
                     .help("Check your Authorization token")
                     .exception();
-        guardCustomerToken(custAuth, app.get().getJwks(), req);
 
         AddrRegDO reg = new AddrRegDO();
         reg.setCid(req.getId());
@@ -207,13 +198,6 @@ public class AddrRegService {
                     .help("Contact support")
                     .cause(e.getCause())
                     .exception();
-        }
-    }
-
-    private void guardCustomerToken(String authorization, JwksDO jwks, AddrRegAOReq req){
-        if(jwks != null) {
-            String token = authorization.replace("Bearer ", "");
-            jwksService.guard(jwks.getEndpoint(), token, req.getId());
         }
     }
 

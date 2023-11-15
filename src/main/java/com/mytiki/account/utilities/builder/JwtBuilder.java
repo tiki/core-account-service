@@ -6,7 +6,7 @@
 package com.mytiki.account.utilities.builder;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.mytiki.account.features.latest.jwks.JwksConfig;
+import com.mytiki.account.security.jwks.JwksConfig;
 import com.mytiki.account.security.oauth.OauthDecoder;
 import com.mytiki.account.security.oauth.OauthSub;
 import com.mytiki.account.security.oauth.OauthSubNamespace;

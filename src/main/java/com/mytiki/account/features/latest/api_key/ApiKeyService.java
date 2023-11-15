@@ -22,8 +22,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -66,30 +64,38 @@ public class ApiKeyService {
         if(found.isEmpty())
             throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT));
         UserInfoDO user = found.get().getUser();
-        OauthSub subject = new OauthSub(OauthSubNamespace.USER, user.getUserId().toString());
-        try {
-            String token = new JwtBuilder()
-                    .exp(expires)
-                    .sub(subject)
-                    .aud(scopes.getAud())
-                    .scp(scopes.getScp())
-                    .build()
-                    .sign(signer)
-                    .toToken();
-            ApiKeyDO apiKey = new ApiKeyDO();
-            apiKey.setUser(user);
-            apiKey.setLabel(label);
-            apiKey.setToken(token);
-            apiKey.setCreated(ZonedDateTime.now());
-            repository.save(apiKey);
+        try{
+            ApiKeyDO key = create(user, label, scopes, expires);
             return OAuth2AccessTokenResponse
-                    .withToken(token)
+                    .withToken(key.getToken())
                     .tokenType(OAuth2AccessToken.TokenType.BEARER)
                     .scopes(new HashSet<>(scopes.getScp()))
                     .expiresIn(expires * 1000)
                     .build();
         } catch (JOSEException e) {
-            throw new RuntimeException(e);
+            throw new OAuth2AuthorizationException(new OAuth2Error(
+                    OAuth2ErrorCodes.SERVER_ERROR,
+                    "Issue with JWT construction",
+                    null
+            ), e);
         }
+    }
+
+    public ApiKeyDO create(UserInfoDO user, String label, OauthScopes scopes, Long expires) throws JOSEException {
+        OauthSub subject = new OauthSub(OauthSubNamespace.USER, user.getUserId().toString());
+        String token = new JwtBuilder()
+                .exp(expires)
+                .sub(subject)
+                .aud(scopes.getAud())
+                .scp(scopes.getScp())
+                .build()
+                .sign(signer)
+                .toToken();
+        ApiKeyDO apiKey = new ApiKeyDO();
+        apiKey.setUser(user);
+        apiKey.setLabel(label);
+        apiKey.setToken(token);
+        apiKey.setCreated(ZonedDateTime.now());
+        return repository.save(apiKey);
     }
 }

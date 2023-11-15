@@ -47,7 +47,6 @@ public class OtpService {
     private final JWSSigner signer;
     private final RefreshService refreshService;
     private final UserInfoService userInfoService;
-    private final OauthScopes allowedScopes;
     private final ReadmeF readme;
 
     public OtpService(
@@ -57,7 +56,6 @@ public class OtpService {
             JWSSigner signer,
             RefreshService refreshService,
             UserInfoService userInfoService,
-            OauthScopes allowedScopes,
             ReadmeF readme) {
         this.repository = repository;
         this.template = template;
@@ -65,7 +63,6 @@ public class OtpService {
         this.signer = signer;
         this.refreshService = refreshService;
         this.userInfoService = userInfoService;
-        this.allowedScopes = allowedScopes;
         this.readme = readme;
     }
 

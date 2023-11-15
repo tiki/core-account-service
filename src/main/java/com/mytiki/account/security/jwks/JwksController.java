@@ -3,10 +3,9 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.features.latest.jwks;
+package com.mytiki.account.security.jwks;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.mytiki.account.health.HealthController;
 import com.nimbusds.jose.jwk.JWKSet;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.RequestMapping;
