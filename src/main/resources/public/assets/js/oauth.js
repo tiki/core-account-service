@@ -1,11 +1,5 @@
-/*
- * Copyright (c) TIKI Inc.
- * MIT license. See LICENSE file in root directory.
- */
-
-const googleCliendId =
-  "536431375324-cnmaso5e0q8jslf9a7um4dhc4mhugkf4.apps.googleusercontent.com";
-const githubClientId = "ebbf90361bcb8c527416";
+const googleCliendId = "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googleusercontent.com"
+const githubClientId = "ebbf90361bcb8c527416"
 
 function githubLogin() {
   window.location.href =
