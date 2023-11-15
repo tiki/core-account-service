@@ -21,6 +21,7 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.oauth2.core.http.converter.OAuth2ErrorHttpMessageConverter;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 @Order(value = Integer.MIN_VALUE)
@@ -59,8 +60,9 @@ public class OauthConfig {
             @Autowired AppInfoService appInfoService,
             @Autowired OtpService otpService,
             @Autowired OauthScopes allowedScopes,
-            @Autowired OauthInternal oauthInternal){
+            @Autowired OauthInternal oauthInternal,
+            @Autowired JwtDecoder decoder){
         return new OauthController(refreshService, apiKeyService,
-                exchangeService, addrRegService, appInfoService, otpService, allowedScopes, oauthInternal);
+                exchangeService, addrRegService, appInfoService, otpService, allowedScopes, oauthInternal, decoder);
     }
 }
