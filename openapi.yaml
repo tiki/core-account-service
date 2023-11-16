@@ -10,54 +10,7 @@ info:
 servers:
 - url: https://mytiki.com/api/account
 paths:
-  /api/latest/user:
-    get:
-      tags:
-      - ""
-      summary: Get User
-      description: Get the authorized user's profile
-      operationId: account-user-get
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserInfoAO'
-      security:
-      - oauth:
-        - account:admin
-    post:
-      tags:
-      - ""
-      summary: Update User
-      description: Update the authorized User's profile
-      operationId: account-user-post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserInfoAOUpdate'
-        required: true
-      responses:
-        "202":
-          description: Accepted
-      security:
-      - oauth:
-        - account:admin
-    delete:
-      tags:
-      - ""
-      summary: Delete User
-      description: Delete the authorized user
-      operationId: account-user-delete
-      responses:
-        "202":
-          description: Accepted
-      security:
-      - oauth:
-        - account:admin
-  /api/latest/app:
+  /api/latest/provider:
     post:
       tags:
       - ""
@@ -68,7 +21,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AppInfoAOReq'
+              $ref: '#/components/schemas/ProviderAOReq'
         required: true
       responses:
         "200":
@@ -76,11 +29,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppInfoAO'
+                $ref: '#/components/schemas/ProviderAO'
       security:
       - oauth:
         - account:admin
-  /api/latest/app/{app-id}:
+  /api/latest/provider/{provider-id}:
     get:
       tags:
       - ""
@@ -88,7 +41,7 @@ paths:
       description: Retrieve the details about an App
       operationId: account-app-get
       parameters:
-      - name: app-id
+      - name: provider-id
         in: path
         required: true
         schema:
@@ -99,7 +52,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppInfoAO'
+                $ref: '#/components/schemas/ProviderAO'
       security:
       - oauth:
         - account:admin
@@ -110,7 +63,7 @@ paths:
       description: Update the details for an App
       operationId: account-app-update
       parameters:
-      - name: app-id
+      - name: provider-id
         in: path
         required: true
         schema:
@@ -119,7 +72,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AppInfoAOReq'
+              $ref: '#/components/schemas/ProviderAOReq'
         required: true
       responses:
         "200":
@@ -127,7 +80,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppInfoAO'
+                $ref: '#/components/schemas/ProviderAO'
       security:
       - oauth:
         - account:admin
@@ -138,7 +91,7 @@ paths:
       description: Permanently delete an App
       operationId: account-app-delete
       parameters:
-      - name: app-id
+      - name: provider-id
         in: path
         required: true
         schema:
@@ -149,7 +102,7 @@ paths:
       security:
       - oauth:
         - account:admin
-  /api/latest/app/{app-id}/address:
+  /api/latest/provider/{provider-id}/user:
     get:
       tags:
       - ""
@@ -157,7 +110,7 @@ paths:
       description: Retrieve and filter registered addresses
       operationId: account-addr-reg-get
       parameters:
-      - name: app-id
+      - name: provider-id
         in: path
         required: true
         schema:
@@ -180,10 +133,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AddrRegAORsp'
+                  $ref: '#/components/schemas/ProviderUserAORsp'
       security:
       - oauth:
-        - account:app
+        - account:provider
     post:
       tags:
       - ""
@@ -191,12 +144,7 @@ paths:
       description: Register an end user address
       operationId: account-addr-reg-post
       parameters:
-      - name: X-Customer-Authorization
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: app-id
+      - name: provider-id
         in: path
         required: true
         schema:
@@ -205,17 +153,17 @@ paths:
         in: query
         required: true
         schema:
-          $ref: '#/components/schemas/AddrRegAOReq'
+          $ref: '#/components/schemas/ProviderUserAOReq'
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AddrRegAORsp'
+                $ref: '#/components/schemas/ProviderUserAORsp'
       security:
       - oauth:
-        - account:app
+        - account:provider
     delete:
       tags:
       - ""
@@ -223,7 +171,7 @@ paths:
       description: Delete registered addresses
       operationId: account-addr-reg-delete
       parameters:
-      - name: app-id
+      - name: provider-id
         in: path
         required: true
         schema:
@@ -244,39 +192,64 @@ paths:
       security:
       - oauth:
         - account:admin
-  /api/latest/org:
+  /api/latest/profile:
     get:
       tags:
       - ""
-      summary: Get Org
-      description: Retrieve the authorized User's Org details
-      operationId: account-org-get
+      summary: Get User
+      description: Get the authorized user's profile
+      operationId: account-user-get
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrgInfoAO'
+                $ref: '#/components/schemas/ProfileAO'
+      security:
+      - oauth:
+        - account:admin
+    post:
+      tags:
+      - ""
+      summary: Update User
+      description: Update the authorized User's profile
+      operationId: account-user-post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileAOUpdate'
+        required: true
+      responses:
+        "202":
+          description: Accepted
+      security:
+      - oauth:
+        - account:admin
+    delete:
+      tags:
+      - ""
+      summary: Delete User
+      description: Delete the authorized user
+      operationId: account-user-delete
+      responses:
+        "202":
+          description: Accepted
       security:
       - oauth:
         - account:admin
 components:
   schemas:
-    UserInfoAOUpdate:
-      type: object
-      properties:
-        email:
-          type: string
-    AppInfoAOReq:
+    ProviderAOReq:
       type: object
       properties:
         name:
           type: string
-    AppInfoAO:
+    ProviderAO:
       type: object
       properties:
-        appId:
+        providerId:
           type: string
         name:
           type: string
@@ -290,7 +263,7 @@ components:
         created:
           type: string
           format: date-time
-    AddrRegAOReq:
+    ProviderUserAOReq:
       type: object
       properties:
         id:
@@ -301,7 +274,7 @@ components:
           type: string
         signature:
           type: string
-    AddrRegAORsp:
+    ProviderUserAORsp:
       type: object
       properties:
         id:
@@ -313,7 +286,12 @@ components:
         created:
           type: string
           format: date-time
-    UserInfoAO:
+    ProfileAOUpdate:
+      type: object
+      properties:
+        email:
+          type: string
+    ProfileAO:
       type: object
       properties:
         userId:
@@ -322,29 +300,6 @@ components:
           type: string
         orgId:
           type: string
-        modified:
-          type: string
-          format: date-time
-        created:
-          type: string
-          format: date-time
-    OrgInfoAO:
-      type: object
-      properties:
-        orgId:
-          type: string
-        billingId:
-          type: string
-        users:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
-        apps:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
         modified:
           type: string
           format: date-time
