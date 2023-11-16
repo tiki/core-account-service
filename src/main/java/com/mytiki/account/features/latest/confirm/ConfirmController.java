@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 @XRayEnabled
 @Tag(name = "")
 @RestController
-@RequestMapping(value = ConfirmController.PATH_CONTROLLER)
+@RequestMapping(value = ConfirmController.ROUTE)
 public class ConfirmController {
-    public static final String PATH_CONTROLLER = Constants.API_LATEST_ROUTE + "confirm";
+    public static final String ROUTE = Constants.API_LATEST_ROUTE + "confirm";
     private final ConfirmService service;
 
     public ConfirmController(ConfirmService service) {

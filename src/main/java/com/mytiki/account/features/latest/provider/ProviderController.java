@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @XRayEnabled
 @Tag(name = "")
 @RestController
-@RequestMapping(value = ProviderController.PATH_CONTROLLER)
+@RequestMapping(value = ProviderController.ROUTE)
 public class ProviderController {
-    public static final String PATH_CONTROLLER = Constants.API_LATEST_ROUTE + "provider";
+    public static final String ROUTE = Constants.API_LATEST_ROUTE + "provider";
 
     private final ProviderService service;
 

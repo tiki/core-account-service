@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 @XRayEnabled
 @Tag(name = "")
 @RestController
-@RequestMapping(value = ProfileController.PATH_CONTROLLER)
+@RequestMapping(value = ProfileController.ROUTE)
 public class ProfileController {
-    public static final String PATH_CONTROLLER = Constants.API_LATEST_ROUTE + "profile";
+    public static final String ROUTE = Constants.API_LATEST_ROUTE + "profile";
     private final ProfileService service;
 
     public ProfileController(ProfileService service) {
