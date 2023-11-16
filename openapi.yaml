@@ -1,22 +1,22 @@
 openapi: 3.0.1
 info:
-  title: TIKI Account
+  title: Account Management Service
   description: TIKI's account management service —configure and provision access to
     the data platform
   license:
     name: MIT
-    url: https://github.com/tiki/tiki-account/blob/main/LICENSE
+    url: https://github.com/tiki/core-account-service/blob/main/LICENSE
   version: 2.6.0
 servers:
-- url: https://mytiki.com/api/account
+- url: https://account.mytiki.com
 paths:
   /api/latest/provider:
     post:
       tags:
-      - ""
-      summary: Create App
-      description: Create a new App
-      operationId: account-app-create
+      - Data Provider
+      summary: Create Provider
+      description: "Creates a new data provider, returning the configuration details"
+      operationId: account-provider-create
       requestBody:
         content:
           application/json:
@@ -31,84 +31,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProviderAO'
       security:
-      - oauth:
-        - account:admin
-  /api/latest/provider/{provider-id}:
-    get:
-      tags:
-      - ""
-      summary: Get App
-      description: Retrieve the details about an App
-      operationId: account-app-get
-      parameters:
-      - name: provider-id
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProviderAO'
-      security:
-      - oauth:
-        - account:admin
-    post:
-      tags:
-      - ""
-      summary: Update App
-      description: Update the details for an App
-      operationId: account-app-update
-      parameters:
-      - name: provider-id
-        in: path
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProviderAOReq'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProviderAO'
-      security:
-      - oauth:
-        - account:admin
-    delete:
-      tags:
-      - ""
-      summary: Delete App
-      description: Permanently delete an App
-      operationId: account-app-delete
-      parameters:
-      - name: provider-id
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-      security:
-      - oauth:
+      - default:
         - account:admin
   /api/latest/provider/{provider-id}/user:
     get:
       tags:
-      - ""
-      summary: Get Addresses
-      description: Retrieve and filter registered addresses
-      operationId: account-addr-reg-get
+      - Data Provider
+      summary: List Addresses
+      description: Returns all registered device addresses matching the criteria
+      operationId: account-provider-user-get
       parameters:
       - name: provider-id
         in: path
@@ -135,14 +66,14 @@ paths:
                 items:
                   $ref: '#/components/schemas/ProviderUserAORsp'
       security:
-      - oauth:
+      - default:
         - account:provider
     post:
       tags:
-      - ""
+      - Data Provider
       summary: Register Address
-      description: Register an end user address
-      operationId: account-addr-reg-post
+      description: Register a new device address for an end user
+      operationId: account-provider-user-post
       parameters:
       - name: provider-id
         in: path
@@ -162,14 +93,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProviderUserAORsp'
       security:
-      - oauth:
+      - default:
         - account:provider
     delete:
       tags:
-      - ""
+      - Data Provider
       summary: Delete Addresses
-      description: Delete registered addresses
-      operationId: account-addr-reg-delete
+      description: Permanently delete all device addresses matching the criteria
+      operationId: account-provider-user-delete
       parameters:
       - name: provider-id
         in: path
@@ -190,15 +121,15 @@ paths:
         "204":
           description: No Content
       security:
-      - oauth:
+      - default:
         - account:admin
   /api/latest/profile:
     get:
       tags:
-      - ""
-      summary: Get User
-      description: Get the authorized user's profile
-      operationId: account-user-get
+      - Profile
+      summary: Get Profile
+      description: Returns your profile information
+      operationId: account-profile-get
       responses:
         "200":
           description: OK
@@ -207,14 +138,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProfileAO'
       security:
-      - oauth:
+      - default:
         - account:admin
     post:
       tags:
-      - ""
-      summary: Update User
-      description: Update the authorized User's profile
-      operationId: account-user-post
+      - Profile
+      summary: Update Profile
+      description: Update your profile information — see request body for modification
+        options
+      operationId: account-profile-post
       requestBody:
         content:
           application/json:
@@ -225,19 +157,60 @@ paths:
         "202":
           description: Accepted
       security:
-      - oauth:
+      - default:
         - account:admin
     delete:
       tags:
-      - ""
-      summary: Delete User
-      description: Delete the authorized user
-      operationId: account-user-delete
+      - Profile
+      summary: Delete Account
+      description: Permanently delete your account — requires email confirmation
+      operationId: account-profile-delete
       responses:
         "202":
           description: Accepted
       security:
-      - oauth:
+      - default:
+        - account:admin
+  /api/latest/provider/{provider-id}:
+    get:
+      tags:
+      - Data Provider
+      summary: Get Provider
+      description: Returns the configuration details for a data provider
+      operationId: account-provider-get
+      parameters:
+      - name: provider-id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderAO'
+      security:
+      - default:
+        - account:admin
+    delete:
+      tags:
+      - Data Provider
+      summary: Delete Provider
+      description: Permanently delete a data provider — stops publishing of new data.
+      operationId: account-provider-delete
+      parameters:
+      - name: provider-id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+      security:
+      - default:
         - account:admin
 components:
   schemas:
@@ -307,11 +280,6 @@ components:
           type: string
           format: date-time
   securitySchemes:
-    oauth:
-      type: oauth2
-      flows:
-        password:
-          tokenUrl: https://mytiki.com/api/account/oauth/token
-          refreshUrl: https://mytiki.com/api/account/oauth/token
-          scopes:
-            auth: this service
+    default:
+      type: http
+      scheme: bearer
