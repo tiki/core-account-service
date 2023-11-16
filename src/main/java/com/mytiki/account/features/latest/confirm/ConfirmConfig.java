@@ -5,7 +5,7 @@
 
 package com.mytiki.account.features.latest.confirm;
 
-import com.mytiki.account.features.latest.user_info.UserInfoRepository;
+import com.mytiki.account.features.latest.profile.ProfileRepository;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.facade.SendgridF;
 import com.mytiki.account.utilities.facade.TemplateF;
@@ -30,8 +30,8 @@ public class ConfirmConfig {
             @Autowired SendgridF sendgrid,
             @Autowired @Qualifier("confirmMustache") TemplateF mustache,
             @Autowired ConfirmRepository repository,
-            @Autowired UserInfoRepository userInfoRepository) {
-        return new ConfirmService(sendgrid, mustache, repository, userInfoRepository);
+            @Autowired ProfileRepository profileRepository) {
+        return new ConfirmService(sendgrid, mustache, repository, profileRepository);
     }
 
     @Bean(name = "confirmMustache")

@@ -30,6 +30,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenRespon
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.text.ParseException;
@@ -76,6 +77,7 @@ public class RefreshTest {
     }
 
     @Test
+    @Transactional
     public void Test_Revoke_Success() throws JOSEException, ParseException {
         String token = service.issue(null, null, null);
         service.revoke(token);
@@ -86,6 +88,7 @@ public class RefreshTest {
     }
 
     @Test
+    @Transactional
     public void Test_Revoke_Replay_Success() throws JOSEException, ParseException {
         String token = service.issue(null, null, null);
         service.revoke(token);
@@ -98,7 +101,8 @@ public class RefreshTest {
 
     @Test
     public void Test_Authorize_Success() throws JOSEException, ParseException {
-        String token = service.issue(null, null, null);
+        OauthSub sub = new OauthSub(OauthSubNamespace.APP, UUID.randomUUID().toString());
+        String token = service.issue(sub, null, null);
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
         assertNotNull(rsp.getAccessToken().getTokenValue());
@@ -114,6 +118,7 @@ public class RefreshTest {
     }
 
     @Test
+    @Transactional
     public void Test_Authorize_Revoked_Success() throws JOSEException {
         String token = service.issue(null, null, null);
         service.revoke(token);
@@ -150,7 +155,8 @@ public class RefreshTest {
     @Test
     public void Test_Authorize_Audience_Success() throws JOSEException {
         String audience = "trail.mytiki.com";
-        String token = service.issue(null, List.of(audience), null);
+        OauthSub sub = new OauthSub(OauthSubNamespace.APP, UUID.randomUUID().toString());
+        String token = service.issue(sub, List.of(audience), null);
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
         Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(rsp.getAccessToken().getTokenValue());
@@ -159,7 +165,7 @@ public class RefreshTest {
 
     @Test
     public void Test_Authorize_Subject_Success() throws JOSEException {
-        OauthSub subject = new OauthSub(OauthSubNamespace.USER, UUID.randomUUID().toString());
+        OauthSub subject = new OauthSub(OauthSubNamespace.APP, UUID.randomUUID().toString());
         String token = service.issue(subject, null, null);
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
@@ -170,7 +176,8 @@ public class RefreshTest {
     @Test
     public void Test_Authorize_Scope_Success() throws JOSEException {
         String scp = "testScope";
-        String token = service.issue(null, null, List.of(scp));
+        OauthSub sub = new OauthSub(OauthSubNamespace.APP, UUID.randomUUID().toString());
+        String token = service.issue(sub, null, List.of(scp));
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
         Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(rsp.getAccessToken().getTokenValue());

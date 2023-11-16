@@ -15,11 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @XRayEnabled
-@Tag(name = "")
 @RestController
 @RequestMapping(value = ApiKeyController.ROUTE)
 public class ApiKeyController {
-    public static final String ROUTE = Constants.API_LATEST_ROUTE + "api-key";
+    public static final String ROUTE = Constants.API_LATEST_ROUTE + "key";
 
     private final ApiKeyService service;
 

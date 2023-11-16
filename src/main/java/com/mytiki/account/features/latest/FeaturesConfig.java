@@ -5,28 +5,28 @@
 
 package com.mytiki.account.features.latest;
 
-import com.mytiki.account.features.latest.addr_reg.AddrRegConfig;
+import com.mytiki.account.features.latest.provider_user.ProviderUserConfig;
 import com.mytiki.account.features.latest.api_key.ApiKeyConfig;
-import com.mytiki.account.features.latest.app_info.AppInfoConfig;
+import com.mytiki.account.features.latest.provider.ProviderConfig;
 import com.mytiki.account.features.latest.confirm.ConfirmConfig;
 import com.mytiki.account.features.latest.exchange.ExchangeConfig;
 import com.mytiki.account.features.latest.jwks.JwksConfig;
 import com.mytiki.account.features.latest.oauth.OauthConfig;
-import com.mytiki.account.features.latest.org_info.OrgInfoConfig;
+import com.mytiki.account.features.latest.org.OrgConfig;
 import com.mytiki.account.features.latest.otp.OtpConfig;
 import com.mytiki.account.features.latest.refresh.RefreshConfig;
-import com.mytiki.account.features.latest.user_info.UserInfoConfig;
+import com.mytiki.account.features.latest.profile.ProfileConfig;
 import org.springframework.context.annotation.Import;
 
 @Import({
         OtpConfig.class,
         RefreshConfig.class,
-        UserInfoConfig.class,
-        AppInfoConfig.class,
+        ProfileConfig.class,
+        ProviderConfig.class,
         ApiKeyConfig.class,
-        OrgInfoConfig.class,
+        OrgConfig.class,
         ExchangeConfig.class,
-        AddrRegConfig.class,
+        ProviderUserConfig.class,
         JwksConfig.class,
         ConfirmConfig.class,
         OauthConfig.class

@@ -23,10 +23,10 @@ CREATE TABLE IF NOT EXISTS refresh(
 );
 
 -- -----------------------------------------------------------------------
--- ORG INFO
+-- ORGANIZATION
 -- -----------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS org_info(
-    org_info_id BIGSERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS org(
+    id BIGSERIAL PRIMARY KEY,
     org_id UUID NOT NULL UNIQUE,
     billing_id TEXT,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -34,13 +34,13 @@ CREATE TABLE IF NOT EXISTS org_info(
 );
 
 -- -----------------------------------------------------------------------
--- APP INFO
+-- DATA PROVIDER
 -- -----------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS app_info(
-    app_info_id BIGSERIAL PRIMARY KEY,
-    app_id UUID NOT NULL UNIQUE,
-    app_name TEXT NOT NULL,
-    org_info_id BIGINT REFERENCES org_info(org_info_id) NOT NULL,
+CREATE TABLE IF NOT EXISTS provider(
+    id BIGSERIAL PRIMARY KEY,
+    provider_id UUID NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    org_id BIGINT REFERENCES org(id) NOT NULL,
     pub_key TEXT NOT NULL UNIQUE,
     sign_key BYTEA NOT NULL UNIQUE,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -48,12 +48,12 @@ CREATE TABLE IF NOT EXISTS app_info(
 );
 
 -- -----------------------------------------------------------------------
--- USER INFO
+-- USER PROFILE
 -- -----------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS user_info(
-    user_info_id BIGSERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS profile(
+    id BIGSERIAL PRIMARY KEY,
     user_id UUID NOT NULL UNIQUE,
-    org_info_id BIGINT REFERENCES org_info(org_info_id) NOT NULL,
+    org_id BIGINT REFERENCES org(id) NOT NULL,
     email TEXT NOT NULL UNIQUE,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
     modified_utc TIMESTAMP WITH TIME ZONE NOT NULL
@@ -64,10 +64,10 @@ CREATE TABLE IF NOT EXISTS user_info(
 -- API KEY
 -- -----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS api_key(
-    api_key_id BIGSERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     token TEXT NOT NULL UNIQUE,
     label TEXT,
-    user_info_id BIGINT REFERENCES user_info(user_info_id) ON DELETE CASCADE,
+    profile_id BIGINT REFERENCES profile(id) ON DELETE CASCADE,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS api_key(
 -- CONFIRM
 -- -----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS confirm(
-    confirm_id BIGSERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     token TEXT UNIQUE NOT NULL,
     action TEXT NOT NULL,
     properties TEXT,
@@ -85,19 +85,19 @@ CREATE TABLE IF NOT EXISTS confirm(
 
 
 -- -----------------------------------------------------------------------
--- ADDRESS REGISTRATION
+-- DATA PROVIDER - USER
 -- -----------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS addr_reg(
-    addr_reg_id BIGSERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS provider_user(
+    id BIGSERIAL PRIMARY KEY,
     address bytea NOT NULL,
     custom_id TEXT NOT NULL,
     public_key BYTEA NOT NULL UNIQUE,
-    app_info_id BIGINT REFERENCES app_info(app_info_id) NOT NULL,
+    provider_id BIGINT REFERENCES provider(id) NOT NULL,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
-    UNIQUE (app_info_id, address)
+    UNIQUE (provider_id, address)
 );
-CREATE INDEX ON addr_reg (app_info_id, custom_id);
-CREATE INDEX ON addr_reg (app_info_id, address);
+CREATE INDEX ON provider_user (provider_id, custom_id);
+CREATE INDEX ON provider_user (provider_id, address);
 
 
 

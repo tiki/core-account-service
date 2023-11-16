@@ -5,13 +5,11 @@
 
 package com.mytiki.account.features.latest.api_key;
 
-import com.mytiki.account.features.latest.app_info.AppInfoDO;
-import com.mytiki.account.features.latest.user_info.UserInfoDO;
+import com.mytiki.account.features.latest.profile.ProfileDO;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "api_key")
@@ -19,12 +17,12 @@ public class ApiKeyDO implements Serializable {
     private Long id;
     private String label;
     private String token;
-    private UserInfoDO user;
+    private ProfileDO profile;
     private ZonedDateTime created;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "api_key_id")
+    @Column(name = "id")
     public Long getId() {
         return id;
     }
@@ -52,13 +50,13 @@ public class ApiKeyDO implements Serializable {
     }
 
     @ManyToOne
-    @JoinColumn(name = "user_info_id")
-    public UserInfoDO getUser() {
-        return user;
+    @JoinColumn(name = "profile_id")
+    public ProfileDO getProfile() {
+        return profile;
     }
 
-    public void setUser(UserInfoDO user) {
-        this.user = user;
+    public void setProfile(ProfileDO profile) {
+        this.profile = profile;
     }
 
     @Column(name = "created_utc")
