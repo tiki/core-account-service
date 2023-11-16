@@ -3,7 +3,7 @@
   ~ MIT license. See LICENSE file in root directory.
   -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -12,56 +12,69 @@
     <title>Login - OTP</title>
   </head>
   <body>
-    <div class="flex h-screen w-screen">
+    <div class="flex h-screen w-screen relative">
       <div
-        class="flex items-center justify-center w-screen sm:w-2/5 sm:bg-white bg-tiki-yellow-xxlight"
+        id="loading-container"
+        class="absolute bg-white bg-opacity-90 z-10 h-full w-full flex items-center justify-center hidden"
       >
-        <div class="w-4/5 sm:w-4/5">
+        <div class="flex items-center flex-col">
+          <img
+            src="../assets/images/logo.svg"
+            alt="Logo Tiki"
+            class="w-24 animate-spin"
+          />
+        </div>
+      </div>
+
+      <div
+        class="flex mt-12 sm:mt-0 items-start sm:items-center justify-center w-screen sm:w-2/5 bg-white"
+      >
+        <div class="w-4/5 sm:w-3/5">
           <div>
-            <img src="../assets/images/logo.svg" alt="Logo Tiki" class="w-24" />
-            <h1 class="text-4xl text-tiki-dark-blue mt-5 font-bold">
+            <div class="flex justify-center">
+              <img
+                src="../assets/images/logo.svg"
+                alt="Logo Tiki"
+                class="w-24 sm:hidden"
+              />
+            </div>
+            <h1 class="text-4xl text-black mt-10 sm:mt-5 font-bold">
               Enter Code
             </h1>
-            <p class="mt-2 text-sm text-tiki-black-xlight">
-              We have emailed you a one-time use code. Enter it below..
+            <p class="mt-5 text-md text-gray font-light">
+              We’ve emailed you a one-time use code. Enter it below to log in.
             </p>
           </div>
-          <div class="mt-5">
+          <div class="mt-8">
             <form action="" id="tikiOtpForm">
-              <label
-                for="code"
-                class="block text-tiki-black-xlight font-bold text-sm"
-                >Code</label
-              >
               <input
                 type="text"
                 name="code"
                 id="code"
-                class="w-full my-2 p-2 border-2 border-solid border-black rounded-md"
-                placeholder="ABC123"
+                class="w-full my-2 p-2.5 border border-solid border-black rounded-md placeholder:text-center placeholder:text-gray"
+                placeholder="Code"
               />
-              <div id="error" class="text-sm my-2 text-pink-dark hidden">
-                That didn't work 🫠 — double check your email, or go back and
-                request a new code.
-              </div>
               <button
                 type="submit"
-                class="cursor-pointer p-4 border-none border rounded-md w-full bg-black text-yellow-dark mt-2 hover:"
+                class="cursor-pointer mt-2 p-3 border-none border rounded-md w-full bg-green text-white mt-2"
               >
-                Continue
+                Log in
               </button>
+              <div
+                id="error"
+                class="text-sm mt-10 text-orange text-center font-normal hidden"
+              >
+                Error: Invalid Code
+              </div>
             </form>
           </div>
         </div>
       </div>
       <div
-        class="hidden sm:w-3/5 bg-tiki-yellow-xxlight sm:flex items-center justify-center"
+        class="hidden sm:w-3/5 bg-yellow-light sm:flex items-center justify-center"
       >
         <div>
-          <img
-            src="../assets/images/pineapple-butt-w-200.png"
-            alt="tiki pineapple"
-          />
+          <img src="../assets/images/logo.svg" alt="tiki pineapple" />
         </div>
       </div>
     </div>

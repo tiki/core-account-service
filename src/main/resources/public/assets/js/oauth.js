@@ -1,95 +1,26 @@
-/*
- * Copyright (c) TIKI Inc.
- * MIT license. See LICENSE file in root directory.
- */
+const googleCliendId = "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googleusercontent.com"
+const githubClientId = "ebbf90361bcb8c527416"
 
-// eslint-disable-next-line no-unused-vars
 function githubLogin() {
   window.location.href =
-    "https://github.com/login/oauth/authorize?client_id=ebbf90361bcb8c527416&scope=user:email";
+    "https://github.com/login/oauth/authorize?scope=user:email&client_id=" +
+    githubClientId;
 }
 
-function handleGoogleSignin(response) {
-  let headers = new Headers();
-  headers.append("Content-Type", "application/x-www-form-urlencoded");
-  headers.append("Accept", "application/json");
-
-  const options = {
-    method: "POST",
-    headers: headers,
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
-      subject_token: response.credential,
-      subject_token_type: "urn:mytiki:params:oauth:token-type:google",
-      client_id:
-        "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googleusercontent.com",
-      scope: "account:admin",
-    }),
-  };
-
-  fetch(`https://account.mytiki.com/api/latest/auth/token`, options)
-    .then((response) => response.json())
-    .then((response) => {
-      if (!response.readme_token) {
-        let element = document.getElementById("error");
-        element.innerHTML =
-          "Hey! Something got bad with your signin, try again in a few minutes";
-        element.classList.remove("hidden");
-        return;
-      }
-      window.location.href = `https://tiki-dev.mytiki.com/?auth_token=${response.readme_token}`;
-    })
-    .catch((err) => console.error(err));
-}
-
-function handleGithubSign() {
-  const url_string = window.location.href.toLowerCase();
-  const url = new URL(url_string);
-  const code = url.searchParams.get("code");
-  if (code) {
-    const headers = new Headers();
-    headers.append("Content-Type", "application/x-www-form-urlencoded");
-    headers.append("Accept", "application/json");
-
-    const options = {
-      method: "POST",
-      headers: headers,
-      body: new URLSearchParams({
-        grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
-        subject_token: code,
-        subject_token_type: "urn:mytiki:params:oauth:token-type:github",
-        client_id: "ebbf90361bcb8c527416",
-        scope: "account admin",
-      }),
-    };
-
-    fetch(`https://account.mytiki.com/api/latest/auth/token`, options)
-      .then((response) => response.json())
-      .then((response) => {
-        if (!response.readme_token) {
-          let element = document.getElementById("error");
-          element.innerHTML =
-            "Hey! Something got bad with your signin, try again in a few minutes";
-          element.classList.remove("hidden");
-          return;
-        }
-        window.location.href = `https://tiki-dev.mytiki.com/?auth_token=${response.readme_token}`;
-      })
-      .catch((err) => console.error(err));
-  }
+function googleLogin(){
+   window.location.href = "https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?"
+    + "access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email"
+    + "&prompt=select_account&redirect_uri=https://account.mytiki.com/pages/code/google.html&response_type=code&client_id=" + googleCliendId
 }
 
 window.onload = function () {
-  handleGithubSign();
-
   google.accounts.id.initialize({
-    client_id:
-      "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googleusercontent.com",
-    callback: handleGoogleSignin,
+    client_id: googleCliendId,
   });
-  google.accounts.id.renderButton(document.getElementById("googleBtn"), {
-    theme: "outline",
-    size: "large",
-    logo_alignment: "center",
-  });
+  document
+    .getElementById("google-sign-in-btn")
+    .addEventListener("click", (_e) => googleLogin());
+  document
+    .getElementById("github-sign-in-btn")
+    .addEventListener("click", (_e) => githubLogin());
 };
