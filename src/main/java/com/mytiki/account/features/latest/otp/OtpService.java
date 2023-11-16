@@ -109,8 +109,8 @@ public class OtpService {
                     null
             ));
         try {
-            ProfileDO userInfo = profileService.createIfNotExists(found.get().getEmail());
-            OauthSub subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId().toString());
+            ProfileDO profile = profileService.createIfNotExists(found.get().getEmail());
+            OauthSub subject = new OauthSub(OauthSubNamespace.USER, profile.getUserId().toString());
             return new JwtBuilder()
                     .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                     .sub(subject)
@@ -119,7 +119,7 @@ public class OtpService {
                     .build()
                     .refresh(refreshService.issue(subject, scopes.getAud(), scopes.getScp()))
                     .sign(signer)
-                    .additional("readme_token", readme.sign(userInfo))
+                    .additional("readme_token", readme.sign(profile))
                     .toResponse();
         } catch (JOSEException | JsonProcessingException e) {
             throw new OAuth2AuthorizationException(new OAuth2Error(

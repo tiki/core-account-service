@@ -41,14 +41,14 @@ public class ReadmeF {
     }
 
     public String sign(ProfileDO user) throws JOSEException, JsonProcessingException {
-        String appId = user.getOrg().getProviders() != null && !user.getOrg().getProviders().isEmpty() ?
+        String providerId = user.getOrg().getProviders() != null && !user.getOrg().getProviders().isEmpty() ?
                 user.getOrg().getProviders().get(0).getProviderId().toString() : null;
         String payload = mapper.writeValueAsString(new HashMap<>(){{
             put("name", user.getEmail());
             put("email", user.getEmail());
             put("version", 1);
             put("parameters", new HashMap<>(){{
-                put("provider-id", appId);
+                put("provider-id", providerId);
                 put("user-id", user.getUserId().toString());
                 put("org-id", user.getOrg().getOrgId().toString());
             }});

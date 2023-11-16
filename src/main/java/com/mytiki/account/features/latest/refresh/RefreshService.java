@@ -6,9 +6,13 @@
 package com.mytiki.account.features.latest.refresh;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mytiki.account.features.latest.oauth.OauthSub;
+import com.mytiki.account.features.latest.profile.ProfileDO;
+import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.JwtBuilder;
+import com.mytiki.account.utilities.facade.readme.ReadmeF;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import jakarta.transaction.Transactional;
@@ -22,6 +26,7 @@ import org.springframework.security.oauth2.jwt.JwtException;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,11 +35,20 @@ public class RefreshService {
     private final RefreshRepository repository;
     private final JWSSigner jwtSigner;
     private final JwtDecoder jwtDecoder;
+    private final ReadmeF readme;
+    private final ProfileService profileService;
 
-    public RefreshService(RefreshRepository repository, JWSSigner jwtSigner, JwtDecoder jwtDecoder) {
+    public RefreshService(
+            RefreshRepository repository,
+            JWSSigner jwtSigner,
+            JwtDecoder jwtDecoder,
+            ReadmeF readme,
+            ProfileService profileService) {
         this.repository = repository;
         this.jwtSigner = jwtSigner;
         this.jwtDecoder = jwtDecoder;
+        this.readme = readme;
+        this.profileService = profileService;
     }
 
     public String issue(OauthSub sub, List<String> aud, List<String> scp) throws JOSEException {
@@ -62,18 +76,24 @@ public class RefreshService {
             Optional<RefreshDO> found = repository.findByJti(UUID.fromString(jwt.getId()));
             if (found.isPresent()) {
                 repository.delete(found.get());
-                return new JwtBuilder()
+                JwtBuilder builder = new JwtBuilder()
                         .sub(jwt.getSubject())
                         .aud(jwt.getAudience())
                         .scp(jwt.getClaim("scp"))
                         .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
                         .refresh(issue(new OauthSub(jwt.getSubject()), jwt.getAudience(), jwt.getClaim("scp")))
                         .build()
-                        .sign(jwtSigner)
-                        .toResponse();
+                        .sign(jwtSigner);
+                OauthSub sub = new OauthSub(jwt.getSubject());
+                if(sub.isUser()){
+                    ProfileDO profile = profileService.getDO(sub.getId()).orElseThrow();
+                    return builder
+                            .additional("readme_token", readme.sign(profile))
+                            .toResponse();
+                }else return builder.toResponse();
             } else
                 throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_GRANT));
-        } catch (JOSEException | JwtException e) {
+        } catch (JOSEException | JwtException | JsonProcessingException | NoSuchElementException e) {
             throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_GRANT), e);
         }
     }
