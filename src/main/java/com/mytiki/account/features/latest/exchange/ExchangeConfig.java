@@ -10,7 +10,7 @@ import com.mytiki.account.features.latest.exchange.github.GithubConfig;
 import com.mytiki.account.features.latest.exchange.google.GoogleClient;
 import com.mytiki.account.features.latest.exchange.shopify.ShopifyClient;
 import com.mytiki.account.features.latest.refresh.RefreshService;
-import com.mytiki.account.features.latest.user_info.UserInfoService;
+import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.features.latest.oauth.OauthScopes;
 import com.mytiki.account.utilities.facade.readme.ReadmeF;
 import com.nimbusds.jose.JWSSigner;
@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Import;
 public class ExchangeConfig {
     @Bean
     public ExchangeService exchangeService(
-            @Autowired UserInfoService userInfoService,
+            @Autowired ProfileService profileService,
             @Autowired RefreshService refreshService,
             @Autowired JWSSigner signer,
             @Autowired OauthScopes allowedScopes,
@@ -36,7 +36,7 @@ public class ExchangeConfig {
             @Autowired GoogleClient google,
             @Autowired GithubClient github,
             @Autowired ShopifyClient shopify) {
-        return new ExchangeService(userInfoService, refreshService, signer,
+        return new ExchangeService(profileService, refreshService, signer,
                 allowedScopes, readme, google, github, shopify);
     }
 }

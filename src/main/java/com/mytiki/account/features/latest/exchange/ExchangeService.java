@@ -11,8 +11,8 @@ import com.mytiki.account.features.latest.exchange.github.GithubClient;
 import com.mytiki.account.features.latest.exchange.google.GoogleClient;
 import com.mytiki.account.features.latest.exchange.shopify.ShopifyClient;
 import com.mytiki.account.features.latest.refresh.RefreshService;
-import com.mytiki.account.features.latest.user_info.UserInfoDO;
-import com.mytiki.account.features.latest.user_info.UserInfoService;
+import com.mytiki.account.features.latest.profile.ProfileDO;
+import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.features.latest.oauth.OauthScopes;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
@@ -30,7 +30,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenRespon
 @XRayEnabled
 public class ExchangeService {
 
-    private final UserInfoService userInfoService;
+    private final ProfileService profileService;
     private final RefreshService refreshService;
     private final OauthScopes allowedScopes;
     private final JWSSigner signer;
@@ -40,7 +40,7 @@ public class ExchangeService {
     private final ShopifyClient shopify;
 
     public ExchangeService(
-            UserInfoService userInfoService,
+            ProfileService profileService,
             RefreshService refreshService,
             JWSSigner signer,
             OauthScopes allowedScopes,
@@ -48,7 +48,7 @@ public class ExchangeService {
             GoogleClient google,
             GithubClient github,
             ShopifyClient shopify) {
-        this.userInfoService = userInfoService;
+        this.profileService = profileService;
         this.refreshService = refreshService;
         this.signer = signer;
         this.allowedScopes = allowedScopes;
@@ -62,7 +62,7 @@ public class ExchangeService {
     public OAuth2AccessTokenResponse authorize(
             OauthScopes scopes, String clientId, String subjectToken, String subjectTokenType) {
         String email = validate(clientId, subjectToken, subjectTokenType);
-        UserInfoDO userInfo = userInfoService.createIfNotExists(email);
+        ProfileDO userInfo = profileService.createIfNotExists(email);
         OauthSub subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId().toString());
         try {
             return new JwtBuilder()

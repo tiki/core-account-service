@@ -6,7 +6,7 @@
 package com.mytiki.account.features.latest.api_key;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.mytiki.account.features.latest.user_info.UserInfoDO;
+import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.oauth.OauthScopes;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
@@ -46,7 +46,7 @@ public class ApiKeyService {
         if(!readme.verify(req, signature))
             throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
         Map<String, String> rsp = new HashMap<>();
-        List<ApiKeyDO> keys = repository.findAllByUserEmail(req.getEmail());
+        List<ApiKeyDO> keys = repository.findAllByProfileEmail(req.getEmail());
         keys.forEach((key) -> rsp.put(key.getLabel(), key.getToken()));
         return rsp;
     }
@@ -63,10 +63,10 @@ public class ApiKeyService {
             Long expires){
         String[] split = sub.getId().split(":");
         String label = split.length < 2 ? "default" : split[1];
-        Optional<ApiKeyDO> found = repository.findByTokenAndUserUserId(clientSecret, UUID.fromString(split[0]));
+        Optional<ApiKeyDO> found = repository.findByTokenAndProfileUserId(clientSecret, UUID.fromString(split[0]));
         if(found.isEmpty())
             throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT));
-        UserInfoDO user = found.get().getUser();
+        ProfileDO user = found.get().getProfile();
         List<String> tokenScopes = decoder.decode(found.get().getToken()).getClaim("scp");
         if(!tokenScopes.contains("account:admin"))
             throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INSUFFICIENT_SCOPE));
@@ -87,7 +87,7 @@ public class ApiKeyService {
         }
     }
 
-    public ApiKeyDO create(UserInfoDO user, String label, OauthScopes scopes, Long expires) throws JOSEException {
+    public ApiKeyDO create(ProfileDO user, String label, OauthScopes scopes, Long expires) throws JOSEException {
         OauthSub subject = new OauthSub(OauthSubNamespace.USER, user.getUserId().toString());
         String token = new JwtBuilder()
                 .exp(expires)
@@ -98,7 +98,7 @@ public class ApiKeyService {
                 .sign(signer)
                 .toToken();
         ApiKeyDO apiKey = new ApiKeyDO();
-        apiKey.setUser(user);
+        apiKey.setProfile(user);
         apiKey.setLabel(label);
         apiKey.setToken(token);
         apiKey.setCreated(ZonedDateTime.now());

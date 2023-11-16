@@ -13,6 +13,6 @@ import java.util.UUID;
 
 public interface ApiKeyRepository extends JpaRepository<ApiKeyDO, Long> {
     void deleteByToken(String token);
-    Optional<ApiKeyDO> findByTokenAndUserUserId(String token, UUID userId);
-    List<ApiKeyDO> findAllByUserEmail(String email);
+    Optional<ApiKeyDO> findByTokenAndProfileUserId(String token, UUID userId);
+    List<ApiKeyDO> findAllByProfileEmail(String email);
 }

@@ -8,7 +8,7 @@ package com.mytiki.account.utilities.facade.readme;
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mytiki.account.features.latest.user_info.UserInfoDO;
+import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -22,7 +22,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 
 @XRayEnabled
@@ -41,15 +40,15 @@ public class ReadmeF {
         }
     }
 
-    public String sign(UserInfoDO user) throws JOSEException, JsonProcessingException {
-        String appId = user.getOrg().getApps() != null && !user.getOrg().getApps().isEmpty() ?
-                user.getOrg().getApps().get(0).getAppId().toString() : null;
+    public String sign(ProfileDO user) throws JOSEException, JsonProcessingException {
+        String appId = user.getOrg().getProviders() != null && !user.getOrg().getProviders().isEmpty() ?
+                user.getOrg().getProviders().get(0).getProviderId().toString() : null;
         String payload = mapper.writeValueAsString(new HashMap<>(){{
             put("name", user.getEmail());
             put("email", user.getEmail());
             put("version", 1);
             put("parameters", new HashMap<>(){{
-                put("app-id", appId);
+                put("provider-id", appId);
                 put("user-id", user.getUserId().toString());
                 put("org-id", user.getOrg().getOrgId().toString());
             }});

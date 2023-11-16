@@ -8,8 +8,8 @@ package com.mytiki.account.features.latest.otp;
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mytiki.account.features.latest.refresh.RefreshService;
-import com.mytiki.account.features.latest.user_info.UserInfoDO;
-import com.mytiki.account.features.latest.user_info.UserInfoService;
+import com.mytiki.account.features.latest.profile.ProfileDO;
+import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.features.latest.oauth.OauthScopes;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
@@ -46,7 +46,7 @@ public class OtpService {
     private final SendgridF sendgrid;
     private final JWSSigner signer;
     private final RefreshService refreshService;
-    private final UserInfoService userInfoService;
+    private final ProfileService profileService;
     private final ReadmeF readme;
 
     public OtpService(
@@ -55,14 +55,14 @@ public class OtpService {
             SendgridF sendgrid,
             JWSSigner signer,
             RefreshService refreshService,
-            UserInfoService userInfoService,
+            ProfileService profileService,
             ReadmeF readme) {
         this.repository = repository;
         this.template = template;
         this.sendgrid = sendgrid;
         this.signer = signer;
         this.refreshService = refreshService;
-        this.userInfoService = userInfoService;
+        this.profileService = profileService;
         this.readme = readme;
     }
 
@@ -109,7 +109,7 @@ public class OtpService {
                     null
             ));
         try {
-            UserInfoDO userInfo = userInfoService.createIfNotExists(found.get().getEmail());
+            ProfileDO userInfo = profileService.createIfNotExists(found.get().getEmail());
             OauthSub subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId().toString());
             return new JwtBuilder()
                     .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)
