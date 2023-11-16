@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @XRayEnabled
-@Tag(name = "")
 @RestController
 @RequestMapping(value = ConfirmController.ROUTE)
 public class ConfirmController {

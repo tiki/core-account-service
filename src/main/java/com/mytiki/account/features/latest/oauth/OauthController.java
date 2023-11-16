@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.*;
 import static com.mytiki.account.utilities.Constants.TOKEN_EXPIRY_DURATION_SECONDS;
 
 @XRayEnabled
-@Tag(name = "")
 @RestController
 @RequestMapping(value = OauthController.ROUTE)
 public class OauthController {
@@ -147,6 +146,7 @@ public class OauthController {
             Cookie cookie = new Cookie(REFRESH_COOKIE, token.getRefreshToken().getTokenValue());
             cookie.setHttpOnly(true);
             cookie.setSecure(true);
+            cookie.setAttribute("SameSite", "Strict");
             cookie.setMaxAge(Constants.REFRESH_EXPIRY_DURATION_SECONDS.intValue());
             servletResponse.addCookie(cookie);
         }

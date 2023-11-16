@@ -15,7 +15,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 
 @XRayEnabled
-@Tag(name = "")
+@Tag(name = "Data Provider")
 @RestController
 @RequestMapping(value = ProviderController.ROUTE)
 public class ProviderController {
@@ -28,10 +28,10 @@ public class ProviderController {
     }
 
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-get",
-            summary = "Get App",
-            description = "Retrieve the details about an App",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-provider-get",
+            summary = "Get Provider",
+            description = "Returns the configuration details for a data provider",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @RequestMapping(method = RequestMethod.GET, path = "/{provider-id}")
     @Secured({"SCOPE_account:admin", "SCOPE_account:internal:read"})
     public ProviderAO get(
@@ -41,36 +41,20 @@ public class ProviderController {
         return service.get(providerId);
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-create",
-            summary = "Create App",
-            description = "Create a new App",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-provider-create",
+            summary = "Create Provider",
+            description = "Creates a new data provider, returning the configuration details",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.POST)
-    public ProviderAO create(
-            JwtAuthenticationToken token,
-            @RequestBody ProviderAOReq body) {
+    public ProviderAO create(JwtAuthenticationToken token, @RequestBody ProviderAOReq body) {
         return service.create(body.getName(), token.getName());
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-update",
-            summary = "Update App",
-            description = "Update the details for an App",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
-    @Secured("SCOPE_account:admin")
-    @RequestMapping(method = RequestMethod.POST,  path = "/{provider-id}")
-    public ProviderAO update(
-            JwtAuthenticationToken token,
-            @PathVariable(name = "provider-id") String providerId,
-            @RequestBody ProviderAOReq body) {
-        service.guard(token, providerId);
-        return service.update(providerId, body);
-    }
-
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-app-delete",
-            summary = "Delete App",
-            description = "Permanently delete an App",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-provider-delete",
+            summary = "Delete Provider",
+            description = "Permanently delete a data provider — stops publishing of new data.",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.DELETE, path = "/{provider-id}")
     public void delete(

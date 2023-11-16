@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 
 @XRayEnabled
-@Tag(name = "")
+@Tag(name = "Profile")
 @RestController
 @RequestMapping(value = ProfileController.ROUTE)
 public class ProfileController {
@@ -27,10 +27,10 @@ public class ProfileController {
         this.service = service;
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-post",
-            summary = "Update User",
-            description = "Update the authorized User's profile",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-profile-post",
+            summary = "Update Profile",
+            description = "Update your profile information — see request body for modification options",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(code = HttpStatus.ACCEPTED)
@@ -38,25 +38,25 @@ public class ProfileController {
         service.update(token.getName(), body);
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-get",
-            summary = "Get User",
-            description = "Get the authorized user's profile",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-profile-get",
+            summary = "Get Profile",
+            description = "Returns your profile information",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.GET)
     public ProfileAO get(JwtAuthenticationToken token) {
         return service.get(token.getName());
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-user-delete",
-            summary = "Delete User",
-            description = "Delete the authorized user",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-profile-delete",
+            summary = "Delete Account",
+            description = "Permanently delete your account — requires email confirmation",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseStatus(code = HttpStatus.ACCEPTED)
     public void delete(JwtAuthenticationToken token) {
-        service.get(token.getName());
+        service.delete(token.getName());
     }
 
     @Operation(hidden = true)

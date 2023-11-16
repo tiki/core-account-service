@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @XRayEnabled
-@Tag(name = "")
+@Tag(name = "Data Provider")
 @RestController
 @RequestMapping(value = Constants.API_LATEST_ROUTE)
 public class ProviderUserController {
@@ -31,10 +31,10 @@ public class ProviderUserController {
         this.service = service;
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-addr-reg-post",
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-provider-user-post",
             summary = "Register Address",
-            description = "Register an end user address",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:provider"))
+            description = "Register a new device address for an end user",
+            security = @SecurityRequirement(name = "default", scopes = "account:provider"))
     @Secured("SCOPE_account:provider")
     @RequestMapping(method = RequestMethod.POST, path = ROUTE)
     public ProviderUserAORsp post(
@@ -45,10 +45,10 @@ public class ProviderUserController {
         return service.register(providerId, body);
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-addr-reg-get",
-            summary = "Get Addresses",
-            description = "Retrieve and filter registered addresses",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:provider"))
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-provider-user-get",
+            summary = "List Addresses",
+            description = "Returns all registered device addresses matching the criteria",
+            security = @SecurityRequirement(name = "default", scopes = "account:provider"))
     @Secured({"SCOPE_account:provider", "SCOPE_account:internal:read"})
     @RequestMapping(method = RequestMethod.GET, path = ROUTE)
     public List<ProviderUserAORsp> getAll(
@@ -62,10 +62,10 @@ public class ProviderUserController {
         else return List.of();
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-addr-reg-delete",
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-provider-user-delete",
             summary = "Delete Addresses",
-            description = "Delete registered addresses",
-            security = @SecurityRequirement(name = "oauth", scopes = "account:admin"))
+            description = "Permanently delete all device addresses matching the criteria",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.DELETE, path = ROUTE)
     @ResponseStatus(code = HttpStatus.NO_CONTENT)

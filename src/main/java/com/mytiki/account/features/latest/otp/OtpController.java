@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @XRayEnabled
-@Tag(name = "")
 @RestController
 @RequestMapping(value = OtpController.ROUTE)
 public class OtpController {

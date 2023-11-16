@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @XRayEnabled
-@Tag(name = "")
 @RestController
 @RequestMapping(value = ApiKeyController.ROUTE)
 public class ApiKeyController {
