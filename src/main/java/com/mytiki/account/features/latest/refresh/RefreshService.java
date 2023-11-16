@@ -78,7 +78,6 @@ public class RefreshService {
         }
     }
 
-    @Transactional
     public void revoke(String token) {
         try {
             Jwt jwt = jwtDecoder.decode(token);
