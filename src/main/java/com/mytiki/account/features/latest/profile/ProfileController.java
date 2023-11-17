@@ -6,7 +6,9 @@
 package com.mytiki.account.features.latest.profile;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.utilities.Constants;
+import com.mytiki.account.utilities.builder.ErrorBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,7 +37,9 @@ public class ProfileController {
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(code = HttpStatus.ACCEPTED)
     public void update(JwtAuthenticationToken token, @RequestBody ProfileAOUpdate body) {
-        service.update(token.getName(), body);
+        OauthSub sub = new OauthSub(token.getName());
+        if(!sub.isUser()) throw new ErrorBuilder(HttpStatus.FORBIDDEN).message("Request requires a user token").exception();
+        service.update(sub.getId(), body);
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-profile-get",
@@ -45,7 +49,9 @@ public class ProfileController {
     @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.GET)
     public ProfileAO get(JwtAuthenticationToken token) {
-        return service.get(token.getName());
+        OauthSub sub = new OauthSub(token.getName());
+        if(!sub.isUser()) throw new ErrorBuilder(HttpStatus.FORBIDDEN).message("Request requires a user token").exception();
+        return service.get(sub.getId());
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-profile-delete",
@@ -56,7 +62,9 @@ public class ProfileController {
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseStatus(code = HttpStatus.ACCEPTED)
     public void delete(JwtAuthenticationToken token) {
-        service.delete(token.getName());
+        OauthSub sub = new OauthSub(token.getName());
+        if(!sub.isUser()) throw new ErrorBuilder(HttpStatus.FORBIDDEN).message("Request requires a user token").exception();
+        service.delete(sub.getId());
     }
 
     @Operation(hidden = true)
