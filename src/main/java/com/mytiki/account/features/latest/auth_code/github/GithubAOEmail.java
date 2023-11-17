@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.features.latest.exchange.github;
+package com.mytiki.account.features.latest.auth_code.github;
 
 public class GithubAOEmail {
     private String email;

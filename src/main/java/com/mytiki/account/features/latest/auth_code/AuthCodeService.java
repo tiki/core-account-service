@@ -3,19 +3,18 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.features.latest.exchange;
+package com.mytiki.account.features.latest.auth_code;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mytiki.account.features.latest.auth_code.github.GithubClient;
 import com.mytiki.account.features.latest.auth_code.google.GoogleClient;
-import com.mytiki.account.features.latest.exchange.shopify.ShopifyClient;
-import com.mytiki.account.features.latest.refresh.RefreshService;
-import com.mytiki.account.features.latest.profile.ProfileDO;
-import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.features.latest.oauth.OauthScopes;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
+import com.mytiki.account.features.latest.profile.ProfileDO;
+import com.mytiki.account.features.latest.profile.ProfileService;
+import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.readme.ReadmeF;
@@ -28,31 +27,33 @@ import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 
 @XRayEnabled
-public class ExchangeService {
+public class AuthCodeService {
 
     private final ProfileService profileService;
     private final RefreshService refreshService;
     private final JWSSigner signer;
     private final ReadmeF readme;
-    private final ShopifyClient shopify;
+    private final GoogleClient google;
+    private final GithubClient github;
 
-    public ExchangeService(
+    public AuthCodeService(
             ProfileService profileService,
             RefreshService refreshService,
             JWSSigner signer,
             ReadmeF readme,
-            ShopifyClient shopify) {
+            GoogleClient google,
+            GithubClient github) {
         this.profileService = profileService;
         this.refreshService = refreshService;
         this.signer = signer;
         this.readme = readme;
-        this.shopify = shopify;
+        this.google = google;
+        this.github = github;
     }
 
     @Transactional
-    public OAuth2AccessTokenResponse authorize(
-            OauthScopes scopes, String clientId, String subjectToken, String subjectTokenType) {
-        String email = validate(clientId, subjectToken, subjectTokenType);
+    public OAuth2AccessTokenResponse authorize(OauthScopes scopes, String clientId, String code) {
+        String email = exchange(clientId, code);
         ProfileDO userInfo = profileService.createIfNotExists(email);
         OauthSub subject = new OauthSub(OauthSubNamespace.USER, userInfo.getUserId().toString());
         try {
@@ -76,12 +77,11 @@ public class ExchangeService {
     }
 
 
-    private String validate(String clientId, String subjectToken, String subjectTokenType) {
-        return switch (subjectTokenType) {
-            case "urn:mytiki:params:oauth:token-type:shopify" -> shopify.validate(clientId, subjectToken);
-            default -> throw new OAuth2AuthorizationException(new OAuth2Error(
+    private String exchange(String clientId, String code) {
+        if(clientId.equals(google.clientId())) return google.exchange(code);
+        else if(clientId.equals(github.clientId())) return github.exchange(code);
+        else throw new OAuth2AuthorizationException(new OAuth2Error(
                     OAuth2ErrorCodes.ACCESS_DENIED),
                     "client_id and/or subject_token_type are invalid");
-        };
     }
 }
