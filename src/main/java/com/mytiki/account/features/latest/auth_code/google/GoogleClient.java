@@ -55,7 +55,7 @@ public class GoogleClient implements AuthCodeClient {
         this.secret = secret;
         try {
             DefaultJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
-            URI remoteKeys = new URI("https://accounts.google.com/.well-known/openid-configuration");
+            URI remoteKeys = new URI("https://www.googleapis.com/oauth2/v3/certs");
             RemoteJWKSet<SecurityContext> jwkSet = new RemoteJWKSet<>(remoteKeys.toURL());
             jwtProcessor.setJWSKeySelector(new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, jwkSet));
             decoder = new NimbusJwtDecoder(jwtProcessor);
