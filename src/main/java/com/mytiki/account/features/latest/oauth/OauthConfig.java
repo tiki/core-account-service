@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.oauth;
 
+import com.mytiki.account.features.latest.auth_code.AuthCodeService;
 import com.mytiki.account.features.latest.provider_user.ProviderUserService;
 import com.mytiki.account.features.latest.api_key.ApiKeyService;
 import com.mytiki.account.features.latest.provider.ProviderService;
@@ -58,11 +59,13 @@ public class OauthConfig {
             @Autowired ExchangeService exchangeService,
             @Autowired ProviderUserService providerUserService,
             @Autowired ProviderService providerService,
+            @Autowired AuthCodeService authCodeService,
             @Autowired OtpService otpService,
             @Autowired OauthScopes allowedScopes,
             @Autowired OauthInternal oauthInternal,
             @Autowired JwtDecoder decoder){
         return new OauthController(refreshService, apiKeyService,
-                exchangeService, providerUserService, providerService, otpService, allowedScopes, oauthInternal, decoder);
+                exchangeService, providerUserService, providerService, authCodeService,
+                otpService, allowedScopes, oauthInternal, decoder);
     }
 }
