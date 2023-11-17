@@ -8,6 +8,7 @@ package com.mytiki.account.features.latest.api_key;
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.facade.readme.ReadmeReq;
+import com.mytiki.account.utilities.facade.readme.ReadmeRsp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class ApiKeyController {
 
     @Operation(hidden = true)
     @RequestMapping(method = RequestMethod.POST, path = "readme")
-    public Map<String, String> list(
+    public ReadmeRsp list(
             @RequestHeader(name = "readme-signature") String signature,
             @RequestBody ReadmeReq body) {
         return service.readme(body, signature);
