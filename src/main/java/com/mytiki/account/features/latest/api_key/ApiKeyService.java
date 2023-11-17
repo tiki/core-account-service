@@ -14,6 +14,7 @@ import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.readme.ReadmeF;
 import com.mytiki.account.utilities.facade.readme.ReadmeReq;
+import com.mytiki.account.utilities.facade.readme.ReadmeRsp;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @XRayEnabled
 public class ApiKeyService {
@@ -42,12 +44,20 @@ public class ApiKeyService {
         this.decoder = decoder;
     }
 
-    public Map<String, String> readme(ReadmeReq req, String signature){
+    public ReadmeRsp readme(ReadmeReq req, String signature){
         if(!readme.verify(req, signature))
             throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
-        Map<String, String> rsp = new HashMap<>();
+        ReadmeRsp rsp = new ReadmeRsp();
+        rsp.setEmail(req.getEmail());
+        rsp.setName(req.getEmail());
         List<ApiKeyDO> keys = repository.findAllByProfileEmail(req.getEmail());
-        keys.forEach((key) -> rsp.put(key.getLabel(), key.getToken()));
+        rsp.setKeys(keys.stream().map((key) -> {
+            Map<String, String> readmeKey = new HashMap<>();
+            readmeKey.put("key", key.getToken());
+            readmeKey.put("apiKey", key.getToken());
+            readmeKey.put("name", key.getLabel());
+            return readmeKey;
+        }).collect(Collectors.toList()));
         return rsp;
     }
 
