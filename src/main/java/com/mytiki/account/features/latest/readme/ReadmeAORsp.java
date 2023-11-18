@@ -3,15 +3,16 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.utilities.facade.readme;
+package com.mytiki.account.features.latest.readme;
 
 import java.util.List;
 import java.util.Map;
 
-public class ReadmeRsp {
+public class ReadmeAORsp {
     private String name;
     private String email;
-    private List<Map<String, String>> keys;
+    private Integer version;
+    private List<ReadmeAORspKey> keys;
 
     public String getName() {
         return name;
@@ -29,11 +30,19 @@ public class ReadmeRsp {
         this.email = email;
     }
 
-    public List<Map<String, String>> getKeys() {
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public List<ReadmeAORspKey> getKeys() {
         return keys;
     }
 
-    public void setKeys(List<Map<String, String>> keys) {
+    public void setKeys(List<ReadmeAORspKey> keys) {
         this.keys = keys;
     }
 }

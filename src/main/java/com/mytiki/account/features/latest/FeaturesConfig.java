@@ -15,6 +15,7 @@ import com.mytiki.account.features.latest.jwks.JwksConfig;
 import com.mytiki.account.features.latest.oauth.OauthConfig;
 import com.mytiki.account.features.latest.org.OrgConfig;
 import com.mytiki.account.features.latest.otp.OtpConfig;
+import com.mytiki.account.features.latest.readme.ReadmeConfig;
 import com.mytiki.account.features.latest.refresh.RefreshConfig;
 import com.mytiki.account.features.latest.profile.ProfileConfig;
 import org.springframework.context.annotation.Import;
@@ -31,7 +32,8 @@ import org.springframework.context.annotation.Import;
         JwksConfig.class,
         ConfirmConfig.class,
         OauthConfig.class,
-        AuthCodeConfig.class
+        AuthCodeConfig.class,
+        ReadmeConfig.class
 })
 public class FeaturesConfig {
 }

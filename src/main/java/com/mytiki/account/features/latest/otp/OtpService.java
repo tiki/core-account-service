@@ -6,20 +6,19 @@
 package com.mytiki.account.features.latest.otp;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mytiki.account.features.latest.refresh.RefreshService;
-import com.mytiki.account.features.latest.profile.ProfileDO;
-import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.features.latest.oauth.OauthScopes;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
+import com.mytiki.account.features.latest.profile.ProfileDO;
+import com.mytiki.account.features.latest.profile.ProfileService;
+import com.mytiki.account.features.latest.readme.ReadmeService;
+import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.B64F;
-import com.mytiki.account.utilities.facade.TemplateF;
-import com.mytiki.account.utilities.facade.readme.ReadmeF;
 import com.mytiki.account.utilities.facade.SendgridF;
+import com.mytiki.account.utilities.facade.TemplateF;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import jakarta.transaction.Transactional;
@@ -36,7 +35,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @XRayEnabled
 public class OtpService {
@@ -47,7 +49,7 @@ public class OtpService {
     private final JWSSigner signer;
     private final RefreshService refreshService;
     private final ProfileService profileService;
-    private final ReadmeF readme;
+    private final ReadmeService readme;
 
     public OtpService(
             OtpRepository repository,
@@ -56,7 +58,7 @@ public class OtpService {
             JWSSigner signer,
             RefreshService refreshService,
             ProfileService profileService,
-            ReadmeF readme) {
+            ReadmeService readme) {
         this.repository = repository;
         this.template = template;
         this.sendgrid = sendgrid;
@@ -119,9 +121,9 @@ public class OtpService {
                     .build()
                     .refresh(refreshService.issue(subject, scopes.getAud(), scopes.getScp()))
                     .sign(signer)
-                    .additional("readme_token", readme.sign(profile))
+                    .additional("readme_token", readme.authorize(profile))
                     .toResponse();
-        } catch (JOSEException | JsonProcessingException e) {
+        } catch (JOSEException e) {
             throw new OAuth2AuthorizationException(new OAuth2Error(
                     OAuth2ErrorCodes.SERVER_ERROR,
                     "Issue with JWT construction",

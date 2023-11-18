@@ -3,9 +3,9 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.utilities.facade.readme;
+package com.mytiki.account.features.latest.readme;
 
-public class ReadmeReq {
+public class ReadmeAOReq {
     private String email;
 
     public String getEmail() {

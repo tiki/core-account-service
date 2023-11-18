@@ -685,8 +685,7 @@ video {
 }
 
 .bg-yellow-light{
-  --tw-bg-opacity: 1 !important;
-  background-color: rgb(255 240 188 / var(--tw-bg-opacity)) !important;
+  background-color: #FFF0BC99 !important;
 }
 
 .bg-opacity-90{
@@ -754,6 +753,12 @@ video {
 .text-white{
   --tw-text-opacity: 1 !important;
   color: rgb(255 255 255 / var(--tw-text-opacity)) !important;
+}
+
+.shadow{
+  --tw-shadow: 4px 4px 0 0 rgba(0,0,0,0.05) !important;
+  --tw-shadow-colored: 4px 4px 0 0 var(--tw-shadow-color) !important;
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
 }
 
 .placeholder\:text-center::-moz-placeholder{

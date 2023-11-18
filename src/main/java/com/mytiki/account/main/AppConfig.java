@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Import;
 
 import java.security.Security;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.TimeZone;
 
 @Import({
@@ -59,6 +61,11 @@ public class AppConfig {
                                 .url("https://github.com/tiki/core-account-service/blob/main/LICENSE")))
                 .servers(Collections.singletonList(new Server()
                         .url("https://account.mytiki.com")))
+                .extensions(new HashMap<>(){{
+                    put("x-readme", new HashMap<>(){{
+                        put("samples-languages", List.of("shell", "node", "python", "go", "java"));
+                    }});
+                }})
                 .components(new Components()
                         .addSecuritySchemes("default", new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)
