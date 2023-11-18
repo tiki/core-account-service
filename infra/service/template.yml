@@ -178,8 +178,14 @@ Resources:
               ValueFrom: !Sub "${Secret}:ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON::"
             - Name: README_SECRET
               ValueFrom: !Sub "${Secret}:README_SECRET::"
+            - Name: GITHUB_OAUTH_ID
+              ValueFrom: !Sub "${Secret}:GITHUB_OAUTH_ID::"
             - Name: GITHUB_OAUTH_SECRET
               ValueFrom: !Sub "${Secret}:GITHUB_OAUTH_SECRET::"
+            - Name: GOOGLE_OAUTH_ID
+              ValueFrom: !Sub "${Secret}:GOOGLE_OAUTH_ID::"
+            - Name: GOOGLE_OAUTH_SECRET
+              ValueFrom: !Sub "${Secret}:GOOGLE_OAUTH_SECRET::"
           LogConfiguration:
             LogDriver: awslogs
             Options:
