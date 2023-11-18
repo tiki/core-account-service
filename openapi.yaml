@@ -283,3 +283,10 @@ components:
     default:
       type: http
       scheme: bearer
+x-readme:
+  samples-languages:
+  - shell
+  - node
+  - python
+  - go
+  - java
