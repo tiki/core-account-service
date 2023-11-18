@@ -685,8 +685,7 @@ video {
 }
 
 .bg-yellow-light{
-  --tw-bg-opacity: 1 !important;
-  background-color: rgb(255 240 188 / var(--tw-bg-opacity)) !important;
+  background-color: #FFF0BC99 !important;
 }
 
 .bg-opacity-90{
