@@ -24,12 +24,11 @@
             method: "POST",
             headers: headers,
             body: new URLSearchParams({
-              grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
-              subject_token: code,
-              subject_token_type: "urn:mytiki:params:oauth:token-type:google",
+              grant_type: "authorization_code",
+              code: code,
               client_id:
                 "240428403253-buvkqgjamee7vqv9dmll0da69m1mpu04.apps.googleusercontent.com",
-              scope: "account admin",
+              scope: "account:admin",
             }),
           };
 

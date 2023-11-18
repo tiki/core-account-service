@@ -3,8 +3,9 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.features.latest.exchange.github;
+package com.mytiki.account.features.latest.auth_code.github;
 
+import com.mytiki.account.features.latest.auth_code.AuthCodeClient;
 import com.mytiki.account.features.latest.exchange.ExchangeClient;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
@@ -17,15 +18,17 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 
-public class GithubClient implements ExchangeClient {
+public class GithubClient implements AuthCodeClient {
+    private final String id;
     private final String secret;
 
-    public GithubClient(String secret) {
+    public GithubClient(String id, String secret) {
         this.secret = secret;
+        this.id = id;
     }
 
     @Override
-    public String validate(String clientId, String token) {
+    public String exchange(String code) {
         try {
             RestTemplate client = new RestTemplateBuilder()
                     .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -33,9 +36,9 @@ public class GithubClient implements ExchangeClient {
             HttpHeaders tokenHeaders = new HttpHeaders();
             tokenHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-            body.add("client_id", clientId);
+            body.add("client_id", id);
             body.add("client_secret", secret);
-            body.add("code", token);
+            body.add("code", code);
             HttpEntity<MultiValueMap<String, String>> tokenReq = new HttpEntity<>(body, tokenHeaders);
             ResponseEntity<GithubAOToken> tokenRsp = client.exchange(
                     "https://github.com/login/oauth/access_token", HttpMethod.POST, tokenReq, GithubAOToken.class);
@@ -64,5 +67,10 @@ public class GithubClient implements ExchangeClient {
                     null
             ), e);
         }
+    }
+
+    @Override
+    public String clientId() {
+        return id;
     }
 }

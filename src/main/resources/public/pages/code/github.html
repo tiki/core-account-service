@@ -24,11 +24,10 @@
             method: "POST",
             headers: headers,
             body: new URLSearchParams({
-              grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
-              subject_token: code,
-              subject_token_type: "urn:mytiki:params:oauth:token-type:github",
+              grant_type: "authorization_code",
+              code: code,
               client_id: "ebbf90361bcb8c527416",
-              scope: "account admin",
+              scope: "account:admin",
             }),
           };
 

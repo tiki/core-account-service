@@ -6,6 +6,7 @@
 package com.mytiki.account.features.latest.oauth;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.mytiki.account.features.latest.auth_code.AuthCodeService;
 import com.mytiki.account.features.latest.provider_user.ProviderUserService;
 import com.mytiki.account.features.latest.api_key.ApiKeyService;
 import com.mytiki.account.features.latest.provider.ProviderService;
@@ -45,6 +46,7 @@ public class OauthController {
     private final ExchangeService exchangeService;
     private final ProviderUserService providerUserService;
     private final ProviderService providerService;
+    private final AuthCodeService authCodeService;
     private final OtpService otpService;
     private final OauthScopes allowedScopes;
     private final OauthInternal oauthInternal;
@@ -56,6 +58,7 @@ public class OauthController {
             ExchangeService exchangeService,
             ProviderUserService providerUserService,
             ProviderService providerService,
+            AuthCodeService authCodeService,
             OtpService otpService,
             OauthScopes allowedScopes,
             OauthInternal oauthInternal,
@@ -69,6 +72,7 @@ public class OauthController {
         this.allowedScopes = allowedScopes;
         this.oauthInternal = oauthInternal;
         this.decoder = decoder;
+        this.authCodeService = authCodeService;
     }
 
     @Operation(hidden = true)
@@ -112,6 +116,7 @@ public class OauthController {
             @RequestParam(name = "client_secret", required = false) String clientSecret,
             @RequestParam(name = "username", required = false) String username,
             @RequestParam(name = "password", required = false) String password,
+            @RequestParam(name = "code", required = false) String code,
             @RequestParam(name = "refresh_token", required = false) String refreshToken,
             @RequestParam(name = "subject_token", required = false) String subjectToken,
             @RequestParam(name = "subject_token_type", required = false) String subjectTokenType,
@@ -122,6 +127,7 @@ public class OauthController {
         OauthScopes scopes = allowedScopes.filter(scope);
         Long exp = expires == null || expires.isBlank() ? TOKEN_EXPIRY_DURATION_SECONDS : Long.parseLong(expires);
         OAuth2AccessTokenResponse token = switch (grantType.getValue()) {
+            case "authorization_code" -> authCodeService.authorize(scopes, clientId, code);
             case "password" ->
                     otpService.authorize(username, password, scopes);
             case "client_credentials" -> {
