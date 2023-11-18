@@ -10,12 +10,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileService;
+import com.mytiki.account.features.latest.readme.ReadmeService;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.JwtBuilder;
-import com.mytiki.account.utilities.facade.readme.ReadmeF;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
-import jakarta.transaction.Transactional;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
@@ -35,14 +34,14 @@ public class RefreshService {
     private final RefreshRepository repository;
     private final JWSSigner jwtSigner;
     private final JwtDecoder jwtDecoder;
-    private final ReadmeF readme;
+    private final ReadmeService readme;
     private final ProfileService profileService;
 
     public RefreshService(
             RefreshRepository repository,
             JWSSigner jwtSigner,
             JwtDecoder jwtDecoder,
-            ReadmeF readme,
+            ReadmeService readme,
             ProfileService profileService) {
         this.repository = repository;
         this.jwtSigner = jwtSigner;
@@ -88,12 +87,12 @@ public class RefreshService {
                 if(sub.isUser()){
                     ProfileDO profile = profileService.getDO(sub.getId()).orElseThrow();
                     return builder
-                            .additional("readme_token", readme.sign(profile))
+                            .additional("readme_token", readme.authorize(profile))
                             .toResponse();
                 }else return builder.toResponse();
             } else
                 throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_GRANT));
-        } catch (JOSEException | JwtException | JsonProcessingException | NoSuchElementException e) {
+        } catch (JOSEException | JwtException | NoSuchElementException e) {
             throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_GRANT), e);
         }
     }

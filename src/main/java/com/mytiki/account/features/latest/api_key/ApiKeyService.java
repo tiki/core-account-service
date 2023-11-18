@@ -6,18 +6,13 @@
 package com.mytiki.account.features.latest.api_key;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.oauth.OauthScopes;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
-import com.mytiki.account.utilities.builder.ErrorBuilder;
+import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.utilities.builder.JwtBuilder;
-import com.mytiki.account.utilities.facade.readme.ReadmeF;
-import com.mytiki.account.utilities.facade.readme.ReadmeReq;
-import com.mytiki.account.utilities.facade.readme.ReadmeRsp;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
@@ -27,38 +22,25 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @XRayEnabled
 public class ApiKeyService {
     private final ApiKeyRepository repository;
     private final JWSSigner signer;
-    private final ReadmeF readme;
     private final JwtDecoder decoder;
 
-    public ApiKeyService(ApiKeyRepository repository, JWSSigner signer, ReadmeF readme, JwtDecoder decoder) {
+    public ApiKeyService(ApiKeyRepository repository, JWSSigner signer, JwtDecoder decoder) {
         this.repository = repository;
         this.signer = signer;
-        this.readme = readme;
         this.decoder = decoder;
     }
 
-    public ReadmeRsp readme(ReadmeReq req, String signature){
-        if(!readme.verify(req, signature))
-            throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
-        ReadmeRsp rsp = new ReadmeRsp();
-        rsp.setEmail(req.getEmail());
-        rsp.setName(req.getEmail());
-        List<ApiKeyDO> keys = repository.findAllByProfileEmail(req.getEmail());
-        rsp.setKeys(keys.stream().map((key) -> {
-            Map<String, String> readmeKey = new HashMap<>();
-            readmeKey.put("key", key.getToken());
-            readmeKey.put("apiKey", key.getToken());
-            readmeKey.put("name", key.getLabel());
-            return readmeKey;
-        }).collect(Collectors.toList()));
-        return rsp;
+    public List<ApiKeyDO> getByEmail(String email) {
+        return repository.findAllByProfileEmail(email);
     }
 
     public void revoke(String token){

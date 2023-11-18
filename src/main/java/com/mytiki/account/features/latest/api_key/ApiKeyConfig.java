@@ -6,7 +6,6 @@
 package com.mytiki.account.features.latest.api_key;
 
 import com.mytiki.account.utilities.Constants;
-import com.mytiki.account.utilities.facade.readme.ReadmeF;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -23,13 +22,7 @@ public class ApiKeyConfig {
     public ApiKeyService apiKeyService(
             @Autowired ApiKeyRepository repository,
             @Autowired JWSSigner signer,
-            @Autowired ReadmeF readme,
             @Autowired JwtDecoder decoder){
-        return new ApiKeyService(repository, signer, readme, decoder);
-    }
-
-    @Bean
-    public ApiKeyController apiKeyController(@Autowired ApiKeyService service){
-        return new ApiKeyController(service);
+        return new ApiKeyService(repository, signer, decoder);
     }
 }
