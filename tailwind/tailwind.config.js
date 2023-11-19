@@ -8,7 +8,7 @@ module.exports = {
   important: true,
   theme: {
     colors: {
-      transparent: "#FFFFFFFF",
+      transparent: "#FFFFFF00",
       white: "#FFFFFF",
       "yellow-light": "#FFF0BC99",
       yellow: "#FFE68F",
