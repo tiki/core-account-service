@@ -2,19 +2,6 @@
  * Copyright (c) TIKI Inc.
  * MIT license. See LICENSE file in root directory.
  */
-const decodedCookie = decodeURIComponent(document.cookie);
-const cookieName = "TikiAccountOtpUser=";
-let username;
-const ca = decodedCookie.split(";");
-for (let i = 0; i < ca.length; i++) {
-  let c = ca[i];
-  while (c.charAt(0) === " ") {
-    c = c.substring(1);
-  }
-  if (c.indexOf(cookieName) === 0) {
-    username = c.substring(cookieName.length, c.length);
-  }
-}
 
 const headers = new Headers();
 headers.append("accept", "application/json");
@@ -29,8 +16,7 @@ const options = {
   credentials: "include",
   body: new URLSearchParams({
     grant_type: "refresh_token",
-    username,
-    scope: "account admin",
+    scope: "account:admin",
   }),
 };
 
