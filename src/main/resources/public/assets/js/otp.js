@@ -34,7 +34,7 @@ const authenticateReadme = (otp) => {
       grant_type: "password",
       username,
       password: otp.toUpperCase(),
-      scope: "account admin",
+      scope: "account:admin",
     }),
   };
 

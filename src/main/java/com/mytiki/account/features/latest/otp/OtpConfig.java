@@ -5,11 +5,11 @@
 
 package com.mytiki.account.features.latest.otp;
 
+import com.mytiki.account.features.latest.readme.ReadmeService;
 import com.mytiki.account.features.latest.refresh.RefreshService;
-import com.mytiki.account.features.latest.user_info.UserInfoService;
+import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.facade.TemplateF;
-import com.mytiki.account.utilities.facade.readme.ReadmeF;
 import com.mytiki.account.utilities.facade.SendgridF;
 import com.nimbusds.jose.JWSSigner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +31,9 @@ public class OtpConfig {
             @Autowired SendgridF sendgrid,
             @Autowired JWSSigner signer,
             @Autowired RefreshService refreshService,
-            @Autowired UserInfoService userInfoService,
-            @Autowired ReadmeF readme) {
-        return new OtpService(otpRepository, mustache, sendgrid, signer, refreshService, userInfoService, readme);
+            @Autowired ProfileService profileService,
+            @Autowired ReadmeService readme) {
+        return new OtpService(otpRepository, mustache, sendgrid, signer, refreshService, profileService, readme);
     }
 
     @Bean

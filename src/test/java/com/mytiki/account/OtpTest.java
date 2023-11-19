@@ -10,8 +10,8 @@ import com.mytiki.account.features.latest.otp.OtpAOStartReq;
 import com.mytiki.account.features.latest.otp.OtpAOStartRsp;
 import com.mytiki.account.features.latest.otp.OtpRepository;
 import com.mytiki.account.features.latest.otp.OtpService;
-import com.mytiki.account.features.latest.user_info.UserInfoAO;
-import com.mytiki.account.features.latest.user_info.UserInfoService;
+import com.mytiki.account.features.latest.profile.ProfileAO;
+import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.main.App;
 import com.mytiki.account.mocks.JwtMock;
 import com.mytiki.account.features.latest.oauth.OauthSub;
@@ -25,7 +25,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -34,7 +33,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
@@ -62,7 +60,7 @@ public class OtpTest {
     private OtpRepository repository;
 
     @Autowired
-    private UserInfoService userInfoService;
+    private ProfileService profileService;
 
     @Autowired
     private OauthScopes allowedScopes;
@@ -139,7 +137,7 @@ public class OtpTest {
         Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(token.getAccessToken().getTokenValue());
         OauthSub sub = new OauthSub(jwt.getSubject());
         assertTrue(sub.isUser());
-        UserInfoAO userInfo = userInfoService.get(sub.getId());
+        ProfileAO userInfo = profileService.get(sub.getId());
         assertEquals(testEmail, userInfo.getEmail());
     }
 
@@ -158,7 +156,7 @@ public class OtpTest {
         Jwt jwt = JwtMock.mockJwtDecoder(jwkSet).decode(token.getAccessToken().getTokenValue());
         OauthSub sub = new OauthSub(jwt.getSubject());
         assertTrue(sub.isUser());
-        UserInfoAO userInfo = userInfoService.get(sub.getId());
+        ProfileAO userInfo = profileService.get(sub.getId());
         assertEquals(testEmail, userInfo.getEmail());
     }
 

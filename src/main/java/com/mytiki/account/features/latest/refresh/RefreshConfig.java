@@ -5,6 +5,8 @@
 
 package com.mytiki.account.features.latest.refresh;
 
+import com.mytiki.account.features.latest.profile.ProfileService;
+import com.mytiki.account.features.latest.readme.ReadmeService;
 import com.mytiki.account.utilities.Constants;
 import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.proc.SecurityContext;
@@ -24,8 +26,10 @@ public class RefreshConfig {
     public RefreshService refreshService(
             @Autowired RefreshRepository repository,
             @Autowired JWSSigner signer,
-            @Autowired JWTProcessor<SecurityContext> jwtProcessor) {
+            @Autowired JWTProcessor<SecurityContext> jwtProcessor,
+            @Autowired ReadmeService readme,
+            @Autowired ProfileService profileService) {
         return new RefreshService(
-                repository, signer, new NimbusJwtDecoder(jwtProcessor));
+                repository, signer, new NimbusJwtDecoder(jwtProcessor), readme, profileService);
     }
 }

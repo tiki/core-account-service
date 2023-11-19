@@ -6,9 +6,9 @@
 package com.mytiki.account.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mytiki.account.features.latest.api_key.ApiKeyController;
 import com.mytiki.account.features.latest.otp.OtpController;
 import com.mytiki.account.features.latest.jwks.JwksController;
+import com.mytiki.account.features.latest.readme.ReadmeController;
 import com.mytiki.account.health.HealthController;
 import com.mytiki.account.features.latest.oauth.OauthController;
 import com.mytiki.account.utilities.Constants;
@@ -97,14 +97,14 @@ public class SecurityFilter {
                                OauthController.ROUTE + "/token",
                                OauthController.ROUTE + "/revoke",
                                OtpController.ROUTE,
-                               ApiKeyController.ROUTE + "/readme"))
+                               ReadmeController.ROUTE))
                .authorizeHttpRequests((req) -> req
                        .requestMatchers(HttpMethod.GET, HealthController.ROUTE).permitAll()
                        .requestMatchers(HttpMethod.GET, Constants.API_DOCS_ROUTE).permitAll()
                        .requestMatchers(HttpMethod.GET, JwksController.ROUTE).permitAll()
                        .requestMatchers(HttpMethod.GET, PublicResolver.PAGES + "/**").permitAll()
                        .requestMatchers(HttpMethod.GET, PublicResolver.ASSETS + "/**").permitAll()
-                       .requestMatchers(HttpMethod.POST, ApiKeyController.ROUTE + "/readme").permitAll()
+                       .requestMatchers(HttpMethod.POST, ReadmeController.ROUTE).permitAll()
                        .requestMatchers(HttpMethod.POST, OauthController.ROUTE + "/token").permitAll()
                        .requestMatchers(HttpMethod.POST, OauthController.ROUTE + "/revoke").permitAll()
                        .requestMatchers(HttpMethod.POST, OtpController.ROUTE).permitAll()

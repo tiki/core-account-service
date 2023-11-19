@@ -6,9 +6,10 @@
 package com.mytiki.account.features.latest.oauth;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.mytiki.account.features.latest.addr_reg.AddrRegService;
+import com.mytiki.account.features.latest.auth_code.AuthCodeService;
+import com.mytiki.account.features.latest.provider_user.ProviderUserService;
 import com.mytiki.account.features.latest.api_key.ApiKeyService;
-import com.mytiki.account.features.latest.app_info.AppInfoService;
+import com.mytiki.account.features.latest.provider.ProviderService;
 import com.mytiki.account.features.latest.exchange.ExchangeService;
 import com.mytiki.account.features.latest.otp.OtpService;
 import com.mytiki.account.features.latest.refresh.RefreshService;
@@ -34,7 +35,6 @@ import org.springframework.web.bind.annotation.*;
 import static com.mytiki.account.utilities.Constants.TOKEN_EXPIRY_DURATION_SECONDS;
 
 @XRayEnabled
-@Tag(name = "")
 @RestController
 @RequestMapping(value = OauthController.ROUTE)
 public class OauthController {
@@ -44,8 +44,9 @@ public class OauthController {
     private final RefreshService refreshService;
     private final ApiKeyService apiKeyService;
     private final ExchangeService exchangeService;
-    private final AddrRegService addrRegService;
-    private final AppInfoService appInfoService;
+    private final ProviderUserService providerUserService;
+    private final ProviderService providerService;
+    private final AuthCodeService authCodeService;
     private final OtpService otpService;
     private final OauthScopes allowedScopes;
     private final OauthInternal oauthInternal;
@@ -55,8 +56,9 @@ public class OauthController {
             RefreshService refreshService,
             ApiKeyService apiKeyService,
             ExchangeService exchangeService,
-            AddrRegService addrRegService,
-            AppInfoService appInfoService,
+            ProviderUserService providerUserService,
+            ProviderService providerService,
+            AuthCodeService authCodeService,
             OtpService otpService,
             OauthScopes allowedScopes,
             OauthInternal oauthInternal,
@@ -64,12 +66,13 @@ public class OauthController {
         this.refreshService = refreshService;
         this.apiKeyService = apiKeyService;
         this.exchangeService = exchangeService;
-        this.addrRegService = addrRegService;
-        this.appInfoService = appInfoService;
+        this.providerUserService = providerUserService;
+        this.providerService = providerService;
         this.otpService = otpService;
         this.allowedScopes = allowedScopes;
         this.oauthInternal = oauthInternal;
         this.decoder = decoder;
+        this.authCodeService = authCodeService;
     }
 
     @Operation(hidden = true)
@@ -113,6 +116,7 @@ public class OauthController {
             @RequestParam(name = "client_secret", required = false) String clientSecret,
             @RequestParam(name = "username", required = false) String username,
             @RequestParam(name = "password", required = false) String password,
+            @RequestParam(name = "code", required = false) String code,
             @RequestParam(name = "refresh_token", required = false) String refreshToken,
             @RequestParam(name = "subject_token", required = false) String subjectToken,
             @RequestParam(name = "subject_token_type", required = false) String subjectTokenType,
@@ -123,6 +127,7 @@ public class OauthController {
         OauthScopes scopes = allowedScopes.filter(scope);
         Long exp = expires == null || expires.isBlank() ? TOKEN_EXPIRY_DURATION_SECONDS : Long.parseLong(expires);
         OAuth2AccessTokenResponse token = switch (grantType.getValue()) {
+            case "authorization_code" -> authCodeService.authorize(scopes, clientId, code);
             case "password" ->
                     otpService.authorize(username, password, scopes);
             case "client_credentials" -> {
@@ -132,8 +137,8 @@ public class OauthController {
                             oauthInternal.authorize(sub, clientSecret, scopes, exp);
                     case USER ->
                             apiKeyService.authorize(sub, clientSecret, scopes, exp);
-                    case APP -> appInfoService.authorize(scopes, sub, clientSecret, exp);
-                    case ADDRESS -> addrRegService.authorize(scopes, sub, clientSecret);
+                    case APP -> providerService.authorize(scopes, sub, clientSecret, exp);
+                    case ADDRESS -> providerUserService.authorize(scopes, sub, clientSecret);
                 };
             }
             case "refresh_token" ->
@@ -147,6 +152,7 @@ public class OauthController {
             Cookie cookie = new Cookie(REFRESH_COOKIE, token.getRefreshToken().getTokenValue());
             cookie.setHttpOnly(true);
             cookie.setSecure(true);
+            cookie.setAttribute("SameSite", "Strict");
             cookie.setMaxAge(Constants.REFRESH_EXPIRY_DURATION_SECONDS.intValue());
             servletResponse.addCookie(cookie);
         }

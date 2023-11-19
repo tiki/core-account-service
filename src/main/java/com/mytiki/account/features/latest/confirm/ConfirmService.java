@@ -5,8 +5,8 @@
 
 package com.mytiki.account.features.latest.confirm;
 
-import com.mytiki.account.features.latest.user_info.UserInfoDO;
-import com.mytiki.account.features.latest.user_info.UserInfoRepository;
+import com.mytiki.account.features.latest.profile.ProfileDO;
+import com.mytiki.account.features.latest.profile.ProfileRepository;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.facade.RandF;
 import com.mytiki.account.utilities.facade.SendgridF;
@@ -25,17 +25,17 @@ public class ConfirmService {
     private final SendgridF sendgrid;
     private final TemplateF template;
     private final ConfirmRepository repository;
-    private final UserInfoRepository userInfoRepository;
+    private final ProfileRepository profileRepository;
 
     public ConfirmService(
             SendgridF sendgrid,
             TemplateF template,
             ConfirmRepository repository,
-            UserInfoRepository userInfoRepository) {
+            ProfileRepository profileRepository) {
         this.sendgrid = sendgrid;
         this.template = template;
         this.repository = repository;
-        this.userInfoRepository = userInfoRepository;
+        this.profileRepository = profileRepository;
     }
 
     public boolean send(ConfirmAO req) {
@@ -71,17 +71,17 @@ public class ConfirmService {
         switch (action){
             case DELETE_USER -> {
                 Long id = Long.parseLong(properties.get("id"));
-                userInfoRepository.deleteById(id);
+                profileRepository.deleteById(id);
             }
             case UPDATE_USER -> {
                 String subject = properties.get("subject");
                 String email = properties.get("email");
-                Optional<UserInfoDO> found = userInfoRepository.findByEmail(subject);
+                Optional<ProfileDO> found = profileRepository.findByEmail(subject);
                 if(found.isPresent()){
-                    UserInfoDO update = found.get();
+                    ProfileDO update = found.get();
                     update.setEmail(email);
                     update.setModified(ZonedDateTime.now());
-                    userInfoRepository.save(update);
+                    profileRepository.save(update);
                 }
             }
         }

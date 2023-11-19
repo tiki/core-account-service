@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Import;
 
 import java.security.Security;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.TimeZone;
 
 @Import({
@@ -51,21 +53,22 @@ public class AppConfig {
     public OpenAPI openAPI(@Value("${springdoc.version}") String appVersion) {
         return new OpenAPI()
                 .info(new Info()
-                        .title("TIKI Account")
+                        .title("Account Management Service")
                         .description("TIKI's account management service —configure and provision access to the data platform")
                         .version(appVersion)
                         .license(new License()
                                 .name("MIT")
-                                .url("https://github.com/tiki/tiki-account/blob/main/LICENSE")))
+                                .url("https://github.com/tiki/core-account-service/blob/main/LICENSE")))
                 .servers(Collections.singletonList(new Server()
-                        .url("https://mytiki.com/api/account")))
+                        .url("https://account.mytiki.com")))
+                .extensions(new HashMap<>(){{
+                    put("x-readme", new HashMap<>(){{
+                        put("samples-languages", List.of("shell", "node", "python", "go", "java"));
+                    }});
+                }})
                 .components(new Components()
-                        .addSecuritySchemes("oauth", new SecurityScheme()
-                                .type(SecurityScheme.Type.OAUTH2)
-                                .flows(new OAuthFlows()
-                                        .password(new OAuthFlow()
-                                                .tokenUrl("https://mytiki.com/api/account/oauth/token")
-                                                .refreshUrl("https://mytiki.com/api/account/oauth/token")
-                                                .scopes(new Scopes().addString("auth","this service")))))); //TODO fix scopes
+                        .addSecuritySchemes("default", new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")));
     }
 }
