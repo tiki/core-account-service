@@ -4,7 +4,7 @@
  */
 
 window.onload = function () {
-  const url_string = window.location.href.toLowerCase();
+  const url_string = window.location.href;
   const url = new URL(url_string);
   const code = url.searchParams.get("code");
 
