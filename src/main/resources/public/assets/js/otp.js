@@ -33,7 +33,7 @@ const authenticateReadme = (otp) => {
     body: new URLSearchParams({
       grant_type: "password",
       username,
-      password: otp.toUpperCase(),
+      password: otp,
       scope: "account:admin",
     }),
   };
@@ -52,7 +52,7 @@ const authenticateReadme = (otp) => {
   );
 };
 
-const url_string = window.location.href.toLowerCase();
+const url_string = window.location.href;
 const url = new URL(url_string);
 const code = url.searchParams.get("code");
 
