@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Account Management Service
+  title: Account Management
   description: TIKI's account management service —configure and provision access to
     the data platform
   license:

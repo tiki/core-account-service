@@ -17,7 +17,6 @@ import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -137,7 +136,7 @@ public class OauthController {
                             oauthInternal.authorize(sub, clientSecret, scopes, exp);
                     case USER ->
                             apiKeyService.authorize(sub, clientSecret, scopes, exp);
-                    case APP -> providerService.authorize(scopes, sub, clientSecret, exp);
+                    case PROVIDER -> providerService.authorize(scopes, sub, clientSecret, exp);
                     case ADDRESS -> providerUserService.authorize(scopes, sub, clientSecret);
                 };
             }

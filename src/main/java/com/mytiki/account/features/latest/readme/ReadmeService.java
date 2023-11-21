@@ -66,19 +66,17 @@ public class ReadmeService {
 
         String providerId = profile.getOrg().getProviders() != null && !profile.getOrg().getProviders().isEmpty() ?
                 profile.getOrg().getProviders().get(0).getProviderId().toString() : null;
-        String userId = profile.getUserId().toString();
-        String orgId = profile.getOrg().getOrgId().toString();
+        ReadmeAORspParams params = new ReadmeAORspParams();
+        params.setOrgId(profile.getOrg().getOrgId().toString());
+        params.setProviderId(providerId);
+        params.setUserId(profile.getUserId().toString());
+        rsp.setParameters(params);
 
         rsp.setKeys(keys.stream().map((key) -> {
             ReadmeAORspKey rspKey = new ReadmeAORspKey();
             rspKey.setApiKey(key.getToken());
             rspKey.setKey(key.getToken());
             rspKey.setName(key.getLabel());
-            ReadmeAORspParams params = new ReadmeAORspParams();
-            params.setOrgId(orgId);
-            params.setProviderId(providerId);
-            params.setUserId(userId);
-            rspKey.setParameters(params);
             return rspKey;
         }).collect(Collectors.toList()));
 

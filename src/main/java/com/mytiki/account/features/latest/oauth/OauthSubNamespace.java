@@ -10,7 +10,7 @@ import java.util.Map;
 
 public enum OauthSubNamespace {
     USER("user"),
-    APP("app"),
+    PROVIDER("provider"),
     INTERNAL("internal"),
     ADDRESS("addr");
 

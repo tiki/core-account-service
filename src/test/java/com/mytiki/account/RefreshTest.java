@@ -21,14 +21,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -101,7 +99,7 @@ public class RefreshTest {
 
     @Test
     public void Test_Authorize_Success() throws JOSEException, ParseException {
-        OauthSub sub = new OauthSub(OauthSubNamespace.APP, UUID.randomUUID().toString());
+        OauthSub sub = new OauthSub(OauthSubNamespace.PROVIDER, UUID.randomUUID().toString());
         String token = service.issue(sub, null, null);
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
@@ -155,7 +153,7 @@ public class RefreshTest {
     @Test
     public void Test_Authorize_Audience_Success() throws JOSEException {
         String audience = "trail.mytiki.com";
-        OauthSub sub = new OauthSub(OauthSubNamespace.APP, UUID.randomUUID().toString());
+        OauthSub sub = new OauthSub(OauthSubNamespace.PROVIDER, UUID.randomUUID().toString());
         String token = service.issue(sub, List.of(audience), null);
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
@@ -165,7 +163,7 @@ public class RefreshTest {
 
     @Test
     public void Test_Authorize_Subject_Success() throws JOSEException {
-        OauthSub subject = new OauthSub(OauthSubNamespace.APP, UUID.randomUUID().toString());
+        OauthSub subject = new OauthSub(OauthSubNamespace.PROVIDER, UUID.randomUUID().toString());
         String token = service.issue(subject, null, null);
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);
@@ -176,7 +174,7 @@ public class RefreshTest {
     @Test
     public void Test_Authorize_Scope_Success() throws JOSEException {
         String scp = "testScope";
-        OauthSub sub = new OauthSub(OauthSubNamespace.APP, UUID.randomUUID().toString());
+        OauthSub sub = new OauthSub(OauthSubNamespace.PROVIDER, UUID.randomUUID().toString());
         String token = service.issue(sub, null, List.of(scp));
 
         OAuth2AccessTokenResponse rsp = service.authorize(token);

@@ -53,7 +53,7 @@ public class OauthSub {
     }
 
     public boolean isApp() {
-        return namespace.equals(OauthSubNamespace.APP);
+        return namespace.equals(OauthSubNamespace.PROVIDER);
     }
 
     public boolean isInternal() {
