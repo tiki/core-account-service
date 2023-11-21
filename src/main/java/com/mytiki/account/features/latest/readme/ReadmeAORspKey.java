@@ -14,7 +14,6 @@ public class ReadmeAORspKey {
     private String apiKey;
     private String key;
     private String name;
-    private ReadmeAORspParams parameters;
 
     public String getApiKey() {
         return apiKey;
@@ -38,13 +37,5 @@ public class ReadmeAORspKey {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public ReadmeAORspParams getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(ReadmeAORspParams parameters) {
-        this.parameters = parameters;
     }
 }

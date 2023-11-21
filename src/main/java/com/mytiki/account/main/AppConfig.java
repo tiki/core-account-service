@@ -53,7 +53,7 @@ public class AppConfig {
     public OpenAPI openAPI(@Value("${springdoc.version}") String appVersion) {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Account Management Service")
+                        .title("Account Management")
                         .description("TIKI's account management service —configure and provision access to the data platform")
                         .version(appVersion)
                         .license(new License()

@@ -8,6 +8,13 @@ updates:
       prefix: "mvn"
     labels:
       - "chore"
+    groups:
+      minor:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -17,6 +24,10 @@ updates:
       prefix: "gh-action"
     labels:
       - "chore"
+    groups:
+      all:
+        patterns:
+          - "*"
 
   - package-ecosystem: "docker"
     directory: "/"
@@ -26,12 +37,20 @@ updates:
       prefix: "docker"
     labels:
       - "chore"
+    groups:
+      all:
+        patterns:
+          - "*"
 
-  - package-ecosystem: "terraform"
-    directory: "/infra"
+  - package-ecosystem: "npm"
+    directory: "/tailwind"
     schedule:
       interval: "weekly"
     commit-message:
-      prefix: "terraform"
+      prefix: "npm"
     labels:
       - "chore"
+    groups:
+      all:
+        patterns:
+          - "*"

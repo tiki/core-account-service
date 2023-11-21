@@ -13,6 +13,7 @@ public class ReadmeAORsp {
     private String email;
     private Integer version;
     private List<ReadmeAORspKey> keys;
+    private ReadmeAORspParams parameters;
 
     public String getName() {
         return name;
@@ -44,5 +45,13 @@ public class ReadmeAORsp {
 
     public void setKeys(List<ReadmeAORspKey> keys) {
         this.keys = keys;
+    }
+
+    public ReadmeAORspParams getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(ReadmeAORspParams parameters) {
+        this.parameters = parameters;
     }
 }
