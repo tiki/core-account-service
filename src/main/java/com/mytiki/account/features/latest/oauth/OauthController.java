@@ -124,6 +124,7 @@ public class OauthController {
             @RequestParam(required = false) String expires,
             HttpServletResponse servletResponse) {
         OauthScopes scopes = allowedScopes.filter(scope);
+        OauthScopes noInternal = scopes.filter(oauthInternal.getScopes());
         Long exp = expires == null || expires.isBlank() ? TOKEN_EXPIRY_DURATION_SECONDS : Long.parseLong(expires);
         OAuth2AccessTokenResponse token = switch (grantType.getValue()) {
             case "authorization_code" -> authCodeService.authorize(scopes, clientId, code);
@@ -135,9 +136,9 @@ public class OauthController {
                     case INTERNAL ->
                             oauthInternal.authorize(sub, clientSecret, scopes, exp);
                     case USER ->
-                            apiKeyService.authorize(sub, clientSecret, scopes, exp);
-                    case PROVIDER -> providerService.authorize(scopes, sub, clientSecret, exp);
-                    case ADDRESS -> providerUserService.authorize(scopes, sub, clientSecret);
+                            apiKeyService.authorize(sub, clientSecret, noInternal, exp);
+                    case PROVIDER -> providerService.authorize(noInternal, sub, clientSecret, exp);
+                    case ADDRESS -> providerUserService.authorize(noInternal, sub, clientSecret);
                 };
             }
             case "refresh_token" ->

@@ -8,6 +8,7 @@ package com.mytiki.account.features.latest.ocean;
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.utilities.Constants;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
@@ -27,10 +28,20 @@ public class OceanController {
     }
 
     @Operation(hidden = true)
-    @Secured("SCOPE_account:internal")
+    @Secured("SCOPE_account:internal:ocean")
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(code = HttpStatus.OK)
     public void update(@RequestBody OceanAO body) {
         service.update(body);
+    }
+
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-ocean-get",
+            summary = "Test Ocean",
+            description = "Fires a dummy request for testing.",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
+    @Secured("SCOPE_account:admin")
+    @RequestMapping(method = RequestMethod.GET)
+    public void test() {
+        service.query(OceanType.COUNT, "SELECT COUNT(*) FROM ocean.attain_transaction;");
     }
 }

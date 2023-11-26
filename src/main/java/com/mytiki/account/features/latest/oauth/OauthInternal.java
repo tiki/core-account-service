@@ -16,6 +16,8 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 
+import java.util.List;
+
 public class OauthInternal {
     private final RefreshService refreshService;
     private final PasswordEncoder secretEncoder;
@@ -54,5 +56,9 @@ public class OauthInternal {
             throw new OAuth2AuthorizationException(new OAuth2Error(
                     OAuth2ErrorCodes.SERVER_ERROR), "Issue with JWT construction", e);
         }
+    }
+
+    public List<String> getScopes() {
+        return creds.getScopes();
     }
 }
