@@ -6,7 +6,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/core-account-service/blob/main/LICENSE
-  version: 2.7.1
+  version: 2.8.0
 servers:
 - url: https://account.mytiki.com
 paths:
@@ -206,6 +206,19 @@ paths:
         required: true
         schema:
           type: string
+      responses:
+        "200":
+          description: OK
+      security:
+      - default:
+        - account:admin
+  /api/latest/ocean:
+    get:
+      tags:
+      - Profile
+      summary: Test Ocean
+      description: Fires a dummy request for testing.
+      operationId: account-ocean-get
       responses:
         "200":
           description: OK
