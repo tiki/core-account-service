@@ -145,11 +145,38 @@ Resources:
     Properties:
       RoleName: TaskRoleCoreAccountService
       Description: ECS Task Role for Core Account Service
-      AssumeRolePolicyDocument: "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ecs-tasks.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
+      AssumeRolePolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: ecs-tasks.amazonaws.com
       Policies:
         - PolicyName: XRay
-          PolicyDocument: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"xray:PutTraceSegments\",\"xray:PutTelemetryRecords\",\"xray:GetSamplingRules\",\"xray:GetSamplingTargets\",\"xray:GetSamplingStatisticSummaries\"],\"Resource\": \"*\"}]}"
-
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - xray:PutTraceSegments
+                  - xray:PutTelemetryRecords
+                  - xray:GetSamplingRules
+                  - xray:GetSamplingTargets
+                  - xray:GetSamplingStatisticSummaries
+                Resource: "*"
+        - PolicyName: SFN
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - states:DescribeExecution
+                  - states:StartExecution
+                Resource:
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:CoreSubscription:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:CoreSubscription
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:CoreSubscription:*:*
   Task:
     Type: AWS::ECS::TaskDefinition
     Properties:
