@@ -28,7 +28,7 @@ public class OceanController {
     }
 
     @Operation(hidden = true)
-    @Secured("SCOPE_account:internal")
+    @Secured("SCOPE_account:internal:ocean")
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(code = HttpStatus.OK)
     public void update(@RequestBody OceanAO body) {
