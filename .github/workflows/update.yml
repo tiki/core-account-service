@@ -74,6 +74,8 @@ jobs:
       GITHUB_OAUTH_SECRET: ${{ secrets.GH_OAUTH_SECRET }}
       GOOGLE_OAUTH_ID: ${{ secrets.GOOGLE_OAUTH_ID }}
       GOOGLE_OAUTH_SECRET: ${{ secrets.GOOGLE_OAUTH_SECRET }}
+      OCEAN_REGION: ${{ vars.OCEAN_REGION }}
+      OCEAN_ARN: ${{ secrets.OCEAN_ARN }}
     services:
       postgres:
         image: postgres:14.5

@@ -6,6 +6,7 @@
 package com.mytiki.account.features.latest;
 
 import com.mytiki.account.features.latest.auth_code.AuthCodeConfig;
+import com.mytiki.account.features.latest.ocean.OceanConfig;
 import com.mytiki.account.features.latest.provider_user.ProviderUserConfig;
 import com.mytiki.account.features.latest.api_key.ApiKeyConfig;
 import com.mytiki.account.features.latest.provider.ProviderConfig;
@@ -33,7 +34,8 @@ import org.springframework.context.annotation.Import;
         ConfirmConfig.class,
         OauthConfig.class,
         AuthCodeConfig.class,
-        ReadmeConfig.class
+        ReadmeConfig.class,
+        OceanConfig.class
 })
 public class FeaturesConfig {
 }
