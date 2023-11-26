@@ -3,6 +3,36 @@
  * MIT license. See LICENSE file in root directory.
  */
 
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
+/*
+ * Copyright (c) TIKI Inc.
+ * MIT license. See LICENSE file in root directory.
+ */
+
 -- -----------------------------------------------------------------------
 -- ONE-TIME PASSWORD
 -- -----------------------------------------------------------------------
@@ -83,6 +113,35 @@ CREATE TABLE IF NOT EXISTS confirm(
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
+-- -----------------------------------------------------------------------
+-- DATA SUBSCRIPTIONS
+-- -----------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS subscription(
+    id BIGSERIAL PRIMARY KEY,
+    profile_id BIGINT REFERENCES profile(id) NOT NULL,
+    query TEXT NOT NULL,
+    status TEXT NOT NULL,
+    created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
+    modified_utc TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+-- -----------------------------------------------------------------------
+-- OCEAN QUERIES
+-- -----------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS ocean(
+    id BIGSERIAL PRIMARY KEY,
+    request_id UUID NOT NULL UNIQUE,
+--     subscription_id BIGINT REFERENCES subscription(id) NOT NULL,
+    status TEXT NOT NULL,
+    type TEXT NOT NULL,
+    execution_arn TEXT NOT NULL,
+    result_uri TEXT,
+    result TEXT,
+    created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
+    modified_utc TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
 
 -- -----------------------------------------------------------------------
 -- DATA PROVIDER - USER
@@ -98,7 +157,3 @@ CREATE TABLE IF NOT EXISTS provider_user(
 );
 CREATE INDEX ON provider_user (provider_id, custom_id);
 CREATE INDEX ON provider_user (provider_id, address);
-
-
-
-
