@@ -213,6 +213,10 @@ Resources:
               ValueFrom: !Sub "${Secret}:GOOGLE_OAUTH_ID::"
             - Name: GOOGLE_OAUTH_SECRET
               ValueFrom: !Sub "${Secret}:GOOGLE_OAUTH_SECRET::"
+            - Name: OCEAN_REGION
+              ValueFrom: !Sub "${Secret}:OCEAN_REGION::"
+            - Name: OCEAN_ARN
+              ValueFrom: !Sub "${Secret}:OCEAN_ARN::"
           LogConfiguration:
             LogDriver: awslogs
             Options:
