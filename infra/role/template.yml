@@ -56,6 +56,7 @@ Resources:
               - iam:DeleteRolePolicy
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
+              - iam:UpdateAssumeRolePolicy
             Resource:
               - !Sub arn:aws:iam::${AWS::AccountId}:role/core-ocean-sar-*
               - !Sub arn:aws:iam::${AWS::AccountId}:role/TaskRoleCoreAccountService
