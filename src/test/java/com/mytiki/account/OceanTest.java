@@ -5,6 +5,7 @@
 
 package com.mytiki.account;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.account.features.latest.api_key.ApiKeyDO;
 import com.mytiki.account.features.latest.api_key.ApiKeyRepository;
@@ -30,9 +31,14 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.sfn.SfnClient;
 import software.amazon.awssdk.services.sfn.model.*;
 
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -59,14 +65,19 @@ public class OceanTest {
 
     @BeforeEach
     public void before() {
-        SfnClient client = Mockito.mock(SfnClient.class);
+        SfnClient sfnClient = Mockito.mock(SfnClient.class);
         Mockito.doReturn(StartExecutionResponse.builder().executionArn(executionArn).build())
-                .when(client)
+                .when(sfnClient)
                 .startExecution(Mockito.any(StartExecutionRequest.class));
         Mockito.doReturn(DescribeExecutionResponse.builder().status(ExecutionStatus.SUCCEEDED).build())
-                .when(client)
+                .when(sfnClient)
                 .describeExecution(Mockito.any(DescribeExecutionRequest.class));
-        this.service = new OceanService(client, arn, mapper, repository);
+        S3Client s3Client = Mockito.mock(S3Client.class);
+        Mockito.doReturn(ResponseBytes.fromByteArray(GetObjectResponse.builder().build(),
+                        "hello,world".getBytes(StandardCharsets.UTF_8)))
+                .when(s3Client)
+                .getObjectAsBytes(Mockito.any(GetObjectRequest.class));
+        this.service = new OceanService(sfnClient, s3Client, arn, mapper, repository);
     }
 
     @Test
