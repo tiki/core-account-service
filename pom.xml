@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.5</version>
+        <version>3.2.0</version>
     </parent>
 
     <properties>
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.2.1</version>
+            <version>5.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -166,7 +166,7 @@
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-client</artifactId>
-            <version>5.2.0</version>
+            <version>5.5.0</version>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
@@ -189,7 +189,7 @@
             <dependency>
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>bom</artifactId>
-                <version>2.21.29</version>
+                <version>2.21.30</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -246,7 +246,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.5.0</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
