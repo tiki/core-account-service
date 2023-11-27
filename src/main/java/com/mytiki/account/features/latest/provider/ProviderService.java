@@ -84,6 +84,7 @@ public class ProviderService {
                     .exception();
         ProviderDO update = found.get();
         update.setName(req.getName());
+        update.setModified(ZonedDateTime.now());
         update = repository.save(update);
         return toAO(update);
     }
@@ -121,10 +122,10 @@ public class ProviderService {
     public void guard(JwtAuthenticationToken token, String providerId){
         if(OauthScopes.hasScope(token,"account:internal:read")) return;
         OauthSub sub = new OauthSub(token.getName());
-        if (sub.isApp() && !sub.getId().equals(providerId)) {
+        if (sub.isProvider() && !sub.getId().equals(providerId)) {
             throw new ErrorBuilder(HttpStatus.FORBIDDEN)
                     .detail("Invalid claim: sub")
-                    .help("App ID does not match claim")
+                    .help("Provider ID does not match claim")
                     .exception();
         }else if (sub.isUser()){
             Optional<ProviderDO> app = repository.findByProviderIdAndUserId(UUID.fromString(providerId), UUID.fromString(sub.getId()));

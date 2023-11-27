@@ -9,6 +9,7 @@ import com.amazonaws.xray.interceptors.TracingInterceptor;
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mytiki.account.features.latest.subscription.SubscriptionDO;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.error.ApiException;
 import com.opencsv.CSVReader;
@@ -75,7 +76,7 @@ public class OceanService {
         this.s3Client = s3Client;
     }
 
-    public OceanDO query(OceanType type, String query) {
+    public OceanDO query(SubscriptionDO subscription, OceanType type, String query) {
         UUID requestId = UUID.randomUUID();
         String executionArn = execute(requestId, query);
         OceanDO ocean = new OceanDO();
@@ -84,6 +85,7 @@ public class OceanService {
         ocean.setType(type);
         ocean.setStatus(OceanStatus.PENDING);
         ocean.setExecutionArn(executionArn);
+        ocean.setSubscription(subscription);
         ocean.setCreated(now);
         ocean.setModified(now);
         return repository.save(ocean);

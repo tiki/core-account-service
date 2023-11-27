@@ -52,7 +52,7 @@ public class OauthSub {
         return namespace.equals(OauthSubNamespace.USER);
     }
 
-    public boolean isApp() {
+    public boolean isProvider() {
         return namespace.equals(OauthSubNamespace.PROVIDER);
     }
 

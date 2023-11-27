@@ -10,7 +10,7 @@ import jakarta.persistence.AttributeConverter;
 public class OceanTypeConverter implements AttributeConverter<OceanType, String> {
     @Override
     public String convertToDatabaseColumn(OceanType type) {
-        return type.toString();
+        return type != null ? type.toString() : null;
     }
 
     @Override

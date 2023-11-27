@@ -34,14 +34,4 @@ public class OceanController {
     public void update(@RequestBody OceanAO body) {
         service.update(body);
     }
-
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-ocean-get",
-            summary = "Test Ocean",
-            description = "Fires a dummy request for testing.",
-            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
-    @Secured("SCOPE_account:admin")
-    @RequestMapping(method = RequestMethod.GET)
-    public void test() {
-        service.query(OceanType.COUNT, "SELECT COUNT(*) FROM ocean.attain_transaction;");
-    }
 }

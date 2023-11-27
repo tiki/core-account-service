@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.ocean;
 
+import com.mytiki.account.features.latest.subscription.SubscriptionDO;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -16,7 +17,7 @@ import java.util.UUID;
 public class OceanDO implements Serializable {
     private Long id;
     private UUID requestId;
-    //private SubscriptionDO subscription;
+    private SubscriptionDO subscription;
     private OceanStatus status;
     private OceanType type;
     private String executionArn;
@@ -43,6 +44,16 @@ public class OceanDO implements Serializable {
 
     public void setRequestId(UUID requestId) {
         this.requestId = requestId;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subscription_id")
+    public SubscriptionDO getSubscription() {
+        return subscription;
+    }
+
+    public void setSubscription(SubscriptionDO subscription) {
+        this.subscription = subscription;
     }
 
     @Column(name = "status")
