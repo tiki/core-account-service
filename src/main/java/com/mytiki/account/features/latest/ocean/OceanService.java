@@ -8,6 +8,8 @@ package com.mytiki.account.features.latest.ocean;
 import com.amazonaws.xray.interceptors.TracingInterceptor;
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.account.features.latest.subscription.SubscriptionDO;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
@@ -29,7 +31,6 @@ import software.amazon.awssdk.services.sfn.model.*;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -91,7 +92,7 @@ public class OceanService {
         return repository.save(ocean);
     }
 
-    public void update(OceanAO req) {
+    public void update(OceanAOReq req) {
         UUID requestId = UUID.fromString(req.getRequestId());
         Optional<OceanDO> found = repository.findByRequestId(requestId);
         if(found.isPresent()){
@@ -121,6 +122,22 @@ public class OceanService {
                 return repository.save(update);
             }else return found.get();
         }else return null;
+    }
+
+    public OceanAO toAO(OceanDO src) {
+        OceanAO rsp = new OceanAO();
+        rsp.setRequestId(src.getRequestId());
+        rsp.setCreated(src.getCreated());
+        rsp.setModified(src.getModified());
+        rsp.setType(src.getType().toString());
+        rsp.setStatus(src.getStatus().toString());
+        try{
+            TypeReference<List<String[]>> typeRef = new TypeReference<>() {};
+            rsp.setResult(mapper.readValue(src.getResult(), typeRef));
+        } catch (JsonProcessingException e) {
+            logger.warn("Failed to read results. Skipping", e);
+        }
+        return rsp;
     }
 
     private String execute(UUID request, String query) {

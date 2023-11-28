@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.subscription;
 
+import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
 import com.mytiki.account.features.latest.ocean.OceanDO;
 import com.mytiki.account.features.latest.ocean.OceanStatusConverter;
 import com.mytiki.account.features.latest.profile.ProfileDO;
@@ -13,12 +14,14 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "subscription")
 public class SubscriptionDO implements Serializable {
     private Long id;
-    private ProfileDO profile;
+    private UUID subscriptionId;
+    private CleanroomDO cleanroom;
     private String query;
     private SubscriptionStatus status;
     private List<OceanDO> results;
@@ -36,14 +39,23 @@ public class SubscriptionDO implements Serializable {
         this.id = id;
     }
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "profile_id")
-    public ProfileDO getProfile() {
-        return profile;
+    @Column(name = "subscription_id")
+    public UUID getSubscriptionId() {
+        return subscriptionId;
     }
 
-    public void setProfile(ProfileDO profile) {
-        this.profile = profile;
+    public void setSubscriptionId(UUID subscriptionId) {
+        this.subscriptionId = subscriptionId;
+    }
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "cleanroom_id")
+    public CleanroomDO getCleanroom() {
+        return cleanroom;
+    }
+
+    public void setCleanroom(CleanroomDO cleanroom) {
+        this.cleanroom = cleanroom;
     }
 
     @Column(name = "query")

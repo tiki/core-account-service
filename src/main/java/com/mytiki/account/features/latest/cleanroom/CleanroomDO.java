@@ -65,7 +65,7 @@ public class CleanroomDO implements Serializable {
         this.org = org;
     }
 
-    @Column(name = "name")
+    @Column(name = "aws_accounts")
     @Convert(converter = ListConvert.class)
     public List<String> getAwsAccounts() {
         return awsAccounts;

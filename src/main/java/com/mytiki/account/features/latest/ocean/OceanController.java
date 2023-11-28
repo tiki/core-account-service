@@ -8,7 +8,6 @@ package com.mytiki.account.features.latest.ocean;
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.utilities.Constants;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
@@ -31,7 +30,7 @@ public class OceanController {
     @Secured("SCOPE_account:internal:ocean")
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(code = HttpStatus.OK)
-    public void update(@RequestBody OceanAO body) {
+    public void update(@RequestBody OceanAOReq body) {
         service.update(body);
     }
 }

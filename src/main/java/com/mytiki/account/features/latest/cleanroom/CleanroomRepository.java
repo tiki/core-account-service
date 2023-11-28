@@ -15,7 +15,6 @@ import java.util.UUID;
 
 public interface CleanroomRepository extends JpaRepository<CleanroomDO, Long> {
     Optional<CleanroomDO> findByCleanroomId(UUID cleanroomId);
-    void deleteByCleanroomId(UUID cleanroomId);
     @Query("SELECT a FROM CleanroomDO a INNER JOIN a.org o INNER JOIN o.profiles u WHERE a.cleanroomId = :cleanroomId AND u.userId = :userId")
     Optional<CleanroomDO> findByCleanroomIdAndUserId(@Param("cleanroomId") UUID cleanroomId, @Param("userId") UUID userId);
 
