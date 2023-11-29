@@ -12,8 +12,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 
 public class CleanroomAOReq {
+    @JsonProperty
     @Parameter(description = "A user friendly name describing your cleanroom")
     private String name;
+    @JsonProperty
     @Parameter(description = "A list of ARNs for IAM accounts to access the cleanroom")
     private List<String> iam;
 
