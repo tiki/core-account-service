@@ -45,7 +45,7 @@ public class CleanroomController {
     @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.POST)
     public CleanroomAO create(JwtAuthenticationToken token, @RequestBody CleanroomAOReq body) {
-        return service.create(body, token.getName());
+        return service.create(body, new OauthSub(token.getName()));
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-cleanroom-update",

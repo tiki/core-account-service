@@ -29,8 +29,9 @@ public class CleanroomService {
         this.profileService = profileService;
     }
 
-    public CleanroomAO create(CleanroomAOReq req, String userId) {
-        Optional<ProfileDO> user =  profileService.getDO(userId);
+    public CleanroomAO create(CleanroomAOReq req, OauthSub sub) {
+        if(!sub.isUser()) throw new ErrorBuilder(HttpStatus.FORBIDDEN).message("User token required").exception();
+        Optional<ProfileDO> user =  profileService.getDO(sub.getId());
         if(user.isEmpty())
             throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
         else {

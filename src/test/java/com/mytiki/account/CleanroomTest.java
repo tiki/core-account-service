@@ -66,7 +66,8 @@ public class CleanroomTest {
 
         CleanroomAOReq req = new CleanroomAOReq();
         req.setName(name);
-        CleanroomAO cleanroom = service.create(req, testUser.getUserId().toString());
+        CleanroomAO cleanroom = service.create(req,
+                new OauthSub(OauthSubNamespace.USER, testUser.getUserId().toString()));
         cleanroomId = cleanroom.getCleanroomId();
 
         assertEquals(name, cleanroom.getName());

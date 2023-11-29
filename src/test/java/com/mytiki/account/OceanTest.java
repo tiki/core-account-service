@@ -10,6 +10,8 @@ import com.mytiki.account.features.latest.cleanroom.CleanroomAO;
 import com.mytiki.account.features.latest.cleanroom.CleanroomAOReq;
 import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
 import com.mytiki.account.features.latest.cleanroom.CleanroomService;
+import com.mytiki.account.features.latest.oauth.OauthSub;
+import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
 import com.mytiki.account.features.latest.ocean.*;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
@@ -96,7 +98,8 @@ public class OceanTest {
 
         CleanroomAOReq req = new CleanroomAOReq();
         req.setName(name);
-        CleanroomAO createdCleanroom = cleanroomService.create(req, testUser.getUserId().toString());
+        CleanroomAO createdCleanroom = cleanroomService.create(req,
+                new OauthSub(OauthSubNamespace.USER, testUser.getUserId().toString()));
         Optional<CleanroomDO> cleanroom = cleanroomService.getDO(createdCleanroom.getCleanroomId());
 
         SubscriptionDO subscription = new SubscriptionDO();
@@ -134,7 +137,8 @@ public class OceanTest {
 
         CleanroomAOReq cleanroomReq = new CleanroomAOReq();
         cleanroomReq.setName(name);
-        CleanroomAO createdCleanroom = cleanroomService.create(cleanroomReq, testUser.getUserId().toString());
+        CleanroomAO createdCleanroom = cleanroomService.create(cleanroomReq,
+                new OauthSub(OauthSubNamespace.USER, testUser.getUserId().toString()));
         Optional<CleanroomDO> cleanroom = cleanroomService.getDO(createdCleanroom.getCleanroomId());
 
         SubscriptionDO subscription = new SubscriptionDO();
