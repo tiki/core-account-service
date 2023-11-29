@@ -7,6 +7,7 @@ package com.mytiki.account.features.latest.cleanroom;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.oauth.OauthSub;
+import com.mytiki.account.features.latest.ocean.OceanService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
@@ -21,12 +22,15 @@ public class CleanroomService {
 
     private final CleanroomRepository repository;
     private final ProfileService profileService;
+    private final OceanService oceanService;
 
     public CleanroomService(
             CleanroomRepository repository,
-            ProfileService profileService) {
+            ProfileService profileService,
+            OceanService oceanService) {
         this.repository = repository;
         this.profileService = profileService;
+        this.oceanService = oceanService;
     }
 
     public CleanroomAO create(CleanroomAOReq req, OauthSub sub) {
@@ -45,6 +49,9 @@ public class CleanroomService {
             cleanroom.setAwsAccounts(req.getIam());
             cleanroom.setCreated(now);
             cleanroom.setModified(now);
+            //TODO this is hacky temporary fix.
+            oceanService.execute(UUID.randomUUID(), "CREATE DATABASE cr_" +
+                    cleanroom.getCleanroomId().toString().replace("-", "_"));
             return toAO(repository.save(cleanroom));
         }
     }
