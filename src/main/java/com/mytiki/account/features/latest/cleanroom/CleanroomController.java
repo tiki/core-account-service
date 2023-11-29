@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 
 @XRayEnabled
-@Tag(name = "Data Purchaser")
+@Tag(name = "Managing Cleanrooms")
 @RestController
 @RequestMapping(value = CleanroomController.ROUTE)
 public class CleanroomController {
@@ -39,7 +39,7 @@ public class CleanroomController {
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-cleanroom-create",
-            summary = "Create Cleanroom",
+            summary = "Create a Cleanroom",
             description = "Creates a new data cleanroom, returning the configuration details",
             security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")

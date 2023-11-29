@@ -6,14 +6,14 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/core-account-service/blob/main/LICENSE
-  version: 2.8.6
+  version: 2.8.7
 servers:
 - url: https://account.mytiki.com
 paths:
   /api/latest/subscription:
     get:
       tags:
-      - Data Purchaser
+      - Managing Data Subscriptions
       summary: List Subscriptions
       description: Returns a filterable list of data subscriptions
       operationId: account-subscription-list
@@ -37,7 +37,7 @@ paths:
         - account:admin
     post:
       tags:
-      - Data Purchaser
+      - Managing Data Subscriptions
       summary: Create Estimate
       description: Creates a new estimate for a data subscription
       operationId: account-subscription-estimate
@@ -60,9 +60,9 @@ paths:
   /api/latest/subscription/{subscription-id}/purchase:
     post:
       tags:
-      - Data Purchaser
+      - Managing Data Subscriptions
       summary: Purchase Subscription
-      description: Purchases a data subscription by converting an estimate
+      description: Converts an estimate into a paid data subscription.
       operationId: account-subscription-purchase
       parameters:
       - name: subscription-id
@@ -83,7 +83,7 @@ paths:
   /api/latest/provider:
     post:
       tags:
-      - Data Provider
+      - Managing Data Providers
       summary: Create Provider
       description: "Creates a new data provider, returning the configuration details"
       operationId: account-provider-create
@@ -106,7 +106,7 @@ paths:
   /api/latest/provider/{provider-id}/user:
     get:
       tags:
-      - Data Provider
+      - Managing End Users
       summary: List Addresses
       description: Returns all registered device addresses matching the criteria
       operationId: account-provider-user-get
@@ -140,7 +140,7 @@ paths:
         - account:provider
     post:
       tags:
-      - Data Provider
+      - Managing End Users
       summary: Register Address
       description: Register a new device address for an end user
       operationId: account-provider-user-post
@@ -167,7 +167,7 @@ paths:
         - account:provider
     delete:
       tags:
-      - Data Provider
+      - Managing End Users
       summary: Delete Addresses
       description: Permanently delete all device addresses matching the criteria
       operationId: account-provider-user-delete
@@ -244,8 +244,8 @@ paths:
   /api/latest/cleanroom:
     post:
       tags:
-      - Data Purchaser
-      summary: Create Cleanroom
+      - Managing Cleanrooms
+      summary: Create a Cleanroom
       description: "Creates a new data cleanroom, returning the configuration details"
       operationId: account-cleanroom-create
       requestBody:
@@ -267,7 +267,7 @@ paths:
   /api/latest/cleanroom/{cleanroom-id}:
     get:
       tags:
-      - Data Purchaser
+      - Managing Cleanrooms
       summary: Get Cleanroom
       description: Returns the configuration details for a data cleanroom
       operationId: account-cleanroom-get
@@ -289,7 +289,7 @@ paths:
         - account:admin
     post:
       tags:
-      - Data Purchaser
+      - Managing Cleanrooms
       summary: Update a Cleanroom
       description: "Updates a data cleanroom, replacing the settings with any non-null\
         \ inputs"
@@ -318,7 +318,7 @@ paths:
         - account:admin
     delete:
       tags:
-      - Data Purchaser
+      - Managing Cleanrooms
       summary: Delete Cleanroom
       description: Permanently delete a data cleanroom and all it's data
       operationId: account-cleanroom-delete
@@ -337,7 +337,7 @@ paths:
   /api/latest/subscription/{subscription-id}:
     get:
       tags:
-      - Data Purchaser
+      - Managing Data Subscriptions
       summary: Get Subscription
       description: Returns the current status for a data subscription
       operationId: account-subscription-get
@@ -360,7 +360,7 @@ paths:
   /api/latest/provider/{provider-id}:
     get:
       tags:
-      - Data Provider
+      - Managing Data Providers
       summary: Get Provider
       description: Returns the configuration details for a data provider
       operationId: account-provider-get
@@ -382,7 +382,7 @@ paths:
         - account:admin
     delete:
       tags:
-      - Data Provider
+      - Managing Data Providers
       summary: Delete Provider
       description: Permanently delete a data provider — stops publishing of new data.
       operationId: account-provider-delete

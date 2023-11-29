@@ -144,7 +144,7 @@ public class OceanService {
         return rsp;
     }
 
-    private String execute(UUID request, String query) {
+    public String execute(UUID request, String query) {
         String requestId = request.toString();
         Map<String, String> input = new HashMap<>(){{
             put("Query", query);
