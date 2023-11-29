@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.cleanroom;
 
+import com.mytiki.account.features.latest.ocean.OceanService;
 import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,8 @@ public class CleanroomConfig {
     @Bean
     public CleanroomService cleanroomService(
             @Autowired CleanroomRepository repository,
-            @Autowired ProfileService profileService){
-        return new CleanroomService(repository, profileService);
+            @Autowired ProfileService profileService,
+            @Autowired OceanService oceanService){
+        return new CleanroomService(repository, profileService, oceanService);
     }
 }

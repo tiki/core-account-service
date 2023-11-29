@@ -6,16 +6,14 @@
 package com.mytiki.account;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mytiki.account.features.latest.cleanroom.CleanroomAO;
-import com.mytiki.account.features.latest.cleanroom.CleanroomAOReq;
-import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
-import com.mytiki.account.features.latest.cleanroom.CleanroomService;
+import com.mytiki.account.features.latest.cleanroom.*;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
 import com.mytiki.account.features.latest.ocean.*;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileRepository;
+import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.features.latest.subscription.SubscriptionDO;
 import com.mytiki.account.features.latest.subscription.SubscriptionRepository;
 import com.mytiki.account.features.latest.subscription.SubscriptionStatus;
@@ -56,14 +54,17 @@ public class OceanTest {
     @Autowired
     private OceanRepository repository;
     @Autowired
-    private CleanroomService cleanroomService;
-    @Autowired
     private SubscriptionRepository subscriptionRepository;
     @Autowired
     private ProfileRepository profileRepository;
     @Autowired
+    private CleanroomRepository cleanroomRepository;
+    @Autowired
+    private ProfileService profileService;
+    @Autowired
     private OrgService orgService;
     private OceanService service;
+    private CleanroomService cleanroomService;
     private final String executionArn = "dummy-execution-arn";
 
     @BeforeEach
@@ -81,6 +82,7 @@ public class OceanTest {
                 .when(s3Client)
                 .getObjectAsBytes(Mockito.any(GetObjectRequest.class));
         this.service = new OceanService(sfnClient, s3Client, arn, mapper, repository);
+        this.cleanroomService = new CleanroomService(cleanroomRepository, profileService, this.service);
     }
 
     @Test

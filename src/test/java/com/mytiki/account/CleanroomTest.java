@@ -8,17 +8,22 @@ package com.mytiki.account;
 
 import com.mytiki.account.features.latest.cleanroom.CleanroomAO;
 import com.mytiki.account.features.latest.cleanroom.CleanroomAOReq;
+import com.mytiki.account.features.latest.cleanroom.CleanroomRepository;
 import com.mytiki.account.features.latest.cleanroom.CleanroomService;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
+import com.mytiki.account.features.latest.ocean.OceanService;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileRepository;
+import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.features.latest.provider.ProviderService;
 import com.mytiki.account.main.App;
 import com.mytiki.account.utilities.error.ApiException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -37,18 +42,25 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CleanroomTest {
-
     @Autowired
-    CleanroomService service;
-
+    private CleanroomRepository repository;
     @Autowired
     private ProfileRepository profileRepository;
-
     @Autowired
     private OrgService orgService;
+    @Autowired
+    private ProfileService profileService;
 
+    private CleanroomService service;
     private String cleanroomId;
     private String userId;
+
+    @BeforeAll
+    public void before() {
+        OceanService oceanService = Mockito.mock(OceanService.class);
+        Mockito.doReturn("dummy").when(oceanService).execute(Mockito.any(), Mockito.any());
+        service = new CleanroomService(repository, profileService, oceanService);
+    }
 
     @Test
     @Order(1)
