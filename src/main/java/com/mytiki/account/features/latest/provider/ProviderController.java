@@ -15,7 +15,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 
 @XRayEnabled
-@Tag(name = "Data Provider")
+@Tag(name = "Managing Data Providers")
 @RestController
 @RequestMapping(value = ProviderController.ROUTE)
 public class ProviderController {

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @XRayEnabled
-@Tag(name = "Data Provider")
+@Tag(name = "Managing End Users")
 @RestController
 @RequestMapping(value = Constants.API_LATEST_ROUTE)
 public class ProviderUserController {
