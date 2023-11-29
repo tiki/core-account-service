@@ -21,6 +21,7 @@ import java.util.UUID;
 public class SubscriptionDO implements Serializable {
     private Long id;
     private UUID subscriptionId;
+    private String name;
     private CleanroomDO cleanroom;
     private String query;
     private SubscriptionStatus status;
@@ -46,6 +47,15 @@ public class SubscriptionDO implements Serializable {
 
     public void setSubscriptionId(UUID subscriptionId) {
         this.subscriptionId = subscriptionId;
+    }
+
+    @Column(name = "name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)

@@ -5,15 +5,10 @@
 
 package com.mytiki.account.features.latest.subscription;
 
-import com.mytiki.account.features.latest.ocean.OceanStatus;
-
 public enum SubscriptionStatus {
     ESTIMATE("estimate"),
-    INITIALIZING("initializing"),
-    UPDATING("updating"),
     SUBSCRIBED("subscribed"),
-    STOPPED("stopped"),
-    ERROR("error");
+    STOPPED("stopped");
 
     private final String string;
 

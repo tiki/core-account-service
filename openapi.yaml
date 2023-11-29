@@ -6,11 +6,35 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/core-account-service/blob/main/LICENSE
-  version: 2.8.5
+  version: 2.8.6
 servers:
 - url: https://account.mytiki.com
 paths:
   /api/latest/subscription:
+    get:
+      tags:
+      - Data Purchaser
+      summary: List Subscriptions
+      description: Returns a filterable list of data subscriptions
+      operationId: account-subscription-list
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubscriptionAO'
+      security:
+      - default:
+        - account:admin
     post:
       tags:
       - Data Purchaser
@@ -23,6 +47,29 @@ paths:
             schema:
               $ref: '#/components/schemas/SubscriptionAOReq'
         required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionAORsp'
+      security:
+      - default:
+        - account:admin
+  /api/latest/subscription/{subscription-id}/purchase:
+    post:
+      tags:
+      - Data Purchaser
+      summary: Purchase Subscription
+      description: Purchases a data subscription by converting an estimate
+      operationId: account-subscription-purchase
+      parameters:
+      - name: subscription-id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -306,7 +353,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SubscriptionAO'
+                $ref: '#/components/schemas/SubscriptionAORsp'
       security:
       - default:
         - account:admin
@@ -356,6 +403,8 @@ components:
     SubscriptionAOReq:
       type: object
       properties:
+        name:
+          type: string
         query:
           type: string
         cleanroomId:
@@ -382,6 +431,29 @@ components:
         modified:
           type: string
           format: date-time
+    SubscriptionAORsp:
+      type: object
+      properties:
+        subscriptionId:
+          type: string
+        cleanroomId:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+        query:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OceanAO'
     SubscriptionAO:
       type: object
       properties:
@@ -389,14 +461,10 @@ components:
           type: string
         cleanroomId:
           type: string
-        query:
+        name:
           type: string
         status:
           type: string
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/OceanAO'
         created:
           type: string
           format: date-time

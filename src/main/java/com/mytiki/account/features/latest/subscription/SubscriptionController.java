@@ -15,6 +15,8 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @XRayEnabled
 @Tag(name = "Data Purchaser")
 @RestController
@@ -28,13 +30,23 @@ public class SubscriptionController {
         this.service = service;
     }
 
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-subscription-list",
+            summary = "List Subscriptions",
+            description = "Returns a filterable list of data subscriptions",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
+    @RequestMapping(method = RequestMethod.GET)
+    @Secured("SCOPE_account:admin")
+    public List<SubscriptionAO> list(JwtAuthenticationToken token, @RequestParam(required = false) String status) {
+        return service.list(new OauthSub(token.getName()), status);
+    }
+
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-subscription-get",
             summary = "Get Subscription",
             description = "Returns the current status for a data subscription",
             security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @RequestMapping(method = RequestMethod.GET, path = "/{subscription-id}")
-    @Secured({"SCOPE_account:admin", "SCOPE_account:internal:read"})
-    public SubscriptionAO get(
+    @Secured("SCOPE_account:admin")
+    public SubscriptionAORsp get(
             JwtAuthenticationToken token,
             @PathVariable(name = "subscription-id") String subscriptionId) {
         return service.get(new OauthSub(token.getName()), subscriptionId);
@@ -45,27 +57,29 @@ public class SubscriptionController {
             description = "Creates a new estimate for a data subscription",
             security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @RequestMapping(method = RequestMethod.POST)
-    @Secured({"SCOPE_account:admin", "SCOPE_account:internal:read"})
-    public SubscriptionAO post(JwtAuthenticationToken token, @RequestBody SubscriptionAOReq body) {
+    @Secured("SCOPE_account:admin")
+    public SubscriptionAORsp post(JwtAuthenticationToken token, @RequestBody SubscriptionAOReq body) {
         return service.estimate(new OauthSub(token.getName()), body);
     }
 
-//    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-subscription-purchase",
-//            summary = "Purchase Subscription",
-//            description = "Purchases a data subscription by converting an estimate",
-//            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
-//    @RequestMapping(method = RequestMethod.POST, path = "/{subscription-id}/purchase")
-//    @Secured({"SCOPE_account:admin", "SCOPE_account:internal:read"})
-//    public SubscriptionAO purchase(JwtAuthenticationToken token) {
-//        return service.estimate(new OauthSub(token.getName()), body);
-//    }
-//
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-subscription-purchase",
+            summary = "Purchase Subscription",
+            description = "Purchases a data subscription by converting an estimate",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
+    @RequestMapping(method = RequestMethod.POST, path = "/{subscription-id}/purchase")
+    @Secured("SCOPE_account:admin")
+    public SubscriptionAO purchase(
+            JwtAuthenticationToken token,
+            @PathVariable(name = "subscription-id") String subscriptionId) {
+        return service.purchase(new OauthSub(token.getName()), subscriptionId);
+    }
+
 //    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-subscription-pause",
 //            summary = "Pause Subscription",
 //            description = "Pauses an existing data subscription",
 //            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
 //    @RequestMapping(method = RequestMethod.POST, path = "/{subscription-id}/pause")
-//    @Secured({"SCOPE_account:admin", "SCOPE_account:internal:read"})
+//    @Secured("SCOPE_account:admin")
 //    public SubscriptionAO pause(JwtAuthenticationToken token) {
 //        return service.estimate(new OauthSub(token.getName()), body);
 //    }

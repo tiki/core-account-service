@@ -9,6 +9,7 @@ import com.mytiki.account.features.latest.cleanroom.CleanroomService;
 import com.mytiki.account.features.latest.ocean.OceanService;
 import com.mytiki.account.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -27,7 +28,8 @@ public class SubscriptionConfig {
     public SubscriptionService subscriptionService(
             @Autowired SubscriptionRepository repository,
             @Autowired OceanService oceanService,
-            @Autowired CleanroomService cleanroomService){
-        return new SubscriptionService(repository, oceanService, cleanroomService);
+            @Autowired CleanroomService cleanroomService,
+            @Value("${com.mytiki.account.cleanroom.bucket}") String bucket){
+        return new SubscriptionService(repository, oceanService, cleanroomService, bucket);
     }
 }
