@@ -6,10 +6,33 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/core-account-service/blob/main/LICENSE
-  version: 2.8.0
+  version: 2.8.1
 servers:
 - url: https://account.mytiki.com
 paths:
+  /api/latest/subscription:
+    post:
+      tags:
+      - Data Purchaser
+      summary: Create Estimate
+      description: Creates a new estimate for a data subscription
+      operationId: account-subscription-estimate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionAOReq'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionAO'
+      security:
+      - default:
+        - account:admin
   /api/latest/provider:
     post:
       tags:
@@ -171,6 +194,122 @@ paths:
       security:
       - default:
         - account:admin
+  /api/latest/cleanroom:
+    post:
+      tags:
+      - Data Purchaser
+      summary: Create Cleanroom
+      description: "Creates a new data cleanroom, returning the configuration details"
+      operationId: account-cleanroom-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CleanroomAOReq'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CleanroomAO'
+      security:
+      - default:
+        - account:admin
+  /api/latest/cleanroom/{cleanroom-id}:
+    get:
+      tags:
+      - Data Purchaser
+      summary: Get Cleanroom
+      description: Returns the configuration details for a data cleanroom
+      operationId: account-cleanroom-get
+      parameters:
+      - name: cleanroom-id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CleanroomAO'
+      security:
+      - default:
+        - account:admin
+    post:
+      tags:
+      - Data Purchaser
+      summary: Update a Cleanroom
+      description: "Updates a data cleanroom, replacing the settings with any non-null\
+        \ inputs"
+      operationId: account-cleanroom-update
+      parameters:
+      - name: cleanroom-id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CleanroomAOReq'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CleanroomAO'
+      security:
+      - default:
+        - account:admin
+    delete:
+      tags:
+      - Data Purchaser
+      summary: Delete Cleanroom
+      description: Permanently delete a data cleanroom and all it's data
+      operationId: account-cleanroom-delete
+      parameters:
+      - name: cleanroom-id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+      security:
+      - default:
+        - account:admin
+  /api/latest/subscription/{subscription-id}:
+    get:
+      tags:
+      - Data Purchaser
+      summary: Get Subscription
+      description: Returns the current status for a data subscription
+      operationId: account-subscription-get
+      parameters:
+      - name: subscription-id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionAO'
+      security:
+      - default:
+        - account:admin
   /api/latest/provider/{provider-id}:
     get:
       tags:
@@ -212,21 +351,58 @@ paths:
       security:
       - default:
         - account:admin
-  /api/latest/ocean:
-    get:
-      tags:
-      - Profile
-      summary: Test Ocean
-      description: Fires a dummy request for testing.
-      operationId: account-ocean-get
-      responses:
-        "200":
-          description: OK
-      security:
-      - default:
-        - account:admin
 components:
   schemas:
+    SubscriptionAOReq:
+      type: object
+      properties:
+        query:
+          type: string
+        cleanroomId:
+          type: string
+    OceanAO:
+      type: object
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        status:
+          type: string
+        type:
+          type: string
+        result:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+    SubscriptionAO:
+      type: object
+      properties:
+        subscriptionId:
+          type: string
+        cleanroomId:
+          type: string
+        query:
+          type: string
+        status:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OceanAO'
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
     ProviderAOReq:
       type: object
       properties:
@@ -277,6 +453,34 @@ components:
       properties:
         email:
           type: string
+    CleanroomAOReq:
+      type: object
+      properties:
+        name:
+          type: string
+        iam:
+          type: array
+          items:
+            type: string
+    CleanroomAO:
+      type: object
+      properties:
+        cleanroomId:
+          type: string
+        name:
+          type: string
+        orgId:
+          type: string
+        iam:
+          type: array
+          items:
+            type: string
+        modified:
+          type: string
+          format: date-time
+        created:
+          type: string
+          format: date-time
     ProfileAO:
       type: object
       properties:
