@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 
 @XRayEnabled
-@Tag(name = "Data Purchaser")
+@Tag(name = "Managing Cleanrooms")
 @RestController
 @RequestMapping(value = CleanroomController.ROUTE)
 public class CleanroomController {

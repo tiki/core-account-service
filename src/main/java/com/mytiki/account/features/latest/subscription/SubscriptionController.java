@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @XRayEnabled
-@Tag(name = "Data Purchaser")
+@Tag(name = "Managing Data Subscriptions")
 @RestController
 @RequestMapping(value = SubscriptionController.ROUTE)
 public class SubscriptionController {
