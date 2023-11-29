@@ -7,7 +7,6 @@ package com.mytiki.account.features.latest.subscription;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.oauth.OauthSub;
-import com.mytiki.account.features.latest.provider.ProviderAO;
 import com.mytiki.account.utilities.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

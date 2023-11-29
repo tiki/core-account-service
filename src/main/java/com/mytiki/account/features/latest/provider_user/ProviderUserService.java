@@ -92,7 +92,7 @@ public class ProviderUserService {
         byte[] addr = B64F.decode(address, true);
         UUID app = UUID.fromString(providerId);
         Optional<ProviderUserDO> found = repository.findByProviderProviderIdAndAddress(app, addr);
-        return found.map(this::toRsp).orElseThrow(() -> new ErrorBuilder(HttpStatus.NOT_FOUND).exception());
+        return found.map(this::toRsp).orElse(new ProviderUserAORsp());
     }
 
     public List<ProviderUserAORsp> getAll(String providerId, String id){

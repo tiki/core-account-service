@@ -101,6 +101,7 @@ public class OceanTest {
 
         SubscriptionDO subscription = new SubscriptionDO();
         subscription.setStatus(SubscriptionStatus.ESTIMATE);
+        subscription.setSubscriptionId(UUID.randomUUID());
         subscription.setModified(ZonedDateTime.now());
         subscription.setCreated(ZonedDateTime.now());
         subscription.setQuery(query);
@@ -138,6 +139,7 @@ public class OceanTest {
 
         SubscriptionDO subscription = new SubscriptionDO();
         subscription.setStatus(SubscriptionStatus.ESTIMATE);
+        subscription.setSubscriptionId(UUID.randomUUID());
         subscription.setModified(ZonedDateTime.now());
         subscription.setCreated(ZonedDateTime.now());
         subscription.setQuery(query);
