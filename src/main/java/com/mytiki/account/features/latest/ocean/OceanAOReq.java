@@ -15,7 +15,7 @@ public class OceanAOReq {
     @JsonCreator
     public OceanAOReq(
             @JsonProperty(required = true) String requestId,
-            @JsonProperty(required = true) String resultUri) {
+            @JsonProperty String resultUri) {
         this.requestId = requestId;
         this.resultUri = resultUri;
     }

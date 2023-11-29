@@ -99,11 +99,13 @@ public class OceanService {
             OceanDO ocean = found.get();
             ocean.setStatus(OceanStatus.SUCCESS);
             ocean.setResultUri(req.getResultUri());
-            try {
-                List<String[]> res = fetch(req.getResultUri());
-                ocean.setResult(mapper.writeValueAsString(res));
-            }catch (ApiException | JsonProcessingException e) {
-                logger.warn("Failed to retrieve results. Skipping", e);
+            if(req.getResultUri() != null) {
+                try {
+                    List<String[]> res = fetch(req.getResultUri());
+                    ocean.setResult(mapper.writeValueAsString(res));
+                } catch (ApiException | JsonProcessingException e) {
+                    logger.warn("Failed to retrieve results. Skipping", e);
+                }
             }
             ocean.setModified(ZonedDateTime.now());
             repository.save(ocean);
@@ -131,11 +133,13 @@ public class OceanService {
         rsp.setModified(src.getModified());
         rsp.setType(src.getType().toString());
         rsp.setStatus(src.getStatus().toString());
-        try{
-            TypeReference<List<String[]>> typeRef = new TypeReference<>() {};
-            rsp.setResult(mapper.readValue(src.getResult(), typeRef));
-        } catch (JsonProcessingException e) {
-            logger.warn("Failed to read results. Skipping", e);
+        if(src.getResult() != null) {
+            try {
+                TypeReference<List<String[]>> typeRef = new TypeReference<>() {};
+                rsp.setResult(mapper.readValue(src.getResult(), typeRef));
+            } catch (JsonProcessingException e) {
+                logger.warn("Failed to read results. Skipping", e);
+            }
         }
         return rsp;
     }

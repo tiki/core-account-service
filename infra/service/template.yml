@@ -177,6 +177,14 @@ Resources:
                   - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:CoreSubscription:*
                   - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:CoreSubscription
                   - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:CoreSubscription:*:*
+        - PolicyName: S3
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: arn:aws:s3:::*/*
+
   Task:
     Type: AWS::ECS::TaskDefinition
     Properties:
