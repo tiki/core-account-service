@@ -77,9 +77,13 @@ public class SubscriptionService {
     }
 
     public SubscriptionAORsp purchase(OauthSub sub, String subscriptionId) {
-        //guard against repeat!
         Optional<SubscriptionDO> found = repository.findBySubscriptionId(UUID.fromString(subscriptionId));
         if(found.isEmpty()) throw new ErrorBuilder(HttpStatus.NOT_FOUND).exception();
+        if(found.get().getStatus() != SubscriptionStatus.ESTIMATE)
+            throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
+                    .message("Subscription exists")
+                    .help("Create a new estimate")
+                    .exception();
         cleanroomService.guard(sub, found.get().getCleanroom().getCleanroomId().toString());
         SubscriptionDO update = found.get();
         update.setStatus(SubscriptionStatus.SUBSCRIBED);
