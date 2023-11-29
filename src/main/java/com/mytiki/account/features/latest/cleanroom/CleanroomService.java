@@ -43,8 +43,8 @@ public class CleanroomService {
             //TODO set permissions in s3/glue.
             ZonedDateTime now = ZonedDateTime.now();
             CleanroomDO cleanroom = new CleanroomDO();
-            cleanroom.setName(req.getName());
             cleanroom.setCleanroomId(UUID.randomUUID());
+            cleanroom.setName( req.getName() != null ? req.getName() : cleanroom.getCleanroomId().toString());
             cleanroom.setOrg(user.get().getOrg());
             cleanroom.setAwsAccounts(req.getIam());
             cleanroom.setCreated(now);
