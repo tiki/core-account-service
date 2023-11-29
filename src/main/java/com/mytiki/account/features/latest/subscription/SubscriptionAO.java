@@ -5,18 +5,13 @@
 
 package com.mytiki.account.features.latest.subscription;
 
-import com.mytiki.account.features.latest.ocean.OceanAO;
-import com.mytiki.account.features.latest.ocean.OceanAOReq;
-
 import java.time.ZonedDateTime;
-import java.util.List;
 
 public class SubscriptionAO {
     private String subscriptionId;
     private String cleanroomId;
-    private String query;
+    private String name;
     private String status;
-    private List<OceanAO> results;
     private ZonedDateTime created;
     private ZonedDateTime modified;
 
@@ -36,12 +31,12 @@ public class SubscriptionAO {
         this.cleanroomId = cleanroomId;
     }
 
-    public String getQuery() {
-        return query;
+    public String getName() {
+        return name;
     }
 
-    public void setQuery(String query) {
-        this.query = query;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getStatus() {
@@ -50,14 +45,6 @@ public class SubscriptionAO {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public List<OceanAO> getResults() {
-        return results;
-    }
-
-    public void setResults(List<OceanAO> results) {
-        this.results = results;
     }
 
     public ZonedDateTime getCreated() {

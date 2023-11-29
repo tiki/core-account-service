@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS cleanroom(
 CREATE TABLE IF NOT EXISTS subscription(
     id BIGSERIAL PRIMARY KEY,
     subscription_id UUID NOT NULL UNIQUE,
+    name TEXT NOT NULL,
     cleanroom_id BIGINT REFERENCES cleanroom(id) NOT NULL,
     query TEXT NOT NULL,
     status TEXT NOT NULL,

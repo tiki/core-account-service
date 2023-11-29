@@ -9,15 +9,26 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SubscriptionAOReq {
+    private String name;
     private String query;
     private String cleanroomId;
 
     @JsonCreator
     public SubscriptionAOReq(
+            @JsonProperty(required = true) String name,
             @JsonProperty(required = true) String query,
             @JsonProperty(required = true) String cleanroomId) {
+        this.name = name;
         this.query = query;
         this.cleanroomId = cleanroomId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getQuery() {
