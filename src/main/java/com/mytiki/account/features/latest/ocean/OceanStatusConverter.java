@@ -10,7 +10,7 @@ import jakarta.persistence.AttributeConverter;
 public class OceanStatusConverter implements AttributeConverter<OceanStatus, String> {
     @Override
     public String convertToDatabaseColumn(OceanStatus status) {
-        return status.toString();
+        return status != null ? status.toString() : null;
     }
 
     @Override

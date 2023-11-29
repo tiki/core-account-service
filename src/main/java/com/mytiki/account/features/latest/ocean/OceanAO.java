@@ -5,34 +5,64 @@
 
 package com.mytiki.account.features.latest.ocean;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class OceanAO {
-    private String requestId;
-    private String resultUri;
+    private UUID requestId;
+    private String status;
+    private String type;
+    private List<String[]> result;
+    private ZonedDateTime created;
+    private ZonedDateTime modified;
 
-    @JsonCreator
-    public OceanAO(
-            @JsonProperty(required = true) String requestId,
-            @JsonProperty(required = true) String resultUri) {
-        this.requestId = requestId;
-        this.resultUri = resultUri;
-    }
-
-    public String getRequestId() {
+    public UUID getRequestId() {
         return requestId;
     }
 
-    public void setRequestId(String requestId) {
+    public void setRequestId(UUID requestId) {
         this.requestId = requestId;
     }
 
-    public String getResultUri() {
-        return resultUri;
+    public String getStatus() {
+        return status;
     }
 
-    public void setResultUri(String resultUri) {
-        this.resultUri = resultUri;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public List<String[]> getResult() {
+        return result;
+    }
+
+    public void setResult(List<String[]> result) {
+        this.result = result;
+    }
+
+    public ZonedDateTime getCreated() {
+        return created;
+    }
+
+    public void setCreated(ZonedDateTime created) {
+        this.created = created;
+    }
+
+    public ZonedDateTime getModified() {
+        return modified;
+    }
+
+    public void setModified(ZonedDateTime modified) {
+        this.modified = modified;
     }
 }
