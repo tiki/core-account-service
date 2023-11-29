@@ -6,7 +6,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/core-account-service/blob/main/LICENSE
-  version: 2.8.6
+  version: 2.8.7
 servers:
 - url: https://account.mytiki.com
 paths:
@@ -83,7 +83,7 @@ paths:
   /api/latest/provider:
     post:
       tags:
-      - Data Provider
+      - Managing Data Providers
       summary: Create Provider
       description: "Creates a new data provider, returning the configuration details"
       operationId: account-provider-create
@@ -106,7 +106,7 @@ paths:
   /api/latest/provider/{provider-id}/user:
     get:
       tags:
-      - Data Provider
+      - Managing End Users
       summary: List Addresses
       description: Returns all registered device addresses matching the criteria
       operationId: account-provider-user-get
@@ -140,7 +140,7 @@ paths:
         - account:provider
     post:
       tags:
-      - Data Provider
+      - Managing End Users
       summary: Register Address
       description: Register a new device address for an end user
       operationId: account-provider-user-post
@@ -167,7 +167,7 @@ paths:
         - account:provider
     delete:
       tags:
-      - Data Provider
+      - Managing End Users
       summary: Delete Addresses
       description: Permanently delete all device addresses matching the criteria
       operationId: account-provider-user-delete
@@ -360,7 +360,7 @@ paths:
   /api/latest/provider/{provider-id}:
     get:
       tags:
-      - Data Provider
+      - Managing Data Providers
       summary: Get Provider
       description: Returns the configuration details for a data provider
       operationId: account-provider-get
@@ -382,7 +382,7 @@ paths:
         - account:admin
     delete:
       tags:
-      - Data Provider
+      - Managing Data Providers
       summary: Delete Provider
       description: Permanently delete a data provider — stops publishing of new data.
       operationId: account-provider-delete
