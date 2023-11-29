@@ -13,7 +13,7 @@ paths:
   /api/latest/subscription:
     get:
       tags:
-      - Data Purchaser
+      - Managing Data Subscriptions
       summary: List Subscriptions
       description: Returns a filterable list of data subscriptions
       operationId: account-subscription-list
@@ -37,7 +37,7 @@ paths:
         - account:admin
     post:
       tags:
-      - Data Purchaser
+      - Managing Data Subscriptions
       summary: Create Estimate
       description: Creates a new estimate for a data subscription
       operationId: account-subscription-estimate
@@ -60,7 +60,7 @@ paths:
   /api/latest/subscription/{subscription-id}/purchase:
     post:
       tags:
-      - Data Purchaser
+      - Managing Data Subscriptions
       summary: Purchase Subscription
       description: Purchases a data subscription by converting an estimate
       operationId: account-subscription-purchase
@@ -244,7 +244,7 @@ paths:
   /api/latest/cleanroom:
     post:
       tags:
-      - Data Purchaser
+      - Managing Cleanrooms
       summary: Create Cleanroom
       description: "Creates a new data cleanroom, returning the configuration details"
       operationId: account-cleanroom-create
@@ -267,7 +267,7 @@ paths:
   /api/latest/cleanroom/{cleanroom-id}:
     get:
       tags:
-      - Data Purchaser
+      - Managing Cleanrooms
       summary: Get Cleanroom
       description: Returns the configuration details for a data cleanroom
       operationId: account-cleanroom-get
@@ -289,7 +289,7 @@ paths:
         - account:admin
     post:
       tags:
-      - Data Purchaser
+      - Managing Cleanrooms
       summary: Update a Cleanroom
       description: "Updates a data cleanroom, replacing the settings with any non-null\
         \ inputs"
@@ -318,7 +318,7 @@ paths:
         - account:admin
     delete:
       tags:
-      - Data Purchaser
+      - Managing Cleanrooms
       summary: Delete Cleanroom
       description: Permanently delete a data cleanroom and all it's data
       operationId: account-cleanroom-delete
@@ -337,7 +337,7 @@ paths:
   /api/latest/subscription/{subscription-id}:
     get:
       tags:
-      - Data Purchaser
+      - Managing Data Subscriptions
       summary: Get Subscription
       description: Returns the current status for a data subscription
       operationId: account-subscription-get
