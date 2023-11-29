@@ -46,6 +46,7 @@ public class SubscriptionService {
     public SubscriptionAO estimate(OauthSub sub, SubscriptionAOReq req) {
         CleanroomDO cleanroom = cleanroomService.guard(sub, req.getCleanroomId());
         SubscriptionDO subscription = new SubscriptionDO();
+        subscription.setSubscriptionId(UUID.randomUUID());
         subscription.setQuery(req.getQuery());
         subscription.setStatus(SubscriptionStatus.ESTIMATE);
         subscription.setCleanroom(cleanroom);
