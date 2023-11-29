@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -91,13 +92,7 @@ public class SecurityFilter {
                    source.registerCorsConfiguration("/**", configuration);
                    cors.configurationSource(source);
                })
-               .csrf((csrf) -> csrf
-                       .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                       .ignoringRequestMatchers(
-                               OauthController.ROUTE + "/token",
-                               OauthController.ROUTE + "/revoke",
-                               OtpController.ROUTE,
-                               ReadmeController.ROUTE))
+               .csrf(AbstractHttpConfigurer::disable)
                .authorizeHttpRequests((req) -> req
                        .requestMatchers(HttpMethod.GET, HealthController.ROUTE).permitAll()
                        .requestMatchers(HttpMethod.GET, Constants.API_DOCS_ROUTE).permitAll()
