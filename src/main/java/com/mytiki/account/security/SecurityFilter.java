@@ -91,13 +91,6 @@ public class SecurityFilter {
                    source.registerCorsConfiguration("/**", configuration);
                    cors.configurationSource(source);
                })
-               .csrf((csrf) -> csrf
-                       .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                       .ignoringRequestMatchers(
-                               OauthController.ROUTE + "/token",
-                               OauthController.ROUTE + "/revoke",
-                               OtpController.ROUTE,
-                               ReadmeController.ROUTE))
                .authorizeHttpRequests((req) -> req
                        .requestMatchers(HttpMethod.GET, HealthController.ROUTE).permitAll()
                        .requestMatchers(HttpMethod.GET, Constants.API_DOCS_ROUTE).permitAll()
