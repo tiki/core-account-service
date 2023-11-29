@@ -62,7 +62,7 @@ paths:
       tags:
       - Managing Data Subscriptions
       summary: Purchase Subscription
-      description: Purchases a data subscription by converting an estimate
+      description: Converts an estimate into a paid data subscription.
       operationId: account-subscription-purchase
       parameters:
       - name: subscription-id
@@ -245,7 +245,7 @@ paths:
     post:
       tags:
       - Managing Cleanrooms
-      summary: Create Cleanroom
+      summary: Create a Cleanroom
       description: "Creates a new data cleanroom, returning the configuration details"
       operationId: account-cleanroom-create
       requestBody:
