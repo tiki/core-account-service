@@ -39,7 +39,7 @@ public class CleanroomController {
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-cleanroom-create",
-            summary = "Create Cleanroom",
+            summary = "Create a Cleanroom",
             description = "Creates a new data cleanroom, returning the configuration details",
             security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")

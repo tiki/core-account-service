@@ -64,7 +64,7 @@ public class SubscriptionController {
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-subscription-purchase",
             summary = "Purchase Subscription",
-            description = "Purchases a data subscription by converting an estimate",
+            description = "Converts an estimate into a paid data subscription.",
             security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @RequestMapping(method = RequestMethod.POST, path = "/{subscription-id}/purchase")
     @Secured("SCOPE_account:admin")
