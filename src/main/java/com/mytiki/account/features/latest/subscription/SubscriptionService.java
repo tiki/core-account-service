@@ -64,7 +64,7 @@ public class SubscriptionService {
         subscription.setSubscriptionId(UUID.randomUUID());
         subscription.setQuery(req.getQuery());
         subscription.setStatus(SubscriptionStatus.ESTIMATE);
-        subscription.setName(req.getName());
+        subscription.setName(req.getName().replace("-", "_")); //TODO fix this hacky temp fix.
         subscription.setCleanroom(cleanroom);
         ZonedDateTime now = ZonedDateTime.now();
         subscription.setCreated(now);
