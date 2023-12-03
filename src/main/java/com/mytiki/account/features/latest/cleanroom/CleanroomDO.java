@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.cleanroom;
 
+import com.mytiki.account.features.latest.ocean.OceanDO;
 import com.mytiki.account.features.latest.org.OrgDO;
 import com.mytiki.account.utilities.converter.ListConvert;
 import jakarta.persistence.*;
@@ -25,6 +26,7 @@ public class CleanroomDO implements Serializable {
     private List<String> awsAccounts;
     private ZonedDateTime created;
     private ZonedDateTime modified;
+    private OceanDO result;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -91,5 +93,19 @@ public class CleanroomDO implements Serializable {
 
     public void setModified(ZonedDateTime modified) {
         this.modified = modified;
+    }
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "cleanroom_ocean",
+            joinColumns = @JoinColumn(name = "cleanroom_id"),
+            inverseJoinColumns = @JoinColumn(name = "ocean_id")
+    )
+    public OceanDO getResult() {
+        return result;
+    }
+
+    public void setResult(OceanDO result) {
+        this.result = result;
     }
 }

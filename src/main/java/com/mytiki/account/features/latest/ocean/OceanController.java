@@ -30,7 +30,7 @@ public class OceanController {
     @Secured("SCOPE_account:internal:ocean")
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(code = HttpStatus.OK)
-    public void update(@RequestBody OceanAOReq body) {
-        service.update(body);
+    public void callback(@RequestBody OceanAOReq body) {
+        service.callback(body);
     }
 }

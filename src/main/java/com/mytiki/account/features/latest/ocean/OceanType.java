@@ -9,7 +9,8 @@ public enum OceanType {
     COUNT("count"),
     SAMPLE("sample"),
     CREATE("create"),
-    UPDATE("update");
+    UPDATE("update"),
+    DATABASE("database");
 
     private final String string;
 

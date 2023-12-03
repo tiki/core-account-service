@@ -23,7 +23,6 @@ public class SubscriptionService {
     private final SubscriptionRepository repository;
     private final OceanService oceanService;
     private final CleanroomService cleanroomService;
-    private final String bucket;
 
     public SubscriptionService(
             SubscriptionRepository repository,
@@ -33,7 +32,6 @@ public class SubscriptionService {
         this.repository = repository;
         this.oceanService = oceanService;
         this.cleanroomService = cleanroomService;
-        this.bucket = bucket;
     }
 
     public List<SubscriptionAO> list(OauthSub sub, String status) {
@@ -44,7 +42,7 @@ public class SubscriptionService {
                 repository.findByUserId(userId);
         return subscriptions.stream().map((subscription) -> {
             SubscriptionAORsp rsp = toAORsp(subscription);
-            rsp.setResults(null);
+            //rsp.setResults(null);
             rsp.setQuery(null);
             return (SubscriptionAO) rsp;
         }).collect(Collectors.toList());
@@ -70,9 +68,9 @@ public class SubscriptionService {
         subscription.setCreated(now);
         subscription.setModified(now);
         SubscriptionDO saved = repository.save(subscription);
-        OceanDO res1 = oceanService.query(saved, OceanType.COUNT, count(req.getQuery()));
-        OceanDO res2 = oceanService.query(saved, OceanType.SAMPLE, sample(req.getQuery()));
-        saved.setResults(List.of(res1, res2));
+        //OceanDO res1 = oceanService.query(saved, OceanType.COUNT, count(req.getQuery()));
+        //OceanDO res2 = oceanService.query(saved, OceanType.SAMPLE, sample(req.getQuery()));
+        //saved.setResults(List.of(res1, res2));
         return toAORsp(saved);
     }
 
@@ -89,35 +87,15 @@ public class SubscriptionService {
         update.setStatus(SubscriptionStatus.SUBSCRIBED);
         update.setModified(ZonedDateTime.now());
         SubscriptionDO saved = repository.save(update);
-        OceanDO res = oceanService.query(saved, OceanType.CREATE,
-                ctas(saved.getQuery(), saved.getCleanroom().getCleanroomId().toString(), saved.getName()));
+        //OceanDO res = oceanService.query(saved, OceanType.CREATE,
+                //ctas(saved.getQuery(), saved.getCleanroom().getCleanroomId().toString(), saved.getName()));
         List<OceanDO> results = new ArrayList<>(saved.getResults());
-        results.add(res);
+        //results.add(res);
         saved.setResults(results);
         return toAORsp(saved);
     }
 
-    private String count(String query) {
-        return "SELECT COUNT(*) as \"total\" FROM (" +
-                query +
-                ");";
-    }
 
-    private String sample(String query) {
-        return "SELECT * FROM (" +
-                query +
-                ") LIMIT 10;";
-    }
-
-    private String ctas(String query, String cleanroomId, String table) {
-        return "CREATE TABLE cr_" + cleanroomId.replace("-", "_") + "." + table +
-                " WITH (" +
-                "table_type = 'ICEBERG'," +
-                "is_external = false," +
-                "format = 'PARQUET'," +
-                "location = 's3://" + bucket + "/cleanroom/" + cleanroomId + "/') " +
-                "AS (" + query + ")";
-    }
 
     private SubscriptionAORsp toAORsp(SubscriptionDO src) {
         SubscriptionAORsp rsp = new SubscriptionAORsp();
@@ -128,8 +106,8 @@ public class SubscriptionService {
         rsp.setQuery(src.getQuery());
         rsp.setStatus(src.getStatus().toString());
         rsp.setName(src.getName());
-        rsp.setResults(src.getResults() != null ?
-                src.getResults().stream().map(oceanService::toAO).collect(Collectors.toList()) : null );
+//        rsp.setResults(src.getResults() != null ?
+//                src.getResults().stream().map(oceanService::toAO).collect(Collectors.toList()) : null );
         return rsp;
     }
 }

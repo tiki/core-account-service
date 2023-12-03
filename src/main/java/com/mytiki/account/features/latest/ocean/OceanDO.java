@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.ocean;
 
+import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
 import com.mytiki.account.features.latest.subscription.SubscriptionDO;
 import jakarta.persistence.*;
 
@@ -17,7 +18,6 @@ import java.util.UUID;
 public class OceanDO implements Serializable {
     private Long id;
     private UUID requestId;
-    private SubscriptionDO subscription;
     private OceanStatus status;
     private OceanType type;
     private String executionArn;
@@ -25,6 +25,8 @@ public class OceanDO implements Serializable {
     private String result;
     private ZonedDateTime created;
     private ZonedDateTime modified;
+    private CleanroomDO cleanroom;
+    private SubscriptionDO subscription;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,16 +46,6 @@ public class OceanDO implements Serializable {
 
     public void setRequestId(UUID requestId) {
         this.requestId = requestId;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subscription_id")
-    public SubscriptionDO getSubscription() {
-        return subscription;
-    }
-
-    public void setSubscription(SubscriptionDO subscription) {
-        this.subscription = subscription;
     }
 
     @Column(name = "status")
@@ -119,5 +111,33 @@ public class OceanDO implements Serializable {
 
     public void setModified(ZonedDateTime modified) {
         this.modified = modified;
+    }
+
+    @OneToOne
+    @JoinTable(
+            name = "cleanroom_ocean",
+            joinColumns = @JoinColumn(name = "ocean_id"),
+            inverseJoinColumns = @JoinColumn(name = "cleanroom_id")
+    )
+    public CleanroomDO getCleanroom() {
+        return cleanroom;
+    }
+
+    public void setCleanroom(CleanroomDO cleanroom) {
+        this.cleanroom = cleanroom;
+    }
+
+    @ManyToOne
+    @JoinTable(
+            name = "subscription_ocean",
+            joinColumns = @JoinColumn(name = "ocean_id"),
+            inverseJoinColumns = @JoinColumn(name = "subscription_id")
+    )
+    public SubscriptionDO getSubscription() {
+        return subscription;
+    }
+
+    public void setSubscription(SubscriptionDO subscription) {
+        this.subscription = subscription;
     }
 }

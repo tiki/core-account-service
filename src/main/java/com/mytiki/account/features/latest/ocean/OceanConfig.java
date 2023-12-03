@@ -25,10 +25,18 @@ public class OceanConfig {
 
     @Bean
     public OceanService oceanService(
-            @Value("${com.mytiki.account.ocean.region}") String region,
-            @Value("${com.mytiki.account.ocean.arn}") String arn,
+            @Autowired OceanAws aws,
+            @Value("${com.mytiki.account.cleanroom.bucket}") String bucket,
             @Autowired ObjectMapper mapper,
             @Autowired OceanRepository repository){
-        return new OceanService(region, arn, mapper, repository);
+        return new OceanService(aws, bucket, mapper, repository);
+    }
+
+    @Bean
+    public OceanAws oceanAws(
+            @Value("${com.mytiki.account.ocean.region}") String region,
+            @Value("${com.mytiki.account.ocean.arn}") String arn,
+            @Autowired ObjectMapper mapper){
+        return new OceanAws(region, arn, mapper);
     }
 }

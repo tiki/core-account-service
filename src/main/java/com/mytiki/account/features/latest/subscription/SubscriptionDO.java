@@ -87,7 +87,12 @@ public class SubscriptionDO implements Serializable {
         this.status = status;
     }
 
-    @OneToMany(mappedBy = "subscription")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "subscription_ocean",
+            joinColumns = @JoinColumn(name = "subscription_id"),
+            inverseJoinColumns = @JoinColumn(name = "ocean_id")
+    )
     public List<OceanDO> getResults() {
         return results;
     }

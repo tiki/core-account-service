@@ -50,8 +50,8 @@ public class CleanroomService {
             cleanroom.setCreated(now);
             cleanroom.setModified(now);
             //TODO this is hacky temporary fix.
-            oceanService.execute(UUID.randomUUID(), "CREATE DATABASE cr_" +
-                    cleanroom.getCleanroomId().toString().replace("-", "_"));
+//            oceanService.execute(UUID.randomUUID(), "CREATE DATABASE cr_" +
+//                    cleanroom.getCleanroomId().toString().replace("-", "_"));
             return toAO(repository.save(cleanroom));
         }
     }
