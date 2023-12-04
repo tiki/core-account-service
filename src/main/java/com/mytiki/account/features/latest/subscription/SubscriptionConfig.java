@@ -28,8 +28,7 @@ public class SubscriptionConfig {
     public SubscriptionService subscriptionService(
             @Autowired SubscriptionRepository repository,
             @Autowired OceanService oceanService,
-            @Autowired CleanroomService cleanroomService,
-            @Value("${com.mytiki.account.cleanroom.bucket}") String bucket){
-        return new SubscriptionService(repository, oceanService, cleanroomService, bucket);
+            @Autowired CleanroomService cleanroomService){
+        return new SubscriptionService(repository, oceanService, cleanroomService);
     }
 }

@@ -5,35 +5,17 @@
 
 package com.mytiki.account.features.latest.ocean;
 
-import com.amazonaws.xray.interceptors.TracingInterceptor;
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
 import com.mytiki.account.features.latest.subscription.SubscriptionDO;
-import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.error.ApiException;
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import software.amazon.awssdk.core.ResponseBytes;
-import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3Uri;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.sfn.SfnClient;
-import software.amazon.awssdk.services.sfn.model.*;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -53,23 +35,27 @@ public class OceanService {
     }
 
     public OceanDO count(String query) {
-        return request(OceanType.COUNT, OceanQuery.count(query));
+        return request(OceanType.COUNT, OceanQuery.wrapCount(query));
     }
 
     public OceanDO sample(String query) {
-        return request(OceanType.SAMPLE, OceanQuery.sample(query));
+        return request(OceanType.SAMPLE, OceanQuery.wrapSample(query));
     }
 
-    public OceanDO database(String cleanroomId) {
-        return request(OceanType.DATABASE, OceanQuery.database(cleanroomId));
+    public OceanDO createDatabase(String cleanroomId) {
+        return request(OceanType.CREATE_DATABASE, OceanQuery.createDatabase(cleanroomId));
+    }
+
+    public OceanDO dropDatabase(String cleanroomId) {
+        return request(OceanType.DROP_DATABASE, OceanQuery.dropDatabase(cleanroomId));
     }
 
     public OceanDO ctas(String cleanroomId, String table, String query) {
-        return request(OceanType.CREATE, OceanQuery.ctas(query, bucket, cleanroomId, table));
+        return request(OceanType.CREATE_TABLE, OceanQuery.wrapCreate(query, bucket, cleanroomId, table));
     }
 
-    public OceanDO get(String requestId) {
-        Optional<OceanDO> found = repository.findByRequestId(UUID.fromString(requestId));
+    public OceanDO get(UUID requestId) {
+        Optional<OceanDO> found = repository.findByRequestId(requestId);
         if(found.isPresent()) {
             if(found.get().getStatus() == OceanStatus.PENDING){
                 OceanDO update = found.get();
@@ -98,13 +84,33 @@ public class OceanService {
                         }
                     }
                 }
-                case CREATE -> {}
-                case DATABASE, UPDATE -> {}
+                case CREATE_TABLE, UPDATE_TABLE -> {
+                    SubscriptionDO sub = ocean.getSubscription();
+                    if(sub != null) {
+                        CleanroomDO cleanroom = sub.getCleanroom();
+                        String table = OceanQuery.table(cleanroom.getCleanroomId().toString(), sub.getName());
+                        request(OceanType.COUNT, OceanQuery.count(table));
+                        request(OceanType.SAMPLE, OceanQuery.sample(table));
+                    }else {
+                        logger.warn("Skipping. No subscription: " + ocean.getRequestId());
+                    }
+                }
+                case CREATE_DATABASE, DROP_DATABASE -> {}
             }
             ocean.setModified(ZonedDateTime.now());
             repository.save(ocean);
         }else {
             logger.warn("Skipping. Invalid request id: " + req.getRequestId());
+        }
+    }
+
+    public List<String[]> deserializeResult(String result) {
+        try {
+            TypeReference<List<String[]>> typeRef = new TypeReference<>() {};
+            return mapper.readValue(result, typeRef);
+        } catch (JsonProcessingException e) {
+            logger.warn("Failed to read results. Skipping", e);
+            return new ArrayList<>();
         }
     }
 
