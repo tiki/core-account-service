@@ -13,7 +13,6 @@ import com.mytiki.account.features.latest.confirm.ConfirmService;
 import com.mytiki.account.features.latest.org.OrgDO;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.oauth.OauthScopes;
-import com.mytiki.account.features.latest.stripe.StripeService;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.nimbusds.jose.JOSEException;

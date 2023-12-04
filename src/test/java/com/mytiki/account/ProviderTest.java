@@ -6,19 +6,17 @@
 package com.mytiki.account;
 
 import com.mytiki.account.features.latest.org.OrgRepository;
-import com.mytiki.account.features.latest.provider.ProviderAO;
-import com.mytiki.account.features.latest.provider.ProviderRepository;
-import com.mytiki.account.features.latest.provider.ProviderService;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileRepository;
-import com.mytiki.account.features.latest.stripe.StripeService;
+import com.mytiki.account.features.latest.provider.ProviderAO;
+import com.mytiki.account.features.latest.provider.ProviderRepository;
+import com.mytiki.account.features.latest.provider.ProviderService;
 import com.mytiki.account.main.App;
 import com.mytiki.account.mocks.StripeMock;
 import com.mytiki.account.utilities.error.ApiException;
 import com.stripe.exception.StripeException;
 import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
