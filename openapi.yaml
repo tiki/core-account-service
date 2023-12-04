@@ -6,7 +6,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/core-account-service/blob/main/LICENSE
-  version: 2.8.9
+  version: 2.9.0
 servers:
 - url: https://account.mytiki.com
 paths:
@@ -409,28 +409,6 @@ components:
           type: string
         cleanroomId:
           type: string
-    OceanAO:
-      type: object
-      properties:
-        requestId:
-          type: string
-          format: uuid
-        status:
-          type: string
-        type:
-          type: string
-        result:
-          type: array
-          items:
-            type: array
-            items:
-              type: string
-        created:
-          type: string
-          format: date-time
-        modified:
-          type: string
-          format: date-time
     SubscriptionAORsp:
       type: object
       properties:
@@ -450,10 +428,43 @@ components:
           format: date-time
         query:
           type: string
-        results:
+        count:
           type: array
           items:
-            $ref: '#/components/schemas/OceanAO'
+            $ref: '#/components/schemas/SubscriptionAORspCount'
+        sample:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionAORspSample'
+    SubscriptionAORspCount:
+      type: object
+      properties:
+        status:
+          type: string
+        total:
+          type: integer
+          format: int64
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+    SubscriptionAORspSample:
+      type: object
+      properties:
+        status:
+          type: string
+        records:
+          type: array
+          items:
+            type: string
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
     SubscriptionAO:
       type: object
       properties:
