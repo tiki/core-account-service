@@ -26,11 +26,11 @@ import com.mytiki.account.mocks.StripeMock;
 import com.mytiki.account.utilities.error.ApiException;
 import com.mytiki.account.utilities.facade.StripeF;
 import com.stripe.exception.StripeException;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.List;

@@ -48,7 +48,7 @@ public class OrgTest {
     @Test
     public void Test_Create_Success() {
         OrgDO created = service.create("dummy@dummy.com");
-        assertNull(created.getBillingId());
+        assertNotNull(created.getBillingId());
         assertNotNull(created.getModified());
         assertNotNull(created.getCreated());
         assertNotNull(created.getOrgId());
@@ -62,7 +62,7 @@ public class OrgTest {
 
         assertTrue(org.getUsers().contains(user.getUserId().toString()));
         assertEquals(user.getOrg().getOrgId().toString(), org.getOrgId());
-        assertNull(org.getBillingId());
+        assertNotNull(org.getBillingId());
         assertNotNull(org.getModified());
         assertNotNull(org.getCreated());
     }

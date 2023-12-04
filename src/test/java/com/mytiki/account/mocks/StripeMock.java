@@ -16,7 +16,7 @@ public class StripeMock {
         Mockito.doReturn("dummy_billing_id").when(stripe).create(Mockito.any(), Mockito.any());
         Mockito.doReturn(true).when(stripe).isValid(Mockito.any());
         Mockito.doReturn("dummy_url").when(stripe).portal(Mockito.any());
-        Mockito.doNothing().when(stripe).usage(Mockito.any(), Mockito.any());
+        Mockito.doNothing().when(stripe).usage(Mockito.any(), Mockito.any(long.class));
         return stripe;
     }
 }
