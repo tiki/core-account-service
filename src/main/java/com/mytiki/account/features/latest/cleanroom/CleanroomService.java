@@ -7,6 +7,7 @@ package com.mytiki.account.features.latest.cleanroom;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.mytiki.account.features.latest.oauth.OauthSub;
+import com.mytiki.account.features.latest.ocean.OceanDO;
 import com.mytiki.account.features.latest.ocean.OceanService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileService;
@@ -39,7 +40,6 @@ public class CleanroomService {
         if(user.isEmpty())
             throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
         else {
-            //TODO call glue to create.
             //TODO set permissions in s3/glue.
             ZonedDateTime now = ZonedDateTime.now();
             CleanroomDO cleanroom = new CleanroomDO();
@@ -49,9 +49,8 @@ public class CleanroomService {
             cleanroom.setAwsAccounts(req.getIam());
             cleanroom.setCreated(now);
             cleanroom.setModified(now);
-            //TODO this is hacky temporary fix.
-            oceanService.execute(UUID.randomUUID(), "CREATE DATABASE cr_" +
-                    cleanroom.getCleanroomId().toString().replace("-", "_"));
+            OceanDO result = oceanService.createDatabase(cleanroom.getCleanroomId().toString());
+            cleanroom.setResult(result);
             return toAO(repository.save(cleanroom));
         }
     }
@@ -73,8 +72,8 @@ public class CleanroomService {
 
     public void delete(OauthSub sub, String cleanroomId){
         CleanroomDO cleanroom = guard(sub, cleanroomId);
+        oceanService.dropDatabase(cleanroomId);
         repository.delete(cleanroom);
-        //TODO call glue to delete.
     }
 
     public Optional<CleanroomDO> getDO(String cleanroomId){

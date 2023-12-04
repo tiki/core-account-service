@@ -81,40 +81,15 @@ public class OceanTest {
                         "hello,world".getBytes(StandardCharsets.UTF_8)))
                 .when(s3Client)
                 .getObjectAsBytes(Mockito.any(GetObjectRequest.class));
-        this.service = new OceanService(sfnClient, s3Client, arn, mapper, repository);
+        OceanAws oceanAws = new OceanAws(sfnClient, s3Client, arn, mapper);
+        this.service = new OceanService(oceanAws, "dummy", mapper, repository);
         this.cleanroomService = new CleanroomService(cleanroomRepository, profileService, this.service);
     }
 
     @Test
     public void Test_Query_Success(){
         String query = "SELECT COUNT(*) FROM dummy";
-        String name = "testCleanroom";
-
-        ProfileDO testUser = new ProfileDO();
-        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
-        testUser.setUserId(UUID.randomUUID());
-        testUser.setCreated(ZonedDateTime.now());
-        testUser.setModified(ZonedDateTime.now());
-        testUser.setOrg(orgService.create());
-        testUser = profileRepository.save(testUser);
-
-        CleanroomAOReq req = new CleanroomAOReq();
-        req.setName(name);
-        CleanroomAO createdCleanroom = cleanroomService.create(req,
-                new OauthSub(OauthSubNamespace.USER, testUser.getUserId().toString()));
-        Optional<CleanroomDO> cleanroom = cleanroomService.getDO(createdCleanroom.getCleanroomId());
-
-        SubscriptionDO subscription = new SubscriptionDO();
-        subscription.setStatus(SubscriptionStatus.ESTIMATE);
-        subscription.setSubscriptionId(UUID.randomUUID());
-        subscription.setModified(ZonedDateTime.now());
-        subscription.setCreated(ZonedDateTime.now());
-        subscription.setName(UUID.randomUUID().toString());
-        subscription.setQuery(query);
-        subscription.setCleanroom(cleanroom.get());
-        subscription = subscriptionRepository.save(subscription);
-
-        OceanDO rsp = service.query(subscription, OceanType.COUNT, query);
+        OceanDO rsp = service.count(query);
         assertNotNull(rsp.getCreated());
         assertNotNull(rsp.getModified());
         assertNotNull(rsp.getRequestId());
@@ -128,36 +103,10 @@ public class OceanTest {
     public void Test_Update_Success(){
         String resultUri = "dummy://";
         String query = "SELECT COUNT(*) FROM dummy";
-        String name = "testCleanroom";
 
-        ProfileDO testUser = new ProfileDO();
-        testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
-        testUser.setUserId(UUID.randomUUID());
-        testUser.setCreated(ZonedDateTime.now());
-        testUser.setModified(ZonedDateTime.now());
-        testUser.setOrg(orgService.create());
-        testUser = profileRepository.save(testUser);
-
-        CleanroomAOReq cleanroomReq = new CleanroomAOReq();
-        cleanroomReq.setName(name);
-        CleanroomAO createdCleanroom = cleanroomService.create(cleanroomReq,
-                new OauthSub(OauthSubNamespace.USER, testUser.getUserId().toString()));
-        Optional<CleanroomDO> cleanroom = cleanroomService.getDO(createdCleanroom.getCleanroomId());
-
-        SubscriptionDO subscription = new SubscriptionDO();
-        subscription.setStatus(SubscriptionStatus.ESTIMATE);
-        subscription.setSubscriptionId(UUID.randomUUID());
-        subscription.setModified(ZonedDateTime.now());
-        subscription.setName(UUID.randomUUID().toString());
-        subscription.setCreated(ZonedDateTime.now());
-        subscription.setQuery(query);
-        subscription.setCleanroom(cleanroom.get());
-        subscription = subscriptionRepository.save(subscription);
-
-        OceanDO ocean = service.query(subscription, OceanType.COUNT, query);
-
+        OceanDO ocean = service.count(query);
         OceanAOReq req = new OceanAOReq(ocean.getRequestId().toString(), resultUri);
-        service.update(req);
+        service.callback(req);
 
         Optional<OceanDO> found = repository.findByRequestId(ocean.getRequestId());
         assertTrue(found.isPresent());

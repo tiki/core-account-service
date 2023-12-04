@@ -6,12 +6,15 @@
 package com.mytiki.account;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.account.features.latest.cleanroom.CleanroomAO;
 import com.mytiki.account.features.latest.cleanroom.CleanroomAOReq;
 import com.mytiki.account.features.latest.cleanroom.CleanroomRepository;
 import com.mytiki.account.features.latest.cleanroom.CleanroomService;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
+import com.mytiki.account.features.latest.ocean.OceanAws;
+import com.mytiki.account.features.latest.ocean.OceanRepository;
 import com.mytiki.account.features.latest.ocean.OceanService;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
@@ -43,6 +46,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CleanroomTest {
     @Autowired
+    private OceanRepository oceanRepository;
+    @Autowired
     private CleanroomRepository repository;
     @Autowired
     private ProfileRepository profileRepository;
@@ -50,6 +55,8 @@ public class CleanroomTest {
     private OrgService orgService;
     @Autowired
     private ProfileService profileService;
+    @Autowired
+    private ObjectMapper mapper;
 
     private CleanroomService service;
     private String cleanroomId;
@@ -57,8 +64,9 @@ public class CleanroomTest {
 
     @BeforeAll
     public void before() {
-        OceanService oceanService = Mockito.mock(OceanService.class);
-        Mockito.doReturn("dummy").when(oceanService).execute(Mockito.any(), Mockito.any());
+        OceanAws oceanAws = Mockito.mock(OceanAws.class);
+        Mockito.doReturn("dummy").when(oceanAws).execute(Mockito.any(), Mockito.any());
+        OceanService oceanService = new OceanService(oceanAws, "dummy", mapper, oceanRepository);
         service = new CleanroomService(repository, profileService, oceanService);
     }
 

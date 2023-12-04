@@ -8,8 +8,10 @@ package com.mytiki.account.features.latest.ocean;
 public enum OceanType {
     COUNT("count"),
     SAMPLE("sample"),
-    CREATE("create"),
-    UPDATE("update");
+    CREATE_TABLE("create_table"),
+    UPDATE_TABLE("update_table"),
+    CREATE_DATABASE("create_database"),
+    DROP_DATABASE("drop_database");;
 
     private final String string;
 

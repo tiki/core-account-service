@@ -3,28 +3,15 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.features.latest.ocean;
+package com.mytiki.account.features.latest.subscription;
 
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
-public class OceanAO {
-    private UUID requestId;
+public class SubscriptionAORspCount {
     private String status;
-    private String type;
-    private List<String[]> result;
+    private Long total;
     private ZonedDateTime created;
     private ZonedDateTime modified;
-
-    public UUID getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(UUID requestId) {
-        this.requestId = requestId;
-    }
 
     public String getStatus() {
         return status;
@@ -34,20 +21,12 @@ public class OceanAO {
         this.status = status;
     }
 
-    public String getType() {
-        return type;
+    public Long getTotal() {
+        return total;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public List<String[]> getResult() {
-        return result;
-    }
-
-    public void setResult(List<String[]> result) {
-        this.result = result;
+    public void setTotal(Long total) {
+        this.total = total;
     }
 
     public ZonedDateTime getCreated() {

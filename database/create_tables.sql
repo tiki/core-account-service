@@ -126,13 +126,12 @@ CREATE TABLE IF NOT EXISTS subscription(
 );
 
 -- -----------------------------------------------------------------------
--- OCEAN QUERIES
+-- OCEAN REQUESTS
 -- -----------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS ocean(
     id BIGSERIAL PRIMARY KEY,
     request_id UUID NOT NULL UNIQUE,
-    subscription_id BIGINT REFERENCES subscription(id) NOT NULL,
     status TEXT NOT NULL,
     type TEXT NOT NULL,
     execution_arn TEXT NOT NULL,
@@ -142,3 +141,24 @@ CREATE TABLE IF NOT EXISTS ocean(
     modified_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
+-- -----------------------------------------------------------------------
+-- SUBSCRIPTION ATHENA REQUESTS
+-- -----------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS subscription_ocean(
+    id BIGSERIAL PRIMARY KEY,
+    subscription_id BIGINT REFERENCES subscription(id) NOT NULL,
+    ocean_id BIGINT REFERENCES ocean(id) NOT NULL,
+    UNIQUE(subscription_id, ocean_id)
+);
+
+-- -----------------------------------------------------------------------
+-- CLEANROOM ATHENA REQUESTS
+-- -----------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS cleanroom_ocean(
+    id BIGSERIAL PRIMARY KEY,
+    cleanroom_id BIGINT REFERENCES cleanroom(id) NOT NULL,
+    ocean_id BIGINT REFERENCES ocean(id) NOT NULL,
+    UNIQUE(cleanroom_id, ocean_id)
+);

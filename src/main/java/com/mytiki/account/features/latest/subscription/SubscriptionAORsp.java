@@ -5,14 +5,12 @@
 
 package com.mytiki.account.features.latest.subscription;
 
-import com.mytiki.account.features.latest.ocean.OceanAO;
-
-import java.time.ZonedDateTime;
 import java.util.List;
 
 public class SubscriptionAORsp extends SubscriptionAO {
     private String query;
-    private List<OceanAO> results;
+    private List<SubscriptionAORspCount> count;
+    private List<SubscriptionAORspSample> sample;
 
     public String getQuery() {
         return query;
@@ -22,11 +20,19 @@ public class SubscriptionAORsp extends SubscriptionAO {
         this.query = query;
     }
 
-    public List<OceanAO> getResults() {
-        return results;
+    public List<SubscriptionAORspCount> getCount() {
+        return count;
     }
 
-    public void setResults(List<OceanAO> results) {
-        this.results = results;
+    public void setCount(List<SubscriptionAORspCount> count) {
+        this.count = count;
+    }
+
+    public List<SubscriptionAORspSample> getSample() {
+        return sample;
+    }
+
+    public void setSample(List<SubscriptionAORspSample> sample) {
+        this.sample = sample;
     }
 }
