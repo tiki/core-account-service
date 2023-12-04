@@ -10,8 +10,10 @@ import com.mytiki.account.features.latest.api_key.ApiKeyService;
 import com.mytiki.account.features.latest.confirm.ConfirmAO;
 import com.mytiki.account.features.latest.confirm.ConfirmAction;
 import com.mytiki.account.features.latest.confirm.ConfirmService;
+import com.mytiki.account.features.latest.org.OrgDO;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.oauth.OauthScopes;
+import com.mytiki.account.features.latest.stripe.StripeService;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.nimbusds.jose.JOSEException;
@@ -80,10 +82,11 @@ public class ProfileService {
         Optional<ProfileDO> found = repository.findByEmail(email);
         ProfileDO profile;
         if (found.isEmpty()) {
+            OrgDO org = orgService.create(email);
             ProfileDO newUser = new ProfileDO();
             newUser.setUserId(UUID.randomUUID());
             newUser.setEmail(email);
-            newUser.setOrg(orgService.create());
+            newUser.setOrg(org);
             ZonedDateTime now = ZonedDateTime.now();
             newUser.setCreated(now);
             newUser.setModified(now);

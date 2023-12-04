@@ -5,18 +5,20 @@
 
 package com.mytiki.account;
 
+import com.mytiki.account.features.latest.org.OrgRepository;
 import com.mytiki.account.features.latest.provider.ProviderAO;
 import com.mytiki.account.features.latest.provider.ProviderRepository;
 import com.mytiki.account.features.latest.provider.ProviderService;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileRepository;
+import com.mytiki.account.features.latest.stripe.StripeService;
 import com.mytiki.account.main.App;
+import com.mytiki.account.mocks.StripeMock;
 import com.mytiki.account.utilities.error.ApiException;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestMethodOrder;
+import com.stripe.exception.StripeException;
+import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -46,7 +48,14 @@ public class ProviderTest {
     private ProviderService service;
 
     @Autowired
+    private OrgRepository orgRepository;
+
     private OrgService orgService;
+
+    @BeforeAll
+    public void before() throws StripeException {
+        orgService = new OrgService(orgRepository, StripeMock.facade());
+    }
 
     @Test
     public void Test_Create_Success() {
@@ -57,7 +66,7 @@ public class ProviderTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
-        testUser.setOrg(orgService.create());
+        testUser.setOrg(orgService.create("dummy@dummy.com"));
         testUser = profileRepository.save(testUser);
 
         ProviderAO app = service.create(name, testUser.getUserId().toString());
@@ -93,7 +102,7 @@ public class ProviderTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
-        testUser.setOrg(orgService.create());
+        testUser.setOrg(orgService.create("dummy@dummy.com"));
         testUser = profileRepository.save(testUser);
 
         ProviderAO app = service.create(name, testUser.getUserId().toString());

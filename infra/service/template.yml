@@ -225,6 +225,10 @@ Resources:
               ValueFrom: !Sub "${Secret}:OCEAN_REGION::"
             - Name: OCEAN_ARN
               ValueFrom: !Sub "${Secret}:OCEAN_ARN::"
+            - Name: STRIPE_SECRET
+              ValueFrom: !Sub "${Secret}:STRIPE_SECRET::"
+            - Name: STRIPE_PRICE
+              ValueFrom: !Sub "${Secret}:STRIPE_PRICE::"
           LogConfiguration:
             LogDriver: awslogs
             Options:

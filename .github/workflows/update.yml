@@ -76,6 +76,8 @@ jobs:
       GOOGLE_OAUTH_SECRET: ${{ secrets.GOOGLE_OAUTH_SECRET }}
       OCEAN_REGION: ${{ vars.OCEAN_REGION }}
       OCEAN_ARN: ${{ secrets.OCEAN_ARN }}
+      STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
+      STRIPE_PRICE: ${{ secrets.STRIPE_PRICE }}
     services:
       postgres:
         image: postgres:14.5

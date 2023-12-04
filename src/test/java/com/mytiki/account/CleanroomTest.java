@@ -13,20 +13,21 @@ import com.mytiki.account.features.latest.cleanroom.CleanroomRepository;
 import com.mytiki.account.features.latest.cleanroom.CleanroomService;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
-import com.mytiki.account.features.latest.ocean.OceanAws;
 import com.mytiki.account.features.latest.ocean.OceanRepository;
 import com.mytiki.account.features.latest.ocean.OceanService;
+import com.mytiki.account.features.latest.org.OrgRepository;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileRepository;
 import com.mytiki.account.features.latest.profile.ProfileService;
-import com.mytiki.account.features.latest.provider.ProviderService;
 import com.mytiki.account.main.App;
+import com.mytiki.account.mocks.OceanMock;
+import com.mytiki.account.mocks.StripeMock;
 import com.mytiki.account.utilities.error.ApiException;
+import com.mytiki.account.utilities.facade.StripeF;
+import com.stripe.exception.StripeException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -52,22 +53,23 @@ public class CleanroomTest {
     @Autowired
     private ProfileRepository profileRepository;
     @Autowired
-    private OrgService orgService;
-    @Autowired
     private ProfileService profileService;
     @Autowired
     private ObjectMapper mapper;
-
     private CleanroomService service;
     private String cleanroomId;
     private String userId;
+    @Autowired
+    private OrgRepository orgRepository;
+    private OrgService orgService;
 
     @BeforeAll
-    public void before() {
-        OceanAws oceanAws = Mockito.mock(OceanAws.class);
-        Mockito.doReturn("dummy").when(oceanAws).execute(Mockito.any(), Mockito.any());
-        OceanService oceanService = new OceanService(oceanAws, "dummy", mapper, oceanRepository);
+    public void before() throws StripeException {
+        StripeF stripe = StripeMock.facade();
+        OceanService oceanService = new OceanService(
+                OceanMock.aws(), "dummy", mapper, oceanRepository, stripe);
         service = new CleanroomService(repository, profileService, oceanService);
+        orgService = new OrgService(orgRepository, stripe);
     }
 
     @Test
@@ -80,7 +82,7 @@ public class CleanroomTest {
         testUser.setUserId(UUID.randomUUID());
         testUser.setCreated(ZonedDateTime.now());
         testUser.setModified(ZonedDateTime.now());
-        testUser.setOrg(orgService.create());
+        testUser.setOrg(orgService.create("dummy@dummy.com"));
         testUser = profileRepository.save(testUser);
         userId = testUser.getUserId().toString();
 

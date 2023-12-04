@@ -20,6 +20,7 @@ import com.mytiki.account.features.latest.otp.OtpConfig;
 import com.mytiki.account.features.latest.readme.ReadmeConfig;
 import com.mytiki.account.features.latest.refresh.RefreshConfig;
 import com.mytiki.account.features.latest.profile.ProfileConfig;
+import com.mytiki.account.features.latest.stripe.StripeConfig;
 import com.mytiki.account.features.latest.subscription.SubscriptionConfig;
 import org.springframework.context.annotation.Import;
 
@@ -39,7 +40,8 @@ import org.springframework.context.annotation.Import;
         ReadmeConfig.class,
         OceanConfig.class,
         CleanroomConfig.class,
-        SubscriptionConfig.class
+        SubscriptionConfig.class,
+        StripeConfig.class
 })
 public class FeaturesConfig {
 }
