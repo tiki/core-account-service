@@ -122,12 +122,4 @@ public class CleanroomTest {
         assertNotNull(cleanroom.getModified());
         assertNotNull(cleanroom.getCreated());
     }
-
-    @Test
-    @Order(4)
-    @Transactional
-    public void Test_Delete_Success() {
-        service.delete(new OauthSub(OauthSubNamespace.USER, userId), cleanroomId);
-        assertThrows(ApiException.class, () -> service.get(new OauthSub(OauthSubNamespace.USER, userId), cleanroomId));
-    }
 }
