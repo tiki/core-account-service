@@ -7,14 +7,14 @@ package com.mytiki.account;
 
 import com.mytiki.account.features.latest.org.OrgAO;
 import com.mytiki.account.features.latest.org.OrgDO;
+import com.mytiki.account.features.latest.org.OrgRepository;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.main.App;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestMethodOrder;
+import com.mytiki.account.mocks.StripeMock;
+import com.stripe.exception.StripeException;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -33,16 +33,22 @@ import static org.junit.jupiter.api.Assertions.*;
 public class OrgTest {
 
     @Autowired
-    private OrgService service;
+    private ProfileService profileService;
 
     @Autowired
-    private ProfileService profileService;
+    private OrgRepository repository;
+
+    private OrgService service;
+
+    @BeforeAll
+    public void before() throws StripeException {
+        service = new OrgService(repository, StripeMock.facade());
+    }
 
     @Test
     public void Test_Create_Success() {
-        OrgDO created = service.create();
-
-        assertNull(created.getBillingId());
+        OrgDO created = service.create("dummy@dummy.com");
+        assertNotNull(created.getBillingId());
         assertNotNull(created.getModified());
         assertNotNull(created.getCreated());
         assertNotNull(created.getOrgId());
@@ -56,7 +62,7 @@ public class OrgTest {
 
         assertTrue(org.getUsers().contains(user.getUserId().toString()));
         assertEquals(user.getOrg().getOrgId().toString(), org.getOrgId());
-        assertNull(org.getBillingId());
+        assertNotNull(org.getBillingId());
         assertNotNull(org.getModified());
         assertNotNull(org.getCreated());
     }

@@ -13,24 +13,33 @@ import com.mytiki.account.features.latest.ocean.OceanService;
 import com.mytiki.account.features.latest.ocean.OceanStatus;
 import com.mytiki.account.features.latest.ocean.OceanType;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
+import com.mytiki.account.utilities.facade.StripeF;
+import com.stripe.exception.StripeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
+import java.lang.invoke.MethodHandles;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class SubscriptionService {
+    protected static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final SubscriptionRepository repository;
     private final OceanService oceanService;
     private final CleanroomService cleanroomService;
+    private final StripeF stripe;
 
     public SubscriptionService(
             SubscriptionRepository repository,
             OceanService oceanService,
-            CleanroomService cleanroomService) {
+            CleanroomService cleanroomService,
+            StripeF stripe) {
         this.repository = repository;
         this.oceanService = oceanService;
         this.cleanroomService = cleanroomService;
+        this.stripe = stripe;
     }
 
     public List<SubscriptionAO> list(OauthSub sub, String status) {
@@ -96,6 +105,18 @@ public class SubscriptionService {
                     .message("Subscription exists")
                     .help("Create a new estimate")
                     .exception();
+
+        boolean hasBilling = false;
+        try{
+            hasBilling = stripe.isValid(found.get().getCleanroom().getOrg().getBillingId());
+        } catch (StripeException e) {
+            logger.error("Stripe error", e);
+        }
+        if(!hasBilling) throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
+                .message("Request requires a valid billing profile")
+                .help("Go to: https://billing.mytiki.com/p/login/3cs2afdmE27veD6288")
+                .exception();
+
         cleanroomService.guard(sub, found.get().getCleanroom().getCleanroomId().toString());
         SubscriptionDO update = found.get();
         update.setStatus(SubscriptionStatus.SUBSCRIBED);

@@ -11,7 +11,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
 import com.mytiki.account.features.latest.subscription.SubscriptionDO;
+import com.mytiki.account.features.latest.subscription.SubscriptionStatus;
 import com.mytiki.account.utilities.error.ApiException;
+import com.mytiki.account.utilities.facade.StripeF;
+import com.stripe.exception.StripeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,12 +29,19 @@ public class OceanService {
     private final String bucket;
     private final ObjectMapper mapper;
     private final OceanRepository repository;
+    private final StripeF stripe;
 
-    public OceanService(OceanAws aws, String bucket, ObjectMapper mapper, OceanRepository repository) {
+    public OceanService(
+            OceanAws aws,
+            String bucket,
+            ObjectMapper mapper,
+            OceanRepository repository,
+            StripeF stripe) {
         this.aws = aws;
         this.bucket = bucket;
         this.mapper = mapper;
         this.repository = repository;
+        this.stripe = stripe;
     }
 
     public OceanDO count(String query) {
@@ -79,8 +89,18 @@ public class OceanService {
                         try {
                             List<String[]> res = aws.fetch(req.getResultUri());
                             ocean.setResult(mapper.writeValueAsString(res));
+                            SubscriptionDO subscription = ocean.getSubscription();
+                            if(found.get().getType() == OceanType.COUNT &&
+                                    subscription.getStatus() == SubscriptionStatus.SUBSCRIBED) {
+                                stripe.usage(
+                                        subscription.getCleanroom().getOrg().getBillingId(),
+                                        Long.parseLong(res.get(1)[0])
+                                );
+                            }
                         } catch (ApiException | JsonProcessingException e) {
                             logger.warn("Failed to retrieve results. Skipping", e);
+                        } catch (StripeException e) {
+                            logger.error("Failed to report usage to billing", e);
                         }
                     }
                 }

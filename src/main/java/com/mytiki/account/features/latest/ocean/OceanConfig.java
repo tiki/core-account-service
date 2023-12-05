@@ -7,6 +7,7 @@ package com.mytiki.account.features.latest.ocean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.account.utilities.Constants;
+import com.mytiki.account.utilities.facade.StripeF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -28,8 +29,9 @@ public class OceanConfig {
             @Autowired OceanAws aws,
             @Value("${com.mytiki.account.cleanroom.bucket}") String bucket,
             @Autowired ObjectMapper mapper,
-            @Autowired OceanRepository repository){
-        return new OceanService(aws, bucket, mapper, repository);
+            @Autowired OceanRepository repository,
+            @Autowired StripeF stripe){
+        return new OceanService(aws, bucket, mapper, repository, stripe);
     }
 
     @Bean

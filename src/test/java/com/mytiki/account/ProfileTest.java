@@ -5,16 +5,16 @@
 
 package com.mytiki.account;
 
+import com.mytiki.account.features.latest.org.OrgRepository;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.profile.ProfileAO;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileRepository;
 import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.main.App;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestMethodOrder;
+import com.mytiki.account.mocks.StripeMock;
+import com.stripe.exception.StripeException;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -40,7 +40,14 @@ public class ProfileTest {
     private ProfileService service;
 
     @Autowired
+    private OrgRepository orgRepository;
+
     private OrgService orgService;
+
+    @BeforeAll
+    public void before() throws StripeException {
+        orgService = new OrgService(orgRepository, StripeMock.facade());
+    }
 
     @Test
     public void Test_Get_Success() {
@@ -49,7 +56,7 @@ public class ProfileTest {
         saved.setUserId(UUID.randomUUID());
         saved.setCreated(ZonedDateTime.now());
         saved.setModified(ZonedDateTime.now());
-        saved.setOrg(orgService.create());
+        saved.setOrg(orgService.create("dummy@dummy.com"));
         saved = repository.save(saved);
 
         ProfileAO user = service.get(saved.getUserId().toString());

@@ -54,7 +54,7 @@ public class OrgDO implements Serializable {
         this.billingId = billingId;
     }
 
-    @OneToMany(mappedBy = "org")
+    @OneToMany(mappedBy = "org", fetch = FetchType.EAGER)
     public List<ProfileDO> getProfiles() {
         return profiles;
     }
@@ -63,7 +63,7 @@ public class OrgDO implements Serializable {
         this.profiles = users;
     }
 
-    @OneToMany(mappedBy = "org")
+    @OneToMany(mappedBy = "org", fetch = FetchType.EAGER)
     public List<ProviderDO> getProviders() {
         return providers;
     }

@@ -19,11 +19,11 @@ import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
-import jakarta.transaction.Transactional;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.transaction.annotation.Transactional;
 
 @XRayEnabled
 public class AuthCodeService {

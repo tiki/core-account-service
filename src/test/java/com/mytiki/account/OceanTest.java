@@ -19,6 +19,9 @@ import com.mytiki.account.features.latest.subscription.SubscriptionRepository;
 import com.mytiki.account.features.latest.subscription.SubscriptionStatus;
 import com.mytiki.account.main.App;
 import com.mytiki.account.mocks.JwtMock;
+import com.mytiki.account.mocks.OceanMock;
+import com.mytiki.account.mocks.StripeMock;
+import com.stripe.exception.StripeException;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,28 +64,14 @@ public class OceanTest {
     private CleanroomRepository cleanroomRepository;
     @Autowired
     private ProfileService profileService;
-    @Autowired
-    private OrgService orgService;
     private OceanService service;
     private CleanroomService cleanroomService;
     private final String executionArn = "dummy-execution-arn";
 
     @BeforeEach
-    public void before() {
-        SfnClient sfnClient = Mockito.mock(SfnClient.class);
-        Mockito.doReturn(StartExecutionResponse.builder().executionArn(executionArn).build())
-                .when(sfnClient)
-                .startExecution(Mockito.any(StartExecutionRequest.class));
-        Mockito.doReturn(DescribeExecutionResponse.builder().status(ExecutionStatus.SUCCEEDED).build())
-                .when(sfnClient)
-                .describeExecution(Mockito.any(DescribeExecutionRequest.class));
-        S3Client s3Client = Mockito.mock(S3Client.class);
-        Mockito.doReturn(ResponseBytes.fromByteArray(GetObjectResponse.builder().build(),
-                        "hello,world".getBytes(StandardCharsets.UTF_8)))
-                .when(s3Client)
-                .getObjectAsBytes(Mockito.any(GetObjectRequest.class));
-        OceanAws oceanAws = new OceanAws(sfnClient, s3Client, arn, mapper);
-        this.service = new OceanService(oceanAws, "dummy", mapper, repository);
+    public void before() throws StripeException {
+        OceanAws oceanAws = OceanMock.aws(executionArn, arn, mapper);
+        this.service = new OceanService(oceanAws, "dummy", mapper, repository, StripeMock.facade());
         this.cleanroomService = new CleanroomService(cleanroomRepository, profileService, this.service);
     }
 

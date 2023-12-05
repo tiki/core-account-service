@@ -21,13 +21,13 @@ import com.mytiki.account.utilities.facade.SendgridF;
 import com.mytiki.account.utilities.facade.TemplateF;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
-import jakarta.transaction.Transactional;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
