@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.org;
 
+import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
 import com.mytiki.account.features.latest.provider.ProviderDO;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import jakarta.persistence.*;
@@ -22,6 +23,7 @@ public class OrgDO implements Serializable {
     private String billingId;
     private List<ProfileDO> profiles;
     private List<ProviderDO> providers;
+    private List<CleanroomDO> cleanrooms;
     private ZonedDateTime created;
     private ZonedDateTime modified;
 
@@ -88,5 +90,14 @@ public class OrgDO implements Serializable {
 
     public void setModified(ZonedDateTime modified) {
         this.modified = modified;
+    }
+
+    @OneToMany(mappedBy = "org", fetch = FetchType.EAGER)
+    public List<CleanroomDO> getCleanrooms() {
+        return cleanrooms;
+    }
+
+    public void setCleanrooms(List<CleanroomDO> cleanrooms) {
+        this.cleanrooms = cleanrooms;
     }
 }

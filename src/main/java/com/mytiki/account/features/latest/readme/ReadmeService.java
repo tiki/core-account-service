@@ -79,10 +79,15 @@ public class ReadmeService {
 
         String providerId = profile.getOrg().getProviders() != null && !profile.getOrg().getProviders().isEmpty() ?
                 profile.getOrg().getProviders().get(0).getProviderId().toString() : null;
+
+        String cleanroomId = profile.getOrg().getCleanrooms() != null && !profile.getOrg().getCleanrooms().isEmpty() ?
+                profile.getOrg().getCleanrooms().get(0).getCleanroomId().toString() : null;
+
         ReadmeAORspParams params = new ReadmeAORspParams();
         params.setOrgId(profile.getOrg().getOrgId().toString());
         params.setProviderId(providerId);
         params.setUserId(profile.getUserId().toString());
+        params.setCleanroomId(cleanroomId);
         rsp.setParameters(params);
 
         rsp.setKeys(keys.stream().map((key) -> {

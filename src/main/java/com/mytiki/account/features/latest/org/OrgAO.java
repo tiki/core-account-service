@@ -12,7 +12,8 @@ public class OrgAO {
     private String orgId;
     private String billingId;
     private Set<String> users;
-    private Set<String> apps;
+    private Set<String> providers;
+    private Set<String> cleanrooms;
     private ZonedDateTime modified;
     private ZonedDateTime created;
 
@@ -48,12 +49,20 @@ public class OrgAO {
         this.users = users;
     }
 
-    public Set<String> getApps() {
-        return apps;
+    public Set<String> getProviders() {
+        return providers;
     }
 
-    public void setApps(Set<String> apps) {
-        this.apps = apps;
+    public void setProviders(Set<String> providers) {
+        this.providers = providers;
+    }
+
+    public Set<String> getCleanrooms() {
+        return cleanrooms;
+    }
+
+    public void setCleanrooms(Set<String> cleanrooms) {
+        this.cleanrooms = cleanrooms;
     }
 
     public ZonedDateTime getCreated() {
