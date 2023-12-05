@@ -16,7 +16,7 @@ public class OceanQuery {
     public static String wrapSample(String query) {
         return "SELECT * FROM (" +
                 query +
-                ") LIMIT 10;";
+                ") LIMIT 3;";
     }
 
     public static String wrapCreate(String query, String bucket, String cleanroomId, String table) {
