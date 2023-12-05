@@ -109,8 +109,8 @@ public class OceanService {
                     if(sub != null) {
                         CleanroomDO cleanroom = sub.getCleanroom();
                         String table = OceanQuery.table(cleanroom.getCleanroomId().toString(), sub.getName());
-                        request(OceanType.COUNT, OceanQuery.count(table));
-                        request(OceanType.SAMPLE, OceanQuery.sample(table));
+                        request(OceanType.COUNT, OceanQuery.count(table), sub);
+                        request(OceanType.SAMPLE, OceanQuery.sample(table), sub);
                     }else {
                         logger.warn("Skipping. No subscription: " + ocean.getRequestId());
                     }
@@ -134,7 +134,12 @@ public class OceanService {
         }
     }
 
+
     private OceanDO request(OceanType type, String query) {
+        return request(type, query, null);
+    }
+
+    private OceanDO request(OceanType type, String query, SubscriptionDO subscription) {
         UUID requestId = UUID.randomUUID();
         String executionArn = aws.execute(requestId, query);
         OceanDO ocean = new OceanDO();
@@ -143,6 +148,7 @@ public class OceanService {
         ocean.setType(type);
         ocean.setStatus(OceanStatus.PENDING);
         ocean.setExecutionArn(executionArn);
+        ocean.setSubscription(subscription);
         ocean.setCreated(now);
         ocean.setModified(now);
         return repository.save(ocean);
