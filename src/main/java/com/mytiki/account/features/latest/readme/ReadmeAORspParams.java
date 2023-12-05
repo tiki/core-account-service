@@ -14,6 +14,8 @@ public class ReadmeAORspParams {
     private String orgId;
     @JsonProperty("provider-id")
     private String providerId;
+    @JsonProperty("cleanroom-id")
+    private String cleanroomId;
 
     public String getUserId() {
         return userId;
@@ -37,5 +39,13 @@ public class ReadmeAORspParams {
 
     public void setProviderId(String providerId) {
         this.providerId = providerId;
+    }
+
+    public String getCleanroomId() {
+        return cleanroomId;
+    }
+
+    public void setCleanroomId(String cleanroomId) {
+        this.cleanroomId = cleanroomId;
     }
 }

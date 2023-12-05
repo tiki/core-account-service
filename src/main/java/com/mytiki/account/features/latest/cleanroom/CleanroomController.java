@@ -61,15 +61,15 @@ public class CleanroomController {
         return service.update(new OauthSub(token.getName()), cleanroomId, body);
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-cleanroom-delete",
-            summary = "Delete Cleanroom",
-            description = "Permanently delete a data cleanroom and all it's data",
-            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
-    @Secured("SCOPE_account:admin")
-    @RequestMapping(method = RequestMethod.DELETE, path = "/{cleanroom-id}")
-    public void delete(
-            JwtAuthenticationToken token,
-            @PathVariable(name = "cleanroom-id") String cleanroomId) {
-        service.delete(new OauthSub(token.getName()), cleanroomId);
-    }
+//    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-cleanroom-delete",
+//            summary = "Delete Cleanroom",
+//            description = "Permanently delete a data cleanroom and all it's data",
+//            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
+//    @Secured("SCOPE_account:admin")
+//    @RequestMapping(method = RequestMethod.DELETE, path = "/{cleanroom-id}")
+//    public void delete(
+//            JwtAuthenticationToken token,
+//            @PathVariable(name = "cleanroom-id") String cleanroomId) {
+//        service.delete(new OauthSub(token.getName()), cleanroomId);
+//    }
 }

@@ -70,9 +70,16 @@ public class OrgService {
         }
 
         if(src.getProviders() != null) {
-            rsp.setApps(src.getProviders()
+            rsp.setProviders(src.getProviders()
                     .stream()
-                    .map(app -> app.getProviderId().toString())
+                    .map(provider -> provider.getProviderId().toString())
+                    .collect(Collectors.toSet()));
+        }
+
+        if(src.getCleanrooms() != null) {
+            rsp.setCleanrooms(src.getCleanrooms()
+                    .stream()
+                    .map(cleanroom -> cleanroom.getCleanroomId().toString())
                     .collect(Collectors.toSet()));
         }
 

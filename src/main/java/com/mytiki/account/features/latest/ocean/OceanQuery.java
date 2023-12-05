@@ -42,11 +42,11 @@ public class OceanQuery {
                 + "." + table.replace("-", "_");
     }
 
-    public static String sample(String table){
+    public static String count(String table){
         return "SELECT COUNT(*) FROM " + table;
     }
 
-    public static String count(String table){
-        return "SELECT * FROM " + table + " LIMIT 10";
+    public static String sample(String table){
+        return "SELECT * FROM " + table + " LIMIT 3";
     }
 }

@@ -128,7 +128,7 @@ public class OceanService {
         try {
             TypeReference<List<String[]>> typeRef = new TypeReference<>() {};
             return mapper.readValue(result, typeRef);
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException | IllegalArgumentException e) {
             logger.warn("Failed to read results. Skipping", e);
             return new ArrayList<>();
         }

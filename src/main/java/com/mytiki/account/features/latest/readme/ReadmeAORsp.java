@@ -12,6 +12,7 @@ public class ReadmeAORsp {
     private String name;
     private String email;
     private Integer version;
+    private String billing;
     private List<ReadmeAORspKey> keys;
     private ReadmeAORspParams parameters;
 
@@ -53,5 +54,13 @@ public class ReadmeAORsp {
 
     public void setParameters(ReadmeAORspParams parameters) {
         this.parameters = parameters;
+    }
+
+    public String getBilling() {
+        return billing;
+    }
+
+    public void setBilling(String billing) {
+        this.billing = billing;
     }
 }
