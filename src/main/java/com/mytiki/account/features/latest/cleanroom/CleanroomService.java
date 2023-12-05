@@ -70,12 +70,6 @@ public class CleanroomService {
         return toAO(update);
     }
 
-    public void delete(OauthSub sub, String cleanroomId){
-        CleanroomDO cleanroom = guard(sub, cleanroomId);
-        oceanService.dropDatabase(cleanroomId);
-        repository.delete(cleanroom);
-    }
-
     public Optional<CleanroomDO> getDO(String cleanroomId){
         return repository.findByCleanroomId(UUID.fromString(cleanroomId));
     }
