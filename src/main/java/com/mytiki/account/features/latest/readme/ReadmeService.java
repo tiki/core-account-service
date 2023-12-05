@@ -12,14 +12,19 @@ import com.mytiki.account.features.latest.api_key.ApiKeyDO;
 import com.mytiki.account.features.latest.api_key.ApiKeyService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
+import com.mytiki.account.utilities.facade.StripeF;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.stripe.exception.StripeException;
 import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -30,17 +35,20 @@ import java.util.stream.Collectors;
 
 @XRayEnabled
 public class ReadmeService {
+    protected static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final JWSSigner signer;
     private final ObjectMapper mapper;
     private final SecretKeySpec secretKeySpec;
     private final ApiKeyService apiKeyService;
+    private final StripeF stripe;
 
-    public ReadmeService(String secret, ApiKeyService apiKeyService) {
+    public ReadmeService(String secret, ApiKeyService apiKeyService, StripeF stripe) {
         try {
             this.mapper = new ObjectMapper();
             signer = new MACSigner(secret);
             secretKeySpec = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
             this.apiKeyService = apiKeyService;
+            this.stripe = stripe;
         } catch (KeyLengthException e) {
             throw new RuntimeException(e);
         }
@@ -63,6 +71,11 @@ public class ReadmeService {
         rsp.setEmail(profile.getEmail());
         rsp.setName(profile.getEmail());
         rsp.setVersion(1);
+        try {
+            rsp.setBilling(stripe.portal(profile.getOrg().getBillingId()));
+        }catch (StripeException | NullPointerException e){
+            logger.warn("Failed to get billing portal. Skipping", e);
+        }
 
         String providerId = profile.getOrg().getProviders() != null && !profile.getOrg().getProviders().isEmpty() ?
                 profile.getOrg().getProviders().get(0).getProviderId().toString() : null;
