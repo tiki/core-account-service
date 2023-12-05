@@ -6,7 +6,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/core-account-service/blob/main/LICENSE
-  version: 2.9.0
+  version: 2.9.1
 servers:
 - url: https://account.mytiki.com
 paths:
@@ -313,24 +313,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CleanroomAO'
-      security:
-      - default:
-        - account:admin
-    delete:
-      tags:
-      - Managing Cleanrooms
-      summary: Delete Cleanroom
-      description: Permanently delete a data cleanroom and all it's data
-      operationId: account-cleanroom-delete
-      parameters:
-      - name: cleanroom-id
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
       security:
       - default:
         - account:admin
