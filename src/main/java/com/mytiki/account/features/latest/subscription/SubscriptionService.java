@@ -108,7 +108,7 @@ public class SubscriptionService {
 
         boolean hasBilling = false;
         try{
-            hasBilling = stripe.isValid(found.get().getCleanroom().getOrg().getBillingId()));
+            hasBilling = stripe.isValid(found.get().getCleanroom().getOrg().getBillingId());
         } catch (StripeException e) {
             logger.error("Stripe error", e);
         }
