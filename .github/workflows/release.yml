@@ -124,10 +124,10 @@ jobs:
         id: version
         run: echo "version=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
 
-      - name: OpenApi
-        uses: readmeio/rdme@8.6.6
-        with:
-          rdme: openapi openapi.yaml --key=${{ secrets.README_API_KEY }} --id=65668b9f406221001c0c80a0
+#      - name: OpenApi
+#        uses: readmeio/rdme@8.6.6
+#        with:
+#          rdme: openapi openapi.yaml --key=${{ secrets.README_API_KEY }} --id=65713595281a77007e17e5e1
 
       - name: Release
         uses: ncipollo/release-action@v1

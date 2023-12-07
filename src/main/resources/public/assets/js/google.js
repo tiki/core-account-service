@@ -34,7 +34,7 @@ window.onload = function () {
           element.classList.remove("hidden");
           return;
         }
-        window.location.href = `https://tiki-dev.mytiki.com/?auth_token=${response.readme_token}`;
+        window.location.href = `https://mytiki.com/?auth_token=${response.readme_token}`;
       })
       .catch((err) => console.error(err));
   }

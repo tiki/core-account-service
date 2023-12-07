@@ -13,7 +13,7 @@ window.onload = function () {
   };
   fetch("https://account.mytiki.com/api/latest/auth/revoke", options)
     .then(async (_response) => {
-      window.location.href = `https://tiki-dev.mytiki.com`;
+      window.location.href = `https://mytiki.com`;
     })
     .catch((error) => {
       console.log("error: ", error);

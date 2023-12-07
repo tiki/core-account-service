@@ -47,7 +47,7 @@ const authenticateReadme = (otp) => {
         document.getElementById("loading-container").classList.add("hidden");
         return;
       }
-      window.location.href = `https://tiki-dev.mytiki.com/?auth_token=${data.readme_token}`;
+      window.location.href = `https://mytiki.com/?auth_token=${data.readme_token}`;
     },
   );
 };
