@@ -7,10 +7,7 @@ package com.mytiki.account;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mytiki.account.features.latest.cleanroom.CleanroomAO;
-import com.mytiki.account.features.latest.cleanroom.CleanroomAOReq;
-import com.mytiki.account.features.latest.cleanroom.CleanroomRepository;
-import com.mytiki.account.features.latest.cleanroom.CleanroomService;
+import com.mytiki.account.features.latest.cleanroom.*;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
 import com.mytiki.account.features.latest.ocean.OceanRepository;
@@ -23,14 +20,12 @@ import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.main.App;
 import com.mytiki.account.mocks.OceanMock;
 import com.mytiki.account.mocks.StripeMock;
-import com.mytiki.account.utilities.error.ApiException;
 import com.mytiki.account.utilities.facade.StripeF;
 import com.stripe.exception.StripeException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -67,7 +62,7 @@ public class CleanroomTest {
     public void before() throws StripeException {
         StripeF stripe = StripeMock.facade();
         OceanService oceanService = new OceanService(
-                OceanMock.aws(), "dummy", mapper, oceanRepository, stripe);
+                OceanMock.sf(), OceanMock.lf(), "dummy", mapper, oceanRepository, stripe);
         service = new CleanroomService(repository, profileService, oceanService);
         orgService = new OrgService(orgRepository, stripe);
     }
@@ -75,8 +70,6 @@ public class CleanroomTest {
     @Test
     @Order(1)
     public void Test_Create_Success() {
-        String name = "testCleanroom";
-
         ProfileDO testUser = new ProfileDO();
         testUser.setEmail("test+" + UUID.randomUUID() + "@test.com");
         testUser.setUserId(UUID.randomUUID());
@@ -86,40 +79,35 @@ public class CleanroomTest {
         testUser = profileRepository.save(testUser);
         userId = testUser.getUserId().toString();
 
-        CleanroomAOReq req = new CleanroomAOReq();
-        req.setName(name);
-        CleanroomAO cleanroom = service.create(req,
+        CleanroomAOReq req = new CleanroomAOReq(null, "dummy");
+        CleanroomAORsp cleanroom = service.create(req,
                 new OauthSub(OauthSubNamespace.USER, testUser.getUserId().toString()));
         cleanroomId = cleanroom.getCleanroomId();
 
-        assertEquals(name, cleanroom.getName());
+        assertNotNull(cleanroom.getName());
         assertNotNull(cleanroom.getCleanroomId());
         assertNotNull(cleanroom.getModified());
         assertNotNull(cleanroom.getCreated());
         assertEquals(testUser.getOrg().getOrgId().toString(), cleanroom.getOrgId());
-        assertNull(cleanroom.getIam());
+        assertEquals(cleanroom.getAws(), req.getAws());
     }
 
     @Test
     @Order(2)
-    public void Test_Update_Success() {
-        String testIam = "aws::iam::test";
-        CleanroomAOReq req = new CleanroomAOReq();
-        req.setIam(List.of(testIam));
-        CleanroomAO update = service.update(new OauthSub(OauthSubNamespace.USER, userId), cleanroomId, req);
-        assertEquals(cleanroomId, update.getCleanroomId());
-        assertEquals(1, update.getIam().size());
-        assertEquals(testIam, update.getIam().get(0));
+    public void Test_Get_Success() {
+        CleanroomAORsp cleanroom = service.get(new OauthSub(OauthSubNamespace.USER, userId), cleanroomId);
+        assertEquals(cleanroomId, cleanroom.getCleanroomId());
+        assertEquals("dummy", cleanroom.getAws());
+        assertNotNull(cleanroom.getCleanroomId());
+        assertNotNull(cleanroom.getModified());
+        assertNotNull(cleanroom.getCreated());
     }
 
     @Test
     @Order(3)
-    public void Test_Get_Success() {
-        CleanroomAO cleanroom = service.get(new OauthSub(OauthSubNamespace.USER, userId), cleanroomId);
-        assertEquals(cleanroomId, cleanroom.getCleanroomId());
-        assertEquals(1, cleanroom.getIam().size());
-        assertNotNull(cleanroom.getCleanroomId());
-        assertNotNull(cleanroom.getModified());
-        assertNotNull(cleanroom.getCreated());
+    public void Test_List_Success() {
+        List<CleanroomAO> cleanrooms = service.list(new OauthSub(OauthSubNamespace.USER, userId));
+        assertEquals(1, cleanrooms.size());
+        assertEquals(cleanroomId, cleanrooms.get(0).getCleanroomId());
     }
 }

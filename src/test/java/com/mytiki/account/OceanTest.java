@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class OceanTest {
-    @Value("${com.mytiki.account.ocean.arn}")
+    @Value("${com.mytiki.account.ocean.arn.state}")
     private String arn;
     @Autowired
     private ObjectMapper mapper;
@@ -54,8 +54,8 @@ public class OceanTest {
 
     @BeforeEach
     public void before() throws StripeException {
-        OceanSF oceanSF = OceanMock.aws(executionArn, arn, mapper);
-        this.service = new OceanService(oceanSF, "dummy", mapper, repository, StripeMock.facade());
+        OceanSF sf = OceanMock.sf(executionArn, arn, mapper);
+        this.service = new OceanService(sf, OceanMock.lf(), "dummy", mapper, repository, StripeMock.facade());
         this.cleanroomService = new CleanroomService(cleanroomRepository, profileService, this.service);
     }
 

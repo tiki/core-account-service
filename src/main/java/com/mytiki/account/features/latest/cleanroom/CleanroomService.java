@@ -50,6 +50,8 @@ public class CleanroomService {
             cleanroom.setOrg(user.get().getOrg());
             cleanroom.setCreated(now);
             cleanroom.setModified(now);
+            cleanroom.setAws(req.getAws());
+            cleanroom.setDescription(req.getDescription());
             OceanDO result = oceanService.createDatabase(cleanroom);
             cleanroom.setResult(result);
             return toAORsp(repository.save(cleanroom));

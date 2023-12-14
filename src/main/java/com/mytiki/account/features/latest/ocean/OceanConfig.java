@@ -28,7 +28,7 @@ public class OceanConfig {
     public OceanService oceanService(
             @Autowired OceanSF sf,
             @Autowired OceanLF lf,
-            @Value("${com.mytiki.account.cleanroom.bucket}") String bucket,
+            @Value("${com.mytiki.account.ocean.bucket}") String bucket,
             @Autowired ObjectMapper mapper,
             @Autowired OceanRepository repository,
             @Autowired StripeF stripe){

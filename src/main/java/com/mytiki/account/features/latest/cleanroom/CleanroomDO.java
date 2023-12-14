@@ -58,7 +58,7 @@ public class CleanroomDO implements Serializable {
         this.name = name;
     }
 
-    @Column(name = "aws")
+    @Column(name = "aws_account")
     public String getAws() {
         return aws;
     }
