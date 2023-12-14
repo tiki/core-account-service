@@ -15,6 +15,8 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @XRayEnabled
 @Tag(name = "Managing Cleanrooms")
 @RestController
@@ -26,6 +28,16 @@ public class CleanroomController {
 
     public CleanroomController(CleanroomService service) {
         this.service = service;
+    }
+
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-cleanroom-list",
+            summary = "List Cleanrooms",
+            description = "Returns the configuration details for a data cleanroom",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
+    @RequestMapping(method = RequestMethod.GET)
+    @Secured("SCOPE_account:admin")
+    public List<CleanroomAO> list(JwtAuthenticationToken token) {
+        return service.list(new OauthSub(token.getName()));
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-cleanroom-get",
