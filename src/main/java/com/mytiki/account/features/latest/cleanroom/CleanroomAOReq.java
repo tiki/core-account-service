@@ -5,25 +5,34 @@
 
 package com.mytiki.account.features.latest.cleanroom;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CleanroomAOReq {
-    private String name;
-    private List<String> iam;
+    private String description;
+    private String aws;
 
-    public String getName() {
-        return name;
+    @JsonCreator
+    public CleanroomAOReq(
+            @JsonProperty String description,
+            @JsonProperty(required = true) String aws) {
+        this.description = description;
+        this.aws = aws;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getDescription() {
+        return description;
     }
 
-    public List<String> getIam() {
-        return iam;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public void setIam(List<String> iam) {
-        this.iam = iam;
+    public String getAws() {
+        return aws;
+    }
+
+    public void setAws(String aws) {
+        this.aws = aws;
     }
 }

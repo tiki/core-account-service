@@ -6,11 +6,14 @@
 package com.mytiki.account.features.latest.org;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.mytiki.account.features.latest.cleanroom.CleanroomAOReq;
+import com.mytiki.account.features.latest.cleanroom.CleanroomAORsp;
+import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
+import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.facade.StripeF;
 import com.stripe.exception.StripeException;
 import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -45,15 +48,9 @@ public class OrgService {
         }
     }
 
-    @Transactional
-    public OrgAO getByUser(String userId){
-        Optional<OrgDO> found = repository.findByUserId(UUID.fromString(userId));
-        return found.map(this::toAO).orElse(null);
-    }
-
-    @Transactional
-    public OrgAO get(String orgId){
-        Optional<OrgDO> found = repository.findByOrgId(UUID.fromString(orgId));
+    public OrgAO get(OauthSub sub){
+        if(!sub.isUser()) throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
+        Optional<OrgDO> found = repository.findByUserId(UUID.fromString(sub.getId()));
         return found.map(this::toAO).orElse(null);
     }
 

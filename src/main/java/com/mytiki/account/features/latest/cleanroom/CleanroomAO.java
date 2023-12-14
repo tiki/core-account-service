@@ -11,10 +11,7 @@ import java.util.List;
 public class CleanroomAO {
     private String cleanroomId;
     private String name;
-    private String orgId;
-    private List<String> iam;
-    private ZonedDateTime modified;
-    private ZonedDateTime created;
+    private String description;
 
     public String getCleanroomId() {
         return cleanroomId;
@@ -32,35 +29,11 @@ public class CleanroomAO {
         this.name = name;
     }
 
-    public String getOrgId() {
-        return orgId;
+    public String getDescription() {
+        return description;
     }
 
-    public void setOrgId(String orgId) {
-        this.orgId = orgId;
-    }
-
-    public List<String> getIam() {
-        return iam;
-    }
-
-    public void setIam(List<String> iam) {
-        this.iam = iam;
-    }
-
-    public ZonedDateTime getModified() {
-        return modified;
-    }
-
-    public void setModified(ZonedDateTime modified) {
-        this.modified = modified;
-    }
-
-    public ZonedDateTime getCreated() {
-        return created;
-    }
-
-    public void setCreated(ZonedDateTime created) {
-        this.created = created;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

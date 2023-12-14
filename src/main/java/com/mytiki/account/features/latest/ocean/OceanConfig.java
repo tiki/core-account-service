@@ -26,19 +26,32 @@ public class OceanConfig {
 
     @Bean
     public OceanService oceanService(
-            @Autowired OceanAws aws,
-            @Value("${com.mytiki.account.cleanroom.bucket}") String bucket,
+            @Autowired OceanSF sf,
+            @Autowired OceanLF lf,
+            @Value("${com.mytiki.account.ocean.bucket}") String bucket,
             @Autowired ObjectMapper mapper,
             @Autowired OceanRepository repository,
             @Autowired StripeF stripe){
-        return new OceanService(aws, bucket, mapper, repository, stripe);
+        return new OceanService(sf, lf, bucket, mapper, repository, stripe);
     }
 
     @Bean
-    public OceanAws oceanAws(
+    public OceanSF oceanSF(
             @Value("${com.mytiki.account.ocean.region}") String region,
-            @Value("${com.mytiki.account.ocean.arn}") String arn,
+            @Value("${com.mytiki.account.ocean.arn.state}") String arn,
             @Autowired ObjectMapper mapper){
-        return new OceanAws(region, arn, mapper);
+        return new OceanSF(region, arn, mapper);
+    }
+
+    @Bean
+    public OceanLF oceanLF(
+            @Value("${com.mytiki.account.ocean.region}") String region,
+            @Value("${com.mytiki.account.ocean.catalog}") String catalog,
+            @Value("${com.mytiki.account.ocean.arn.location}") String location,
+            @Value("${com.mytiki.account.ocean.arn.admin}") String admin,
+            @Value("${com.mytiki.account.ocean.arn.exec}") String exec,
+            @Value("${com.mytiki.account.ocean.bucket}") String bucket,
+            @Autowired ObjectMapper mapper){
+        return new OceanLF(region, catalog, location, admin, exec, bucket);
     }
 }

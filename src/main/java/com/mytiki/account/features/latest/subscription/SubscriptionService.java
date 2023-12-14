@@ -120,8 +120,7 @@ public class SubscriptionService {
         cleanroomService.guard(sub, found.get().getCleanroom().getCleanroomId().toString());
         SubscriptionDO update = found.get();
         update.setStatus(SubscriptionStatus.SUBSCRIBED);
-        OceanDO res = oceanService.ctas(
-                update.getCleanroom().getCleanroomId().toString(), update.getName(), update.getQuery());
+        OceanDO res = oceanService.ctas(update);
         List<OceanDO> results = update.getResults() != null ? new ArrayList<>(update.getResults()) : new ArrayList<>();
         results.add(res);
         update.setResults(results);

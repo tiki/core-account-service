@@ -15,6 +15,8 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @XRayEnabled
 @Tag(name = "Managing Cleanrooms")
 @RestController
@@ -28,6 +30,16 @@ public class CleanroomController {
         this.service = service;
     }
 
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-cleanroom-list",
+            summary = "List Cleanrooms",
+            description = "Returns the configuration details for a data cleanroom",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
+    @RequestMapping(method = RequestMethod.GET)
+    @Secured("SCOPE_account:admin")
+    public List<CleanroomAO> list(JwtAuthenticationToken token) {
+        return service.list(new OauthSub(token.getName()));
+    }
+
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-cleanroom-get",
             summary = "Get Cleanroom",
             description = "Returns the configuration details for a data cleanroom",
@@ -39,7 +51,7 @@ public class CleanroomController {
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-cleanroom-create",
-            summary = "Create a Cleanroom",
+            summary = "Create Cleanroom",
             description = "Creates a new data cleanroom, returning the configuration details",
             security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
@@ -48,18 +60,18 @@ public class CleanroomController {
         return service.create(body, new OauthSub(token.getName()));
     }
 
-    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-cleanroom-update",
-            summary = "Update a Cleanroom",
-            description = "Updates a data cleanroom, replacing the settings with any non-null inputs",
-            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
-    @Secured("SCOPE_account:admin")
-    @RequestMapping(method = RequestMethod.POST, path = "/{cleanroom-id}")
-    public CleanroomAO update(
-            JwtAuthenticationToken token,
-            @RequestBody CleanroomAOReq body,
-            @PathVariable(name = "cleanroom-id") String cleanroomId) {
-        return service.update(new OauthSub(token.getName()), cleanroomId, body);
-    }
+//    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-cleanroom-update",
+//            summary = "Update a Cleanroom",
+//            description = "Updates a data cleanroom, replacing the settings with any non-null inputs",
+//            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
+//    @Secured("SCOPE_account:admin")
+//    @RequestMapping(method = RequestMethod.POST, path = "/{cleanroom-id}")
+//    public CleanroomAO update(
+//            JwtAuthenticationToken token,
+//            @RequestBody CleanroomAOReq body,
+//            @PathVariable(name = "cleanroom-id") String cleanroomId) {
+//        return service.update(new OauthSub(token.getName()), cleanroomId, body);
+//    }
 
 //    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-cleanroom-delete",
 //            summary = "Delete Cleanroom",

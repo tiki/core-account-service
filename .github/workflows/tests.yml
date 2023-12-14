@@ -27,10 +27,16 @@ jobs:
       GITHUB_OAUTH_SECRET: ${{ secrets.GH_OAUTH_SECRET }}
       GOOGLE_OAUTH_ID: ${{ secrets.GOOGLE_OAUTH_ID }}
       GOOGLE_OAUTH_SECRET: ${{ secrets.GOOGLE_OAUTH_SECRET }}
-      OCEAN_REGION: ${{ vars.OCEAN_REGION }}
-      OCEAN_ARN: ${{ secrets.OCEAN_ARN }}
       STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
       STRIPE_PRICE: ${{ secrets.STRIPE_PRICE }}
+      OCEAN_BUCKET: ${{ vars.OCEAN_BUCKET }}
+      OCEAN_REGION: ${{ vars.OCEAN_REGION }}
+      OCEAN_CATALOG: ${{ secrets.OCEAN_CATALOG }}
+      OCEAN_ARN_STATE: ${{ secrets.OCEAN_ARN_STATE }}
+      OCEAN_ARN_LOCATION: ${{ secrets.OCEAN_ARN_LOCATION }}
+      OCEAN_ARN_EXEC: ${{ secrets.OCEAN_ARN_EXEC }}
+      OCEAN_ARN_ADMIN: ${{ secrets.OCEAN_ARN_ADMIN }}
+
     services:
       postgres:
         image: postgres:14.5

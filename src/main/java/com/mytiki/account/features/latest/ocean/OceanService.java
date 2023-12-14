@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
+import com.mytiki.account.features.latest.org.OrgDO;
 import com.mytiki.account.features.latest.subscription.SubscriptionDO;
 import com.mytiki.account.features.latest.subscription.SubscriptionStatus;
 import com.mytiki.account.utilities.error.ApiException;
@@ -25,19 +26,22 @@ import java.util.*;
 @XRayEnabled
 public class OceanService {
     protected static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final OceanAws aws;
+    private final OceanSF sf;
+    private final OceanLF lf;
     private final String bucket;
     private final ObjectMapper mapper;
     private final OceanRepository repository;
     private final StripeF stripe;
 
     public OceanService(
-            OceanAws aws,
+            OceanSF sf,
+            OceanLF lf,
             String bucket,
             ObjectMapper mapper,
             OceanRepository repository,
             StripeF stripe) {
-        this.aws = aws;
+        this.sf = sf;
+        this.lf = lf;
         this.bucket = bucket;
         this.mapper = mapper;
         this.repository = repository;
@@ -52,16 +56,18 @@ public class OceanService {
         return request(OceanType.SAMPLE, OceanQuery.wrapSample(query));
     }
 
-    public OceanDO createDatabase(String cleanroomId) {
-        return request(OceanType.CREATE_DATABASE, OceanQuery.createDatabase(cleanroomId));
+    public OceanDO createDatabase(CleanroomDO cleanroom) {
+        return request(OceanType.CREATE_DATABASE, OceanQuery.createDatabase(cleanroom.getName()));
     }
 
-    public OceanDO dropDatabase(String cleanroomId) {
-        return request(OceanType.DROP_DATABASE, OceanQuery.dropDatabase(cleanroomId));
+    public OceanDO dropDatabase(CleanroomDO cleanroom) {
+        return request(OceanType.DROP_DATABASE, OceanQuery.dropDatabase(cleanroom.getName()));
     }
 
-    public OceanDO ctas(String cleanroomId, String table, String query) {
-        return request(OceanType.CREATE_TABLE, OceanQuery.wrapCreate(query, bucket, cleanroomId, table));
+    public OceanDO ctas(SubscriptionDO subscription) {
+        return request(OceanType.CREATE_TABLE, OceanQuery.wrapCreate(
+                subscription.getQuery(), bucket, subscription.getCleanroom().getCleanroomId().toString(),
+                subscription.getCleanroom().getName(), subscription.getName()));
     }
 
     public OceanDO get(UUID requestId) {
@@ -69,7 +75,7 @@ public class OceanService {
         if(found.isPresent()) {
             if(found.get().getStatus() == OceanStatus.PENDING){
                 OceanDO update = found.get();
-                update.setStatus(aws.status(update.getExecutionArn()));
+                update.setStatus(sf.status(update.getExecutionArn()));
                 update.setModified(ZonedDateTime.now());
                 return repository.save(update);
             }else return found.get();
@@ -87,7 +93,7 @@ public class OceanService {
                 case COUNT, SAMPLE -> {
                     if(req.getResultUri() != null) {
                         try {
-                            List<String[]> res = aws.fetch(req.getResultUri());
+                            List<String[]> res = sf.fetch(req.getResultUri());
                             ocean.setResult(mapper.writeValueAsString(res));
                             SubscriptionDO subscription = ocean.getSubscription();
                             if(found.get().getType() == OceanType.COUNT &&
@@ -108,14 +114,18 @@ public class OceanService {
                     SubscriptionDO sub = ocean.getSubscription();
                     if(sub != null) {
                         CleanroomDO cleanroom = sub.getCleanroom();
-                        String table = OceanQuery.table(cleanroom.getCleanroomId().toString(), sub.getName());
+                        String table = OceanQuery.table(cleanroom.getName(), sub.getName());
                         request(OceanType.COUNT, OceanQuery.count(table), sub);
                         request(OceanType.SAMPLE, OceanQuery.sample(table), sub);
                     }else {
                         logger.warn("Skipping. No subscription: " + ocean.getRequestId());
                     }
                 }
-                case CREATE_DATABASE, DROP_DATABASE -> {}
+                case CREATE_DATABASE -> {
+                    CleanroomDO cleanroom = ocean.getCleanroom();
+                    lf.add(cleanroom);
+                }
+                case DROP_DATABASE ->  {}
             }
             ocean.setModified(ZonedDateTime.now());
             repository.save(ocean);
@@ -141,7 +151,7 @@ public class OceanService {
 
     private OceanDO request(OceanType type, String query, SubscriptionDO subscription) {
         UUID requestId = UUID.randomUUID();
-        String executionArn = aws.execute(requestId, query);
+        String executionArn = sf.execute(requestId, query);
         OceanDO ocean = new OceanDO();
         ZonedDateTime now = ZonedDateTime.now();
         ocean.setRequestId(requestId);

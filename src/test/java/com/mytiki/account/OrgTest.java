@@ -5,6 +5,8 @@
 
 package com.mytiki.account;
 
+import com.mytiki.account.features.latest.oauth.OauthSub;
+import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
 import com.mytiki.account.features.latest.org.OrgAO;
 import com.mytiki.account.features.latest.org.OrgDO;
 import com.mytiki.account.features.latest.org.OrgRepository;
@@ -58,7 +60,7 @@ public class OrgTest {
     @Test
     public void Test_Get_Success() {
         ProfileDO user = profileService.createIfNotExists(UUID.randomUUID() + "@test.com");
-        OrgAO org = service.getByUser(user.getUserId().toString());
+        OrgAO org = service.get(new OauthSub(OauthSubNamespace.USER, user.getUserId().toString()));
 
         assertTrue(org.getUsers().contains(user.getUserId().toString()));
         assertEquals(user.getOrg().getOrgId().toString(), org.getOrgId());
@@ -69,7 +71,7 @@ public class OrgTest {
 
     @Test
     public void Test_Get_None_Success() {
-        OrgAO org = service.getByUser(UUID.randomUUID().toString());
+        OrgAO org = service.get(new OauthSub(OauthSubNamespace.USER, UUID.randomUUID().toString()));
         assertNull(org);
     }
 }
