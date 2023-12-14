@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.features.latest.cleanroom;
+package com.mytiki.account.features.latest.ocean;
 
 import com.amazonaws.xray.interceptors.TracingInterceptor;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class CleanroomAws {
+public class OceanLF {
     private static final String INTERNAL_TAG = "internal";
     private static final String INTERNAL_TAG_READ = "read";
     private static final String INTERNAL_TAG_WRITE = "write";
@@ -28,7 +28,7 @@ public class CleanroomAws {
     private final String execRoleArn;
     private final String bucket;
 
-    public CleanroomAws(
+    public OceanLF(
             String region,
             String catalogId,
             String locationRoleArn,
@@ -45,7 +45,7 @@ public class CleanroomAws {
                 catalogId, locationRoleArn, adminRoleArn, execRoleArn, bucket);
     }
 
-    public CleanroomAws(
+    public OceanLF(
             LakeFormationClient lfClient,
             String catalogId,
             String locationRoleArn,

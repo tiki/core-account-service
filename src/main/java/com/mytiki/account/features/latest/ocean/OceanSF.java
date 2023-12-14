@@ -31,13 +31,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class OceanAws {
+public class OceanSF {
     private final SfnClient sfnClient;
     private final S3Client s3Client;
     private final String arn;
     private final ObjectMapper mapper;
 
-    public OceanAws(String region, String arn, ObjectMapper mapper) {
+    public OceanSF(String region, String arn, ObjectMapper mapper) {
         this(SfnClient.builder()
                         .region(Region.of(region))
                         .overrideConfiguration(ClientOverrideConfiguration
@@ -55,7 +55,7 @@ public class OceanAws {
                 arn, mapper);
     }
 
-    public OceanAws(SfnClient sfnClient, S3Client s3Client, String arn, ObjectMapper mapper) {
+    public OceanSF(SfnClient sfnClient, S3Client s3Client, String arn, ObjectMapper mapper) {
         this.arn = arn;
         this.mapper = mapper;
         this.sfnClient = sfnClient;

@@ -6,7 +6,7 @@
 package com.mytiki.account.mocks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mytiki.account.features.latest.ocean.OceanAws;
+import com.mytiki.account.features.latest.ocean.OceanSF;
 import org.mockito.Mockito;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -19,13 +19,13 @@ import java.nio.charset.StandardCharsets;
 
 public class OceanMock {
 
-    public static OceanAws aws() {
-        OceanAws oceanAws = Mockito.mock(OceanAws.class);
-        Mockito.doReturn("dummy").when(oceanAws).execute(Mockito.any(), Mockito.any());
-        return oceanAws;
+    public static OceanSF aws() {
+        OceanSF oceanSF = Mockito.mock(OceanSF.class);
+        Mockito.doReturn("dummy").when(oceanSF).execute(Mockito.any(), Mockito.any());
+        return oceanSF;
     }
 
-    public static OceanAws aws(String executionArn, String arn, ObjectMapper mapper){
+    public static OceanSF aws(String executionArn, String arn, ObjectMapper mapper){
         SfnClient sfnClient = Mockito.mock(SfnClient.class);
         Mockito.doReturn(StartExecutionResponse.builder().executionArn(executionArn).build())
                 .when(sfnClient)
@@ -38,6 +38,6 @@ public class OceanMock {
                         "hello,world".getBytes(StandardCharsets.UTF_8)))
                 .when(s3Client)
                 .getObjectAsBytes(Mockito.any(GetObjectRequest.class));
-        return new OceanAws(sfnClient, s3Client, arn, mapper);
+        return new OceanSF(sfnClient, s3Client, arn, mapper);
     }
 }

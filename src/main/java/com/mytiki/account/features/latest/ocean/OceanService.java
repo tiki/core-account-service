@@ -25,19 +25,22 @@ import java.util.*;
 @XRayEnabled
 public class OceanService {
     protected static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final OceanAws aws;
+    private final OceanSF sf;
+    private final OceanLF lf;
     private final String bucket;
     private final ObjectMapper mapper;
     private final OceanRepository repository;
     private final StripeF stripe;
 
     public OceanService(
-            OceanAws aws,
+            OceanSF sf,
+            OceanLF lf,
             String bucket,
             ObjectMapper mapper,
             OceanRepository repository,
             StripeF stripe) {
-        this.aws = aws;
+        this.sf = sf;
+        this.lf = lf;
         this.bucket = bucket;
         this.mapper = mapper;
         this.repository = repository;
@@ -69,7 +72,7 @@ public class OceanService {
         if(found.isPresent()) {
             if(found.get().getStatus() == OceanStatus.PENDING){
                 OceanDO update = found.get();
-                update.setStatus(aws.status(update.getExecutionArn()));
+                update.setStatus(sf.status(update.getExecutionArn()));
                 update.setModified(ZonedDateTime.now());
                 return repository.save(update);
             }else return found.get();
@@ -87,7 +90,7 @@ public class OceanService {
                 case COUNT, SAMPLE -> {
                     if(req.getResultUri() != null) {
                         try {
-                            List<String[]> res = aws.fetch(req.getResultUri());
+                            List<String[]> res = sf.fetch(req.getResultUri());
                             ocean.setResult(mapper.writeValueAsString(res));
                             SubscriptionDO subscription = ocean.getSubscription();
                             if(found.get().getType() == OceanType.COUNT &&
@@ -115,7 +118,13 @@ public class OceanService {
                         logger.warn("Skipping. No subscription: " + ocean.getRequestId());
                     }
                 }
-                case CREATE_DATABASE, DROP_DATABASE -> {}
+                case CREATE_DATABASE -> {
+                    CleanroomDO cleanroom = ocean.getCleanroom();
+                    lf.add(cleanroom.getOrg().getOrgId().toString(),
+                            "TBD", //TODO FIX ME
+                            cleanroom.getCleanroomId().toString());
+                }
+                case DROP_DATABASE ->  {}
             }
             ocean.setModified(ZonedDateTime.now());
             repository.save(ocean);
@@ -141,7 +150,7 @@ public class OceanService {
 
     private OceanDO request(OceanType type, String query, SubscriptionDO subscription) {
         UUID requestId = UUID.randomUUID();
-        String executionArn = aws.execute(requestId, query);
+        String executionArn = sf.execute(requestId, query);
         OceanDO ocean = new OceanDO();
         ZonedDateTime now = ZonedDateTime.now();
         ocean.setRequestId(requestId);
