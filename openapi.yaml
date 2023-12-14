@@ -6,7 +6,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/core-account-service/blob/main/LICENSE
-  version: 2.9.3
+  version: 2.9.4
 servers:
 - url: https://account.mytiki.com
 paths:
@@ -242,64 +242,30 @@ paths:
       - default:
         - account:admin
   /api/latest/cleanroom:
-    post:
-      tags:
-      - Managing Cleanrooms
-      summary: Create a Cleanroom
-      description: "Creates a new data cleanroom, returning the configuration details"
-      operationId: account-cleanroom-create
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CleanroomAOReq'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CleanroomAO'
-      security:
-      - default:
-        - account:admin
-  /api/latest/cleanroom/{cleanroom-id}:
     get:
       tags:
       - Managing Cleanrooms
-      summary: Get Cleanroom
+      summary: List Cleanrooms
       description: Returns the configuration details for a data cleanroom
-      operationId: account-cleanroom-get
-      parameters:
-      - name: cleanroom-id
-        in: path
-        required: true
-        schema:
-          type: string
+      operationId: account-cleanroom-list
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CleanroomAO'
+                type: array
+                items:
+                  $ref: '#/components/schemas/CleanroomAO'
       security:
       - default:
         - account:admin
     post:
       tags:
       - Managing Cleanrooms
-      summary: Update a Cleanroom
-      description: "Updates a data cleanroom, replacing the settings with any non-null\
-        \ inputs"
-      operationId: account-cleanroom-update
-      parameters:
-      - name: cleanroom-id
-        in: path
-        required: true
-        schema:
-          type: string
+      summary: Create Cleanroom
+      description: "Creates a new data cleanroom, returning the configuration details"
+      operationId: account-cleanroom-create
       requestBody:
         content:
           application/json:
@@ -377,6 +343,29 @@ paths:
       responses:
         "200":
           description: OK
+      security:
+      - default:
+        - account:admin
+  /api/latest/cleanroom/{cleanroom-id}:
+    get:
+      tags:
+      - Managing Cleanrooms
+      summary: Get Cleanroom
+      description: Returns the configuration details for a data cleanroom
+      operationId: account-cleanroom-get
+      parameters:
+      - name: cleanroom-id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CleanroomAO'
       security:
       - default:
         - account:admin
@@ -517,12 +506,10 @@ components:
     CleanroomAOReq:
       type: object
       properties:
-        name:
+        description:
           type: string
-        iam:
-          type: array
-          items:
-            type: string
+        aws:
+          type: string
     CleanroomAO:
       type: object
       properties:
@@ -530,18 +517,8 @@ components:
           type: string
         name:
           type: string
-        orgId:
+        description:
           type: string
-        iam:
-          type: array
-          items:
-            type: string
-        modified:
-          type: string
-          format: date-time
-        created:
-          type: string
-          format: date-time
     ProfileAO:
       type: object
       properties:
