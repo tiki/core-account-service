@@ -6,6 +6,7 @@
 package com.mytiki.account.features.latest.ocean;
 
 import com.amazonaws.xray.interceptors.TracingInterceptor;
+import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.core.exception.SdkClientException;
@@ -60,41 +61,34 @@ public class OceanLF {
         this.bucket = bucket;
     }
 
-    public void add(String orgId, String awsAccount, String... cleanroomIds){
+    public void add(CleanroomDO cleanroom){
+        String orgId = cleanroom.getOrg().getOrgId().toString();
+        String cleanroomId = cleanroom.getCleanroomId().toString();
+        String arn = "arn:aws:s3:::" + bucket + "/cleanroom/" + cleanroomId;
+
         Optional<List<String>> vals = getTag(orgId);
-        if(vals.isEmpty()) { createTag(orgId, List.of(cleanroomIds)); }
-        else {
-            List<String> filtered = Arrays
-                    .stream(cleanroomIds)
-                    .filter((id) -> !vals.get().contains(id))
-                    .toList();
-            updateTag(orgId, filtered, null);
-        }
+        if(vals.isEmpty()) { createTag(orgId, List.of(cleanroomId)); }
+        else if(!vals.get().contains(cleanroomId)) { updateTag(orgId, List.of(cleanroomId), null); }
 
-        for(String cleanroomId : cleanroomIds) {
-            String arn = "arn:aws:s3:::" + bucket + "/cleanroom/" + cleanroomId;
-            String database = "cr_" + cleanroomId.replace('-', '_');
+        register(arn);
+        grantLocation(cleanroom.getAws(), arn, List.of(Permission.DATA_LOCATION_ACCESS));
+        grantLocation(execRoleArn, arn, List.of(Permission.DATA_LOCATION_ACCESS));
 
-            register(arn);
-            grantLocation(awsAccount, arn, List.of(Permission.DATA_LOCATION_ACCESS));
-            grantLocation(execRoleArn, arn, List.of(Permission.DATA_LOCATION_ACCESS));
+        addTag(cleanroom.getName(), orgId, cleanroomId);
+        addTag(cleanroom.getName(), INTERNAL_TAG, INTERNAL_TAG_READ);
 
-            addTag(database, orgId, cleanroomId);
-            addTag(database, INTERNAL_TAG, INTERNAL_TAG_READ);
-
-            grantDatabase(awsAccount, database, orgId, List.of(cleanroomId),
-                    List.of(Permission.DESCRIBE));
-            grantTable(awsAccount, database, orgId, List.of(cleanroomId),
-                    List.of(Permission.DESCRIBE, Permission.SELECT));
-            grantDatabase(execRoleArn, database, INTERNAL_TAG,
-                    List.of(INTERNAL_TAG_READ, INTERNAL_TAG_WRITE), List.of(Permission.ALL));
-            grantTable(execRoleArn, database, INTERNAL_TAG,
-                    List.of(INTERNAL_TAG_READ, INTERNAL_TAG_WRITE), List.of(Permission.ALL));
-            grantDatabase(adminRoleArn, database, INTERNAL_TAG,
-                    List.of(INTERNAL_TAG_READ), List.of(Permission.DESCRIBE));
-            grantTable(adminRoleArn, database, INTERNAL_TAG,
-                    List.of(INTERNAL_TAG_READ), List.of(Permission.SELECT, Permission.DESCRIBE));
-        }
+        grantDatabase(cleanroom.getAws(), cleanroom.getName(), orgId, List.of(cleanroomId),
+                List.of(Permission.DESCRIBE));
+        grantTable(cleanroom.getAws(), cleanroom.getName(), orgId, List.of(cleanroomId),
+                List.of(Permission.DESCRIBE, Permission.SELECT));
+        grantDatabase(execRoleArn, cleanroom.getName(), INTERNAL_TAG,
+                List.of(INTERNAL_TAG_READ, INTERNAL_TAG_WRITE), List.of(Permission.ALL));
+        grantTable(execRoleArn, cleanroom.getName(), INTERNAL_TAG,
+                List.of(INTERNAL_TAG_READ, INTERNAL_TAG_WRITE), List.of(Permission.ALL));
+        grantDatabase(adminRoleArn, cleanroom.getName(), INTERNAL_TAG,
+                List.of(INTERNAL_TAG_READ), List.of(Permission.DESCRIBE));
+        grantTable(adminRoleArn, cleanroom.getName(), INTERNAL_TAG,
+                List.of(INTERNAL_TAG_READ), List.of(Permission.SELECT, Permission.DESCRIBE));
     }
 
     private void createTag(String tagKey, List<String> tagValues) throws AwsServiceException, SdkClientException {

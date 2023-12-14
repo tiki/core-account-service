@@ -1,5 +1,3 @@
-
-
 -- -----------------------------------------------------------------------
 -- ONE-TIME PASSWORD
 -- -----------------------------------------------------------------------
@@ -105,8 +103,9 @@ CREATE TABLE IF NOT EXISTS cleanroom(
     id BIGSERIAL PRIMARY KEY,
     cleanroom_id UUID NOT NULL UNIQUE,
     name TEXT NOT NULL,
+    description TEXT,
+    aws_account TEXT NOT NULL,
     org_id BIGINT REFERENCES org(id) NOT NULL,
-    aws_accounts TEXT,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
     modified_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );

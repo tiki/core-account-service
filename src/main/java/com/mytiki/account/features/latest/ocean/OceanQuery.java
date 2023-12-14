@@ -19,8 +19,13 @@ public class OceanQuery {
                 ") LIMIT 3;";
     }
 
-    public static String wrapCreate(String query, String bucket, String cleanroomId, String table) {
-        return "CREATE TABLE " + table(cleanroomId, table) +
+    public static String wrapCreate(
+            String query,
+            String bucket,
+            String cleanroomId,
+            String database,
+            String table) {
+        return "CREATE TABLE " + table(database, table) +
                 " WITH (" +
                 "table_type = 'ICEBERG'," +
                 "is_external = false," +
@@ -29,17 +34,16 @@ public class OceanQuery {
                 "AS (" + query + ")";
     }
 
-    public static String createDatabase(String cleanroomId) {
-        return "CREATE DATABASE cr_" + cleanroomId.replace("-", "_");
+    public static String createDatabase(String database) {
+        return "CREATE DATABASE " + database;
     }
 
-    public static String dropDatabase(String cleanroomId) {
-        return "DROP DATABASE cr_" + cleanroomId.replace("-", "_");
+    public static String dropDatabase(String database) {
+        return "DROP DATABASE " + database;
     }
 
-    public static String table(String cleanroomId, String table) {
-        return "cr_" + cleanroomId.replace("-", "_")
-                + "." + table.replace("-", "_");
+    public static String table(String name, String table) {
+        return name + "." + table.replace("-", "_");
     }
 
     public static String count(String table){

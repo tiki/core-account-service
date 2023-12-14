@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CleanroomAORsp extends CleanroomAO {
     private String orgId;
-    private List<String> iam;
+    private String aws;
     private ZonedDateTime modified;
     private ZonedDateTime created;
 
@@ -22,12 +22,12 @@ public class CleanroomAORsp extends CleanroomAO {
         this.orgId = orgId;
     }
 
-    public List<String> getIam() {
-        return iam;
+    public String getAws() {
+        return aws;
     }
 
-    public void setIam(List<String> iam) {
-        this.iam = iam;
+    public void setAws(String aws) {
+        this.aws = aws;
     }
 
     public ZonedDateTime getModified() {

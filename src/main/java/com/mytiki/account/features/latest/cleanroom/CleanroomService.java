@@ -42,16 +42,15 @@ public class CleanroomService {
         if(user.isEmpty())
             throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
         else {
-            //TODO set permissions in s3/glue.
             ZonedDateTime now = ZonedDateTime.now();
             CleanroomDO cleanroom = new CleanroomDO();
-            cleanroom.setCleanroomId(UUID.randomUUID());
-            cleanroom.setName( req.getName() != null ? req.getName() : cleanroom.getCleanroomId().toString());
+            UUID id = UUID.randomUUID();
+            cleanroom.setCleanroomId(id);
+            cleanroom.setName("cr_" + id.toString().replace('-', '_'));
             cleanroom.setOrg(user.get().getOrg());
-            cleanroom.setAwsAccounts(req.getIam());
             cleanroom.setCreated(now);
             cleanroom.setModified(now);
-            OceanDO result = oceanService.createDatabase(cleanroom.getCleanroomId().toString());
+            OceanDO result = oceanService.createDatabase(cleanroom);
             cleanroom.setResult(result);
             return toAORsp(repository.save(cleanroom));
         }
@@ -60,16 +59,6 @@ public class CleanroomService {
     public CleanroomAORsp get(OauthSub sub, String cleanroomId) {
         CleanroomDO cleanroom = guard(sub, cleanroomId);
         return toAORsp(cleanroom);
-    }
-
-    public CleanroomAORsp update(OauthSub sub, String cleanroomId, CleanroomAOReq req){
-        //TODO set permissions in s3/glue.
-        CleanroomDO update = guard(sub, cleanroomId);
-        if(req.getName() != null) update.setName(req.getName());
-        if(req.getIam() != null) update.setAwsAccounts(req.getIam());
-        update.setModified(ZonedDateTime.now());
-        update = repository.save(update);
-        return toAORsp(update);
     }
 
     public List<CleanroomAO> list(OauthSub sub) {
@@ -86,6 +75,7 @@ public class CleanroomService {
                             CleanroomAO rsp = new CleanroomAO();
                             rsp.setCleanroomId(cleanroom.getCleanroomId().toString());
                             rsp.setName(cleanroom.getName());
+                            rsp.setDescription(cleanroom.getDescription());
                             return rsp;
                         }).toList();
             }
@@ -122,10 +112,11 @@ public class CleanroomService {
         CleanroomAORsp rsp = new CleanroomAORsp();
         rsp.setCleanroomId(src.getCleanroomId().toString());
         rsp.setName(src.getName());
+        rsp.setAws(src.getAws());
+        rsp.setDescription(src.getDescription());
         rsp.setModified(src.getModified());
         rsp.setCreated(src.getCreated());
         rsp.setOrgId(src.getOrg().getOrgId().toString());
-        rsp.setIam(src.getAwsAccounts());
         return rsp;
     }
 }

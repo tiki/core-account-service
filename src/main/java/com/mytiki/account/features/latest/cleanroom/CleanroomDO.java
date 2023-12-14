@@ -22,8 +22,9 @@ public class CleanroomDO implements Serializable {
     private Long id;
     private UUID cleanroomId;
     private String name;
+    private String aws;
+    private String description;
     private OrgDO org;
-    private List<String> awsAccounts;
     private ZonedDateTime created;
     private ZonedDateTime modified;
     private OceanDO result;
@@ -57,6 +58,24 @@ public class CleanroomDO implements Serializable {
         this.name = name;
     }
 
+    @Column(name = "aws")
+    public String getAws() {
+        return aws;
+    }
+
+    public void setAws(String aws) {
+        this.aws = aws;
+    }
+
+    @Column(name = "description")
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "org_id")
     public OrgDO getOrg() {
@@ -65,16 +84,6 @@ public class CleanroomDO implements Serializable {
 
     public void setOrg(OrgDO org) {
         this.org = org;
-    }
-
-    @Column(name = "aws_accounts")
-    @Convert(converter = ListConvert.class)
-    public List<String> getAwsAccounts() {
-        return awsAccounts;
-    }
-
-    public void setAwsAccounts(List<String> awsAccounts) {
-        this.awsAccounts = awsAccounts;
     }
 
     @Column(name = "created_utc")

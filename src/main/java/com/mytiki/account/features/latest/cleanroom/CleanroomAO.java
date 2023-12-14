@@ -11,6 +11,7 @@ import java.util.List;
 public class CleanroomAO {
     private String cleanroomId;
     private String name;
+    private String description;
 
     public String getCleanroomId() {
         return cleanroomId;
@@ -28,4 +29,11 @@ public class CleanroomAO {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
+import com.mytiki.account.features.latest.org.OrgDO;
 import com.mytiki.account.features.latest.subscription.SubscriptionDO;
 import com.mytiki.account.features.latest.subscription.SubscriptionStatus;
 import com.mytiki.account.utilities.error.ApiException;
@@ -55,16 +56,18 @@ public class OceanService {
         return request(OceanType.SAMPLE, OceanQuery.wrapSample(query));
     }
 
-    public OceanDO createDatabase(String cleanroomId) {
-        return request(OceanType.CREATE_DATABASE, OceanQuery.createDatabase(cleanroomId));
+    public OceanDO createDatabase(CleanroomDO cleanroom) {
+        return request(OceanType.CREATE_DATABASE, OceanQuery.createDatabase(cleanroom.getName()));
     }
 
-    public OceanDO dropDatabase(String cleanroomId) {
-        return request(OceanType.DROP_DATABASE, OceanQuery.dropDatabase(cleanroomId));
+    public OceanDO dropDatabase(CleanroomDO cleanroom) {
+        return request(OceanType.DROP_DATABASE, OceanQuery.dropDatabase(cleanroom.getName()));
     }
 
-    public OceanDO ctas(String cleanroomId, String table, String query) {
-        return request(OceanType.CREATE_TABLE, OceanQuery.wrapCreate(query, bucket, cleanroomId, table));
+    public OceanDO ctas(SubscriptionDO subscription) {
+        return request(OceanType.CREATE_TABLE, OceanQuery.wrapCreate(
+                subscription.getQuery(), bucket, subscription.getCleanroom().getCleanroomId().toString(),
+                subscription.getCleanroom().getName(), subscription.getName()));
     }
 
     public OceanDO get(UUID requestId) {
@@ -111,7 +114,7 @@ public class OceanService {
                     SubscriptionDO sub = ocean.getSubscription();
                     if(sub != null) {
                         CleanroomDO cleanroom = sub.getCleanroom();
-                        String table = OceanQuery.table(cleanroom.getCleanroomId().toString(), sub.getName());
+                        String table = OceanQuery.table(cleanroom.getName(), sub.getName());
                         request(OceanType.COUNT, OceanQuery.count(table), sub);
                         request(OceanType.SAMPLE, OceanQuery.sample(table), sub);
                     }else {
@@ -120,9 +123,7 @@ public class OceanService {
                 }
                 case CREATE_DATABASE -> {
                     CleanroomDO cleanroom = ocean.getCleanroom();
-                    lf.add(cleanroom.getOrg().getOrgId().toString(),
-                            "TBD", //TODO FIX ME
-                            cleanroom.getCleanroomId().toString());
+                    lf.add(cleanroom);
                 }
                 case DROP_DATABASE ->  {}
             }

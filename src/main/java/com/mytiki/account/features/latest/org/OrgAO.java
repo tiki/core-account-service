@@ -11,6 +11,7 @@ import java.util.Set;
 public class OrgAO {
     private String orgId;
     private String billingId;
+    private String awsAccount;
     private Set<String> users;
     private Set<String> providers;
     private Set<String> cleanrooms;
@@ -31,6 +32,14 @@ public class OrgAO {
 
     public void setBillingId(String billingId) {
         this.billingId = billingId;
+    }
+
+    public String getAwsAccount() {
+        return awsAccount;
+    }
+
+    public void setAwsAccount(String awsAccount) {
+        this.awsAccount = awsAccount;
     }
 
     public ZonedDateTime getModified() {
