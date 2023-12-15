@@ -6,7 +6,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/core-account-service/blob/main/LICENSE
-  version: 2.9.6
+  version: 2.9.7
 servers:
 - url: https://account.mytiki.com
 paths:
@@ -76,7 +76,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SubscriptionAO'
+                $ref: '#/components/schemas/SubscriptionAORsp'
       security:
       - default:
         - account:admin
@@ -278,7 +278,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CleanroomAO'
+                $ref: '#/components/schemas/CleanroomAORsp'
       security:
       - default:
         - account:admin
@@ -365,7 +365,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CleanroomAO'
+                $ref: '#/components/schemas/CleanroomAORsp'
       security:
       - default:
         - account:admin
@@ -436,23 +436,6 @@ components:
         modified:
           type: string
           format: date-time
-    SubscriptionAO:
-      type: object
-      properties:
-        subscriptionId:
-          type: string
-        cleanroomId:
-          type: string
-        name:
-          type: string
-        status:
-          type: string
-        created:
-          type: string
-          format: date-time
-        modified:
-          type: string
-          format: date-time
     ProviderAOReq:
       type: object
       properties:
@@ -510,7 +493,7 @@ components:
           type: string
         aws:
           type: string
-    CleanroomAO:
+    CleanroomAORsp:
       type: object
       properties:
         cleanroomId:
@@ -519,6 +502,33 @@ components:
           type: string
         description:
           type: string
+        orgId:
+          type: string
+        aws:
+          type: string
+        modified:
+          type: string
+          format: date-time
+        created:
+          type: string
+          format: date-time
+    SubscriptionAO:
+      type: object
+      properties:
+        subscriptionId:
+          type: string
+        cleanroomId:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
     ProfileAO:
       type: object
       properties:
@@ -534,6 +544,15 @@ components:
         created:
           type: string
           format: date-time
+    CleanroomAO:
+      type: object
+      properties:
+        cleanroomId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
   securitySchemes:
     default:
       type: http
