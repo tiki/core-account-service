@@ -221,14 +221,24 @@ Resources:
               ValueFrom: !Sub "${Secret}:GOOGLE_OAUTH_ID::"
             - Name: GOOGLE_OAUTH_SECRET
               ValueFrom: !Sub "${Secret}:GOOGLE_OAUTH_SECRET::"
-            - Name: OCEAN_REGION
-              ValueFrom: !Sub "${Secret}:OCEAN_REGION::"
-            - Name: OCEAN_ARN
-              ValueFrom: !Sub "${Secret}:OCEAN_ARN::"
             - Name: STRIPE_SECRET
               ValueFrom: !Sub "${Secret}:STRIPE_SECRET::"
             - Name: STRIPE_PRICE
               ValueFrom: !Sub "${Secret}:STRIPE_PRICE::"
+            - Name: OCEAN_BUCKET
+              ValueFrom: !Sub "${Secret}:OCEAN_BUCKET::"
+            - Name: OCEAN_REGION
+              ValueFrom: !Sub "${Secret}:OCEAN_REGION::"
+            - Name: OCEAN_CATALOG
+              ValueFrom: !Sub "${Secret}:OCEAN_CATALOG::"
+            - Name: OCEAN_ARN_STATE
+              ValueFrom: !Sub "${Secret}:OCEAN_ARN_STATE::"
+            - Name: OCEAN_ARN_LOCATION
+              ValueFrom: !Sub "${Secret}:OCEAN_ARN_LOCATION::"
+            - Name: OCEAN_ARN_EXEC
+              ValueFrom: !Sub "${Secret}:OCEAN_ARN_EXEC::"
+            - Name: OCEAN_ARN_ADMIN
+              ValueFrom: !Sub "${Secret}:OCEAN_ARN_ADMIN::"
           LogConfiguration:
             LogDriver: awslogs
             Options:
