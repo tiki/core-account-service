@@ -152,6 +152,8 @@ Resources:
             Action: sts:AssumeRole
             Principal:
               Service: ecs-tasks.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager
       Policies:
         - PolicyName: XRay
           PolicyDocument:
@@ -189,8 +191,49 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                Action: lakeformation:GetDataAccess
+                Action:
+                  - lakeformation:GetDataAccess
+                  - lakeformation:UpdateResource
+                  - lakeformation:GetDataAccess
+                  - lakeformation:RemoveLFTagsFromResource
+                  - lakeformation:UpdateLFTag
+                  - lakeformation:RegisterResource
+                  - lakeformation:GetLFTag
+                  - lakeformation:GetResourceLFTags
+                  - lakeformation:DescribeResource
+                  - lakeformation:RevokePermissions
+                  - lakeformation:GrantPermissions
+                  - lakeformation:CreateLFTag
+                  - lakeformation:AddLFTagsToResource
+                  - lakeformation:DeleteLFTag
+                  - lakeformation:DeregisterResource
+                  - ram:CreateResourceShare
+                  - ram:GetResourceShares
                 Resource: "*"
+              - Effect: Allow
+                Action:
+                  - glue:GetDatabases
+                  - glue:GetDatabase
+                  - glue:GetTables
+                  - glue:GetTable
+                Resource:
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/*
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/*/*
+              - Effect: Allow
+                Action:
+                  - ram:ListResourceSharePermissions
+                  - ram:AssociateResourceShare
+                  - ram:DeleteResourceShare
+                  - ram:UpdateResourceShare
+                Resource:
+                  - !Sub arn:aws:ram:${AWS::Region}:${AWS::AccountId}:resource-share/*
+              - Effect: Allow
+                Action:
+                  - iam:GetRole
+                  - iam:PassRole
+                Resource:
+                  - !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess
 
   Task:
     Type: AWS::ECS::TaskDefinition
