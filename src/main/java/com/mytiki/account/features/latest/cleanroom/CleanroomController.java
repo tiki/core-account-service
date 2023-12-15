@@ -46,7 +46,7 @@ public class CleanroomController {
             security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @RequestMapping(method = RequestMethod.GET, path = "/{cleanroom-id}")
     @Secured("SCOPE_account:admin")
-    public CleanroomAO get(JwtAuthenticationToken token, @PathVariable(name = "cleanroom-id") String cleanroomId) {
+    public CleanroomAORsp get(JwtAuthenticationToken token, @PathVariable(name = "cleanroom-id") String cleanroomId) {
         return service.get(new OauthSub(token.getName()), cleanroomId);
     }
 
@@ -56,7 +56,7 @@ public class CleanroomController {
             security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.POST)
-    public CleanroomAO create(JwtAuthenticationToken token, @RequestBody CleanroomAOReq body) {
+    public CleanroomAORsp create(JwtAuthenticationToken token, @RequestBody CleanroomAOReq body) {
         return service.create(body, new OauthSub(token.getName()));
     }
 
