@@ -76,7 +76,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SubscriptionAO'
+                $ref: '#/components/schemas/SubscriptionAORsp'
       security:
       - default:
         - account:admin
@@ -436,23 +436,6 @@ components:
         modified:
           type: string
           format: date-time
-    SubscriptionAO:
-      type: object
-      properties:
-        subscriptionId:
-          type: string
-        cleanroomId:
-          type: string
-        name:
-          type: string
-        status:
-          type: string
-        created:
-          type: string
-          format: date-time
-        modified:
-          type: string
-          format: date-time
     ProviderAOReq:
       type: object
       properties:
@@ -527,6 +510,23 @@ components:
           type: string
           format: date-time
         created:
+          type: string
+          format: date-time
+    SubscriptionAO:
+      type: object
+      properties:
+        subscriptionId:
+          type: string
+        cleanroomId:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        created:
+          type: string
+          format: date-time
+        modified:
           type: string
           format: date-time
     ProfileAO:
