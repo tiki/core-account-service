@@ -68,7 +68,7 @@ public class SubscriptionController {
             security = @SecurityRequirement(name = "default", scopes = "account:admin"))
     @RequestMapping(method = RequestMethod.POST, path = "/{subscription-id}/purchase")
     @Secured("SCOPE_account:admin")
-    public SubscriptionAO purchase(
+    public SubscriptionAORsp purchase(
             JwtAuthenticationToken token,
             @PathVariable(name = "subscription-id") String subscriptionId) {
         return service.purchase(new OauthSub(token.getName()), subscriptionId);
