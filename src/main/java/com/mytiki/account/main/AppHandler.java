@@ -15,6 +15,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,15 +28,6 @@ import java.lang.invoke.MethodHandles;
 @ControllerAdvice
 public class AppHandler {
     protected static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    @ExceptionHandler(value = {Exception.class})
-    public ResponseEntity<ApiError> handleException(Exception e, HttpServletRequest request){
-        logger.error("Request: " + request.getRequestURI(), e);
-        ApiError error = new ApiError();
-        error.setMessage(e.getMessage());
-        error.setDetail(e.getClass().getName());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-    }
 
     @ExceptionHandler(value = {NoHandlerFoundException.class})
     public ResponseEntity<ApiError> handleNoHandlerFoundException(
@@ -83,6 +75,22 @@ public class AppHandler {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(error);
     }
 
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request) {
+        logger.trace("Request: " + request.getRequestURI(), e);
+        ApiError error = new ApiError();
+        error.setMessage(e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    public ResponseEntity<ApiError> handleException(IllegalArgumentException e, HttpServletRequest request) {
+        logger.trace("Request: " + request.getRequestURI(), e);
+        ApiError error = new ApiError();
+        error.setMessage(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
     @ExceptionHandler(value = {ApiException.class})
     public ResponseEntity<ApiError> handleApiException(ApiException e, HttpServletRequest request){
         logger.debug("Request: " + request.getRequestURI(), e);
@@ -95,11 +103,12 @@ public class AppHandler {
         return ResponseEntity.status(e.getHttpStatus()).body(error);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class})
-    public ResponseEntity<ApiError> handleException(IllegalArgumentException e, HttpServletRequest request) {
-        logger.trace("Request: " + request.getRequestURI(), e);
+    @ExceptionHandler(value = {Exception.class})
+    public ResponseEntity<ApiError> handleException(Exception e, HttpServletRequest request){
+        logger.error("Request: " + request.getRequestURI(), e);
         ApiError error = new ApiError();
         error.setMessage(e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        error.setDetail(e.getClass().getName());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }
