@@ -30,7 +30,7 @@ public class OceanQuery {
                 "table_type = 'ICEBERG'," +
                 "is_external = false," +
                 "format = 'PARQUET'," +
-                "location = 's3://" + bucket + "/cleanroom/" + cleanroomId + "/') " +
+                "location = 's3://" + bucket + "/cleanroom/" + cleanroomId + "/" + tableName(table) + "/') " +
                 "AS (" + query + ")";
     }
 
@@ -43,7 +43,7 @@ public class OceanQuery {
     }
 
     public static String table(String name, String table) {
-        return name + "." + table.replace("-", "_");
+        return name + "." + tableName(table);
     }
 
     public static String count(String table){
@@ -52,5 +52,9 @@ public class OceanQuery {
 
     public static String sample(String table){
         return "SELECT * FROM " + table + " LIMIT 3";
+    }
+
+    private static String tableName(String table) {
+        return table.replace("-", "_");
     }
 }
