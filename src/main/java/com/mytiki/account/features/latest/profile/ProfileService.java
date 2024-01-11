@@ -92,7 +92,7 @@ public class ProfileService {
             profile = repository.save(newUser);
             try {
                 OauthScopes scopes = allowedScopes.filter("account:admin trail publish");
-                apiKeyService.create(profile, "default", scopes, Constants.REFRESH_EXPIRY_DURATION_SECONDS);
+                apiKeyService.create(profile, "default", scopes);
             } catch (JOSEException e) {
                 throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED).cause(e).exception();
             }
