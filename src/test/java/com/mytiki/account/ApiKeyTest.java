@@ -81,7 +81,7 @@ public class ApiKeyTest {
         testUser.setOrg(orgService.create("dummy@dummy.com"));
         testUser = profileRepository.save(testUser);
         String label = UUID.randomUUID().toString();
-        ApiKeyDO key = service.create(testUser, label, allowedScopes.filter("account:admin"), 100L);
+        ApiKeyDO key = service.create(testUser, label, allowedScopes.filter("account:admin"));
         assertNotNull(key.getId());
         assertNotNull(key.getCreated());
         assertNotNull(key.getToken());
@@ -98,7 +98,7 @@ public class ApiKeyTest {
         testUser.setOrg(orgService.create("dummy@dummy.com"));
         testUser = profileRepository.save(testUser);
         String label = UUID.randomUUID().toString();
-        ApiKeyDO key = service.create(testUser, label, allowedScopes.filter("account:admin"), 100L);
+        ApiKeyDO key = service.create(testUser, label, allowedScopes.filter("account:admin"));
 
         List<ApiKeyDO> keys = repository.findAllByProfileEmail(testUser.getEmail());
 
@@ -118,7 +118,7 @@ public class ApiKeyTest {
         testUser.setOrg(orgService.create("dummy@dummy.com"));
         testUser = profileRepository.save(testUser);
         String label = UUID.randomUUID().toString();
-        ApiKeyDO key = service.create(testUser, label, allowedScopes.filter("account:admin"), 100L);
+        ApiKeyDO key = service.create(testUser, label, allowedScopes.filter("account:admin"));
         service.revoke(key.getToken());
         Optional<ApiKeyDO> found = repository.findById(key.getId());
         assertTrue(found.isEmpty());
@@ -139,7 +139,7 @@ public class ApiKeyTest {
         testUser.setOrg(orgService.create("dummy@dummy.com"));
         testUser = profileRepository.save(testUser);
         String label = UUID.randomUUID().toString();
-        ApiKeyDO key = service.create(testUser, label, allowedScopes.filter("account:admin"), 100L);
+        ApiKeyDO key = service.create(testUser, label, allowedScopes.filter("account:admin"));
 
         OAuth2AccessTokenResponse rsp = service.authorize(
                 new OauthSub(OauthSubNamespace.USER, testUser.getUserId().toString() + ":" + UUID.randomUUID()),
