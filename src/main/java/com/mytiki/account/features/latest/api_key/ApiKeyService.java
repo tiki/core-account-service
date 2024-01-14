@@ -63,7 +63,7 @@ public class ApiKeyService {
         if(!tokenScopes.contains("account:admin"))
             throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INSUFFICIENT_SCOPE));
         try{
-            ApiKeyDO key = create(user, label, scopes, expires);
+            ApiKeyDO key = create(user, label, scopes);
             return OAuth2AccessTokenResponse
                     .withToken(key.getToken())
                     .tokenType(OAuth2AccessToken.TokenType.BEARER)
@@ -79,10 +79,9 @@ public class ApiKeyService {
         }
     }
 
-    public ApiKeyDO create(ProfileDO user, String label, OauthScopes scopes, Long expires) throws JOSEException {
+    public ApiKeyDO create(ProfileDO user, String label, OauthScopes scopes) throws JOSEException {
         OauthSub subject = new OauthSub(OauthSubNamespace.USER, user.getUserId().toString());
         String token = new JwtBuilder()
-                .exp(expires)
                 .sub(subject)
                 .aud(scopes.getAud())
                 .scp(scopes.getScp())
