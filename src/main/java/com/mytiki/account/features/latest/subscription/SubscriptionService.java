@@ -153,7 +153,26 @@ public class SubscriptionService {
                             sample.setModified(res.getModified());
                             sample.setStatus(res.getStatus().toString());
                             sample.setRecords(result.stream()
-                                    .map((val) -> String.join(",", val)).collect(Collectors.toList()));
+                                    .map((val) -> {
+                                        String[] wrappedLine = new String[val.length];
+                                        for (int i=0; i<val.length; i++) {
+                                            String cur = val[i];
+                                            if (cur != null) {
+                                                if (cur.contains("\"")) {
+                                                    cur = cur.replace("\"", "\"\"");
+                                                }
+                                                if (cur.contains(",")
+                                                        || cur.contains("\n")
+                                                        || cur.contains("'")
+                                                        || cur.contains("\\")
+                                                        || cur.contains("\"")) {
+                                                    cur = "\"" + cur + "\"";
+                                                }
+                                            }
+                                            wrappedLine[i] = cur;
+                                        }
+                                        return String.join(",", wrappedLine);
+                                    }).toList());
                             sampleList.add(sample);
                         }
                     }
