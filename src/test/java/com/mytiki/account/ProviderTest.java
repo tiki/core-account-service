@@ -5,6 +5,8 @@
 
 package com.mytiki.account;
 
+import com.mytiki.account.features.latest.oauth.OauthSub;
+import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
 import com.mytiki.account.features.latest.org.OrgRepository;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
@@ -67,7 +69,7 @@ public class ProviderTest {
         testUser.setOrg(orgService.create("dummy@dummy.com"));
         testUser = profileRepository.save(testUser);
 
-        ProviderAO app = service.create(name, testUser.getUserId().toString());
+        ProviderAO app = service.create(name, new OauthSub(OauthSubNamespace.USER, testUser.getUserId().toString()));
         assertEquals(name, app.getName());
         assertNotNull(app.getProviderId());
         assertNotNull(app.getModified());
@@ -86,7 +88,7 @@ public class ProviderTest {
         testUser.setModified(ZonedDateTime.now());
 
         ApiException ex = assertThrows(ApiException.class,
-                () -> service.create(name, testUser.getUserId().toString()));
+                () -> service.create(name, new OauthSub(OauthSubNamespace.USER, testUser.getUserId().toString())));
         assertNotNull(ex);
         assertEquals(HttpStatus.FORBIDDEN, ex.getHttpStatus());
     }
@@ -103,7 +105,7 @@ public class ProviderTest {
         testUser.setOrg(orgService.create("dummy@dummy.com"));
         testUser = profileRepository.save(testUser);
 
-        ProviderAO app = service.create(name, testUser.getUserId().toString());
+        ProviderAO app = service.create(name, new OauthSub(OauthSubNamespace.USER, testUser.getUserId().toString()));
         ProviderAO found = service.get(app.getProviderId());
 
         assertEquals(app.getProviderId(), found.getProviderId());
