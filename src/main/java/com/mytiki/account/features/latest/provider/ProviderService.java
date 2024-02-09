@@ -43,32 +43,33 @@ public class ProviderService {
         this.signer = signer;
     }
 
-    public ProviderAO create(String name, String userId){
-       Optional<ProfileDO> user =  profileService.getDO(userId);
-       if(user.isEmpty())
-           throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
-       else {
-           ZonedDateTime now = ZonedDateTime.now();
-           ProviderDO app = new ProviderDO();
-           app.setName(name);
-           app.setProviderId(UUID.randomUUID());
-           app.setOrg(user.get().getOrg());
-           app.setCreated(now);
-           app.setModified(now);
-           try {
-               RSAPrivateKey privateKey = RsaF.generate();
-               app.setSignKey(privateKey);
-               RSAPublicKey publicKey = RsaF.toPublic(privateKey);
-               app.setPubKey(B64F.encode(publicKey.getEncoded()));
-           } catch (JOSEException | IOException e) {
-               throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
-                       .message("Issue with Sign Key")
-                       .detail(e.getMessage())
-                       .help("Please contact support")
-                       .exception();
-           }
-           return toAO(repository.save(app));
-       }
+    public ProviderAO create(String name, OauthSub sub){
+        if(!sub.isUser()) throw new ErrorBuilder(HttpStatus.UNAUTHORIZED).exception();
+        Optional<ProfileDO> user =  profileService.getDO(sub.getId());
+        if(user.isEmpty())
+        throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
+            else {
+                ZonedDateTime now = ZonedDateTime.now();
+                ProviderDO app = new ProviderDO();
+                app.setName(name);
+                app.setProviderId(UUID.randomUUID());
+                app.setOrg(user.get().getOrg());
+                app.setCreated(now);
+                app.setModified(now);
+            try {
+                RSAPrivateKey privateKey = RsaF.generate();
+                app.setSignKey(privateKey);
+                RSAPublicKey publicKey = RsaF.toPublic(privateKey);
+                app.setPubKey(B64F.encode(publicKey.getEncoded()));
+            } catch (JOSEException | IOException e) {
+                throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
+                        .message("Issue with Sign Key")
+                        .detail(e.getMessage())
+                        .help("Please contact support")
+                        .exception();
+            }
+            return toAO(repository.save(app));
+        }
     }
 
     public ProviderAO get(String providerId){

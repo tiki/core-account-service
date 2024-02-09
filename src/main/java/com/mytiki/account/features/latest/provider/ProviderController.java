@@ -6,6 +6,7 @@
 package com.mytiki.account.features.latest.provider;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.utilities.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -48,7 +49,7 @@ public class ProviderController {
     @Secured("SCOPE_account:admin")
     @RequestMapping(method = RequestMethod.POST)
     public ProviderAO create(JwtAuthenticationToken token, @RequestBody ProviderAOReq body) {
-        return service.create(body.getName(), token.getName());
+        return service.create(body.getName(), new OauthSub(token.getName()));
     }
 
     @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-provider-delete",
