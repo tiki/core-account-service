@@ -66,7 +66,7 @@ public class ProviderUserTest {
     @Test
     public void Test_RegisterNew_Success() throws JOSEException, NoSuchAlgorithmException, CryptoException {
         ProfileDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        ProviderAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
+        ProviderAO app = appInfo.create(UUID.randomUUID().toString(), new OauthSub(OauthSubNamespace.USER, user.getUserId().toString()));
 
         String id = UUID.randomUUID().toString();
         ProviderUserAOReq req = AddrFixture.req(id);
@@ -81,7 +81,9 @@ public class ProviderUserTest {
     @Test
     public void Test_RegisterTwo_Success() throws JOSEException, NoSuchAlgorithmException, CryptoException {
         ProfileDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        ProviderAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
+        ProviderAO app = appInfo.create(
+                UUID.randomUUID().toString(),
+                new OauthSub(OauthSubNamespace.USER, user.getUserId().toString()));
 
         String id = UUID.randomUUID().toString();
         ProviderUserAOReq req1 = AddrFixture.req(id);
@@ -95,7 +97,9 @@ public class ProviderUserTest {
     @Test
     public void Test_Get_Success() throws JOSEException, NoSuchAlgorithmException, CryptoException {
         ProfileDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        ProviderAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
+        ProviderAO app = appInfo.create(
+                UUID.randomUUID().toString(),
+                new OauthSub(OauthSubNamespace.USER, user.getUserId().toString()));
 
         String id = UUID.randomUUID().toString();
         ProviderUserAOReq req = AddrFixture.req(id);
@@ -111,7 +115,9 @@ public class ProviderUserTest {
     @Test
     public void Test_GetAll_Success() throws NoSuchAlgorithmException, CryptoException, JOSEException {
         ProfileDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        ProviderAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
+        ProviderAO app = appInfo.create(
+                UUID.randomUUID().toString(),
+                new OauthSub(OauthSubNamespace.USER, user.getUserId().toString()));
 
         String id = UUID.randomUUID().toString();
         service.register(app.getProviderId(), AddrFixture.req(id));
@@ -125,7 +131,7 @@ public class ProviderUserTest {
     @Transactional
     public void Test_Delete_Success() throws NoSuchAlgorithmException, CryptoException, JOSEException {
         ProfileDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        ProviderAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
+        ProviderAO app = appInfo.create(UUID.randomUUID().toString(), new OauthSub(OauthSubNamespace.USER, user.getUserId().toString()));
 
         String id = UUID.randomUUID().toString();
         ProviderUserAOReq req = AddrFixture.req(id);
@@ -139,7 +145,9 @@ public class ProviderUserTest {
     @Transactional
     public void Test_DeleteAll_Success() throws NoSuchAlgorithmException, CryptoException, JOSEException {
         ProfileDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        ProviderAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
+        ProviderAO app = appInfo.create(
+                UUID.randomUUID().toString(),
+                new OauthSub(OauthSubNamespace.USER, user.getUserId().toString()));
 
         String id = UUID.randomUUID().toString();
         service.register(app.getProviderId(), AddrFixture.req(id));
@@ -154,7 +162,9 @@ public class ProviderUserTest {
     @Transactional
     public void Test_Authorize_Success() throws NoSuchAlgorithmException, CryptoException, JOSEException {
         ProfileDO user = userInfo.createIfNotExists(UUID.randomUUID() + "@test.com");
-        ProviderAO app = appInfo.create(UUID.randomUUID().toString(), user.getUserId().toString());
+        ProviderAO app = appInfo.create(
+                UUID.randomUUID().toString(),
+                new OauthSub(OauthSubNamespace.USER, user.getUserId().toString()));
 
         RSAKey keypair = new RSAKeyGenerator(RSAKeyGenerator.MIN_KEY_SIZE_BITS).generate();
 
