@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.1</version>
+        <version>3.2.2</version>
     </parent>
 
     <properties>
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.3</version>
+            <version>5.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -155,7 +155,7 @@
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
-            <version>2.2.0</version>
+            <version>2.3.0</version>
         </dependency>
         <dependency>
             <groupId>com.opencsv</groupId>
@@ -165,7 +165,7 @@
         <dependency>
             <groupId>com.stripe</groupId>
             <artifactId>stripe-java</artifactId>
-            <version>24.10.0</version>
+            <version>24.14.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -198,7 +198,7 @@
             <dependency>
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>bom</artifactId>
-                <version>2.22.12</version>
+                <version>2.23.17</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
