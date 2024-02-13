@@ -129,7 +129,7 @@ public class OceanLF {
     private void register(String arn) throws AwsServiceException, SdkClientException {
         RegisterResourceRequest request = RegisterResourceRequest.builder()
                 .resourceArn(arn)
-                .hybridAccessEnabled(false)
+                .hybridAccessEnabled(true)
                 .roleArn(locationRoleArn)
                 .build();
         lfClient.registerResource(request);
