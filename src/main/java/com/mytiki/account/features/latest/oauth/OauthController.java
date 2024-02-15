@@ -6,12 +6,12 @@
 package com.mytiki.account.features.latest.oauth;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
-import com.mytiki.account.features.latest.auth_code.AuthCodeService;
-import com.mytiki.account.features.latest.provider_user.ProviderUserService;
 import com.mytiki.account.features.latest.api_key.ApiKeyService;
-import com.mytiki.account.features.latest.provider.ProviderService;
+import com.mytiki.account.features.latest.auth_code.AuthCodeService;
 import com.mytiki.account.features.latest.exchange.ExchangeService;
 import com.mytiki.account.features.latest.otp.OtpService;
+import com.mytiki.account.features.latest.provider.ProviderService;
+import com.mytiki.account.features.latest.provider_user.ProviderUserService;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
@@ -124,7 +124,7 @@ public class OauthController {
             @RequestParam(required = false) String expires,
             HttpServletResponse servletResponse) {
         OauthScopes scopes = allowedScopes.filter(scope);
-        OauthScopes noInternal = scopes.filter(oauthInternal.getScopes());
+        OauthScopes noInternal = scopes.filter(oauthInternal.getScopes(), true);
         Long exp = expires == null || expires.isBlank() ? TOKEN_EXPIRY_DURATION_SECONDS : Long.parseLong(expires);
         OAuth2AccessTokenResponse token = switch (grantType.getValue()) {
             case "authorization_code" -> authCodeService.authorize(scopes, clientId, code);
