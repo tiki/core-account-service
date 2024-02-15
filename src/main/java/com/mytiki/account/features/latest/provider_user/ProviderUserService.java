@@ -6,6 +6,7 @@
 package com.mytiki.account.features.latest.provider_user;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.mytiki.account.features.latest.oauth.OauthInternal;
 import com.mytiki.account.features.latest.provider.ProviderDO;
 import com.mytiki.account.features.latest.provider.ProviderService;
 import com.mytiki.account.features.latest.refresh.RefreshService;
@@ -44,17 +45,17 @@ public class ProviderUserService {
     private final ProviderService providerService;
     private final RefreshService refreshService;
     private final JWSSigner signer;
-    private final List<String> publicScopes;
+    private final OauthInternal oauthInternal;
 
     public ProviderUserService(
             ProviderUserRepository repository,
             ProviderService providerService,
             RefreshService refreshService,
             JWSSigner signer,
-            List<String> publicScopes) {
+            OauthInternal oauthInternal) {
         this.repository = repository;
         this.providerService = providerService;
-        this.publicScopes = publicScopes;
+        this.oauthInternal = oauthInternal;
         this.refreshService = refreshService;
         this.signer = signer;
     }
@@ -130,7 +131,7 @@ public class ProviderUserService {
                         address.getBytes(StandardCharsets.UTF_8),
                         B64F.decode(clientSecret));
                 if(isValid){
-                    scopes = scopes.filter(publicScopes);
+                    scopes = scopes.filter(oauthInternal.getScopes(), true);
                     OauthSub subject = new OauthSub(OauthSubNamespace.ADDRESS, providerId + ":" + address);
                     return new JwtBuilder()
                             .exp(Constants.TOKEN_EXPIRY_DURATION_SECONDS)

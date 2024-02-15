@@ -5,6 +5,7 @@
 
 package com.mytiki.account.features.latest.provider_user;
 
+import com.mytiki.account.features.latest.oauth.OauthInternal;
 import com.mytiki.account.features.latest.provider.ProviderService;
 import com.mytiki.account.features.latest.refresh.RefreshService;
 import com.mytiki.account.utilities.Constants;
@@ -28,8 +29,8 @@ public class ProviderUserConfig {
             @Autowired ProviderService providerService,
             @Autowired RefreshService refreshService,
             @Autowired JWSSigner signer,
-            @Value("${com.mytiki.account.oauth.client_credentials.public.scopes}") List<String> publicScopes) {
-        return new ProviderUserService(repository, providerService, refreshService, signer, publicScopes);
+            @Autowired OauthInternal oauthInternal) {
+        return new ProviderUserService(repository, providerService, refreshService, signer, oauthInternal);
     }
 
     @Bean

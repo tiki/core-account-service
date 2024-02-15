@@ -43,19 +43,23 @@ public class OauthScopes {
         this.scp = scp.stream().toList();
     }
 
-    public OauthScopes filter(String criteria) {
+    public OauthScopes filter(String criteria) { return filter(criteria, false); }
+
+    public OauthScopes filter(String criteria, Boolean exclusive) {
         List<String> list = criteria == null ?
                 new ArrayList<>() :
                 Arrays.stream(criteria.split(" ")).toList();
-        return filter(list);
+        return filter(list, exclusive);
     }
 
-    public OauthScopes filter(List<String> criteria) {
+    public OauthScopes filter(List<String> criteria) { return filter(criteria, false); }
+
+    public OauthScopes filter(List<String> criteria, Boolean exclusive) {
         OauthScopes oauthScopes = new OauthScopes();
         Map<String,OauthScope> filtered = scopes
                 .entrySet()
                 .stream()
-                .filter(entry -> criteria.contains(entry.getKey()))
+                .filter(entry -> exclusive != criteria.contains(entry.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         oauthScopes.setScopes(filtered);
         return oauthScopes;
