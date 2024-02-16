@@ -6,7 +6,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/core-account-service/blob/main/LICENSE
-  version: 2.9.15
+  version: 2.9.16
 servers:
 - url: https://account.mytiki.com
 paths:
@@ -150,11 +150,12 @@ paths:
         required: true
         schema:
           type: string
-      - name: body
-        in: query
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProviderUserAOReq'
         required: true
-        schema:
-          $ref: '#/components/schemas/ProviderUserAOReq'
       responses:
         "200":
           description: OK
