@@ -40,7 +40,7 @@ public class ProviderUserController {
     public ProviderUserAORsp post(
             JwtAuthenticationToken token,
             @PathVariable(name = "provider-id") String providerId,
-            ProviderUserAOReq body) {
+            @RequestBody ProviderUserAOReq body) {
         service.guard(token, providerId);
         return service.register(providerId, body);
     }
