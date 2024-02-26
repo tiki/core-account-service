@@ -130,6 +130,51 @@ public class SubscriptionService {
         return toAORsp(saved);
     }
 
+    public SubscriptionAORsp pause(OauthSub sub, String subscriptionId) {
+        Optional<SubscriptionDO> found = repository.findBySubscriptionId(UUID.fromString(subscriptionId));
+        if(found.isEmpty()) throw new ErrorBuilder(HttpStatus.NOT_FOUND).exception();
+        if(found.get().getStatus() != SubscriptionStatus.SUBSCRIBED)
+            throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
+                    .message("Not Subscribed")
+                    .help("Subscribe first")
+                    .exception();
+
+        cleanroomService.guard(sub, found.get().getCleanroom().getCleanroomId().toString());
+        SubscriptionDO update = found.get();
+        update.setStatus(SubscriptionStatus.STOPPED);
+        update.setModified(ZonedDateTime.now());
+        SubscriptionDO saved = repository.save(update);
+        return toAORsp(saved);
+    }
+
+    public SubscriptionAORsp restart(OauthSub sub, String subscriptionId) {
+        Optional<SubscriptionDO> found = repository.findBySubscriptionId(UUID.fromString(subscriptionId));
+        if(found.isEmpty()) throw new ErrorBuilder(HttpStatus.NOT_FOUND).exception();
+        if(found.get().getStatus() != SubscriptionStatus.STOPPED)
+            throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
+                    .message("Subscription exists")
+                    .help("Create a new estimate")
+                    .exception();
+
+        boolean hasBilling = false;
+        try{
+            hasBilling = stripe.isValid(found.get().getCleanroom().getOrg().getBillingId());
+        } catch (StripeException e) {
+            logger.error("Stripe error", e);
+        }
+        if(!hasBilling) throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
+                .message("Request requires a valid billing profile")
+                .help("Go to: https://billing.mytiki.com/p/login/3cs2afdmE27veD6288")
+                .exception();
+
+        cleanroomService.guard(sub, found.get().getCleanroom().getCleanroomId().toString());
+        SubscriptionDO update = found.get();
+        update.setStatus(SubscriptionStatus.SUBSCRIBED);
+        update.setModified(ZonedDateTime.now());
+        SubscriptionDO saved = repository.save(update);
+        return toAORsp(saved);
+    }
+
     private SubscriptionAORsp toAORsp(SubscriptionDO src) {
         SubscriptionAORsp rsp = new SubscriptionAORsp();
         rsp.setCreated(src.getCreated());

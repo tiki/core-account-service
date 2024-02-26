@@ -74,13 +74,27 @@ public class SubscriptionController {
         return service.purchase(new OauthSub(token.getName()), subscriptionId);
     }
 
-//    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-subscription-pause",
-//            summary = "Pause Subscription",
-//            description = "Pauses an existing data subscription",
-//            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
-//    @RequestMapping(method = RequestMethod.POST, path = "/{subscription-id}/pause")
-//    @Secured("SCOPE_account:admin")
-//    public SubscriptionAO pause(JwtAuthenticationToken token) {
-//        return service.estimate(new OauthSub(token.getName()), body);
-//    }
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-subscription-pause",
+            summary = "Pause Subscription",
+            description = "Pauses an existing data subscription",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
+    @RequestMapping(method = RequestMethod.POST, path = "/{subscription-id}/pause")
+    @Secured("SCOPE_account:admin")
+    public SubscriptionAO pause(
+            JwtAuthenticationToken token,
+            @PathVariable(name = "subscription-id") String subscriptionId) {
+        return service.pause(new OauthSub(token.getName()), subscriptionId);
+    }
+
+    @Operation(operationId = Constants.PROJECT_DASH_PATH +  "-subscription-restart",
+            summary = "Restart Subscription",
+            description = "Restart an paused data subscription",
+            security = @SecurityRequirement(name = "default", scopes = "account:admin"))
+    @RequestMapping(method = RequestMethod.POST, path = "/{subscription-id}/restart")
+    @Secured("SCOPE_account:admin")
+    public SubscriptionAO restart(
+            JwtAuthenticationToken token,
+            @PathVariable(name = "subscription-id") String subscriptionId) {
+        return service.restart(new OauthSub(token.getName()), subscriptionId);
+    }
 }
