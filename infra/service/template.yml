@@ -63,6 +63,7 @@ Resources:
   DBIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
+      GroupId: !GetAtt SecurityGroup.GroupId
       IpProtocol: tcp
       FromPort: 5432
       ToPort: 5432
@@ -71,6 +72,7 @@ Resources:
   ServiceIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
+      GroupId: !GetAtt SecurityGroup.GroupId
       IpProtocol: tcp
       FromPort: 8228
       ToPort: 8228
