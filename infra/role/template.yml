@@ -85,6 +85,7 @@ Resources:
               - ec2:DescribeAccountAttributes
               - ec2:DescribeSubnets
               - ec2:DescribeVpcs
+              - ec2:DescribeInternetGateways
             Resource: "*"
           - Effect: Allow
             Action:
