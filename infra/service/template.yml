@@ -35,9 +35,6 @@ Parameters:
   Secret:
     Type: String
     Description: The arn for the secret properties.
-  SfnAccount:
-    Type: String
-    Description: The account id for the step functions.
 
 Resources:
   SecurityGroup:
@@ -284,20 +281,14 @@ Resources:
               ValueFrom: !Sub "${Secret}:STRIPE_SECRET::"
             - Name: STRIPE_PRICE
               ValueFrom: !Sub "${Secret}:STRIPE_PRICE::"
-            - Name: OCEAN_BUCKET
-              ValueFrom: !Sub "${Secret}:OCEAN_BUCKET::"
-            - Name: OCEAN_REGION
-              ValueFrom: !Sub "${Secret}:OCEAN_REGION::"
-            - Name: OCEAN_CATALOG
-              ValueFrom: !Sub "${Secret}:OCEAN_CATALOG::"
-            - Name: OCEAN_ARN_STATE
-              ValueFrom: !Sub "${Secret}:OCEAN_ARN_STATE::"
-            - Name: OCEAN_ARN_LOCATION
-              ValueFrom: !Sub "${Secret}:OCEAN_ARN_LOCATION::"
-            - Name: OCEAN_ARN_EXEC
-              ValueFrom: !Sub "${Secret}:OCEAN_ARN_EXEC::"
-            - Name: OCEAN_ARN_ADMIN
-              ValueFrom: !Sub "${Secret}:OCEAN_ARN_ADMIN::"
+            - Name: EVENT_REGION
+              ValueFrom: !Sub "${Secret}:EVENT_REGION::"
+            - Name: ARN_CR_CREATE
+              ValueFrom: !Sub "${Secret}:ARN_CR_CREATE::"
+            - Name: ARN_SUB_ESTIMATE
+              ValueFrom: !Sub "${Secret}:ARN_SUB_ESTIMATE::"
+            - Name: ARN_SUB_PURCHASE
+              ValueFrom: !Sub "${Secret}:ARN_SUB_PURCHASE::"
           LogConfiguration:
             LogDriver: awslogs
             Options:
