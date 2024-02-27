@@ -47,7 +47,7 @@ Resources:
               - s3:GetObject
               - s3:GetObjectVersion
             Resource:
-              - arn:aws:s3:::mytiki-sam-deploy/*
+              - arn:aws:s3:::mytiki-core-ocean-cf-deploy/*
           - Effect: Allow
             Action:
               - iam:CreateRole
