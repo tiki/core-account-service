@@ -41,7 +41,6 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId: !Ref VpcId
-      GroupName: core-account-service
       GroupDescription: Core Account Service
       Tags:
         - Key: Name
