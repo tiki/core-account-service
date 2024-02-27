@@ -153,207 +153,207 @@ Resources:
       RepositoryName: !Ref Name
       RepositoryPolicyText: !Sub "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"new statement\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\": [\"arn:aws:iam::${AWS::AccountId}:role/${DeployRole}\"]},\"Action\": \"ecr:PutImage\"}]}"
 
-#  Cluster:
-#    Type: AWS::ECS::Cluster
-#    Properties:
-#      ClusterName: !Ref Name
-#
-#  TaskRole:
-#    Type: AWS::IAM::Role
-#    Properties:
-#      RoleName: !Sub "task-${Name}"
-#      Description: ECS Task Role for Core Account Service
-#      AssumeRolePolicyDocument:
-#        Version: '2008-10-17'
-#        Statement:
-#          - Effect: Allow
-#            Action: sts:AssumeRole
-#            Principal:
-#              Service: ecs-tasks.amazonaws.com
-#      ManagedPolicyArns:
-#        - arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager
-#      Policies:
-#        - PolicyName: XRay
-#          PolicyDocument:
-#            Version: '2012-10-17'
-#            Statement:
-#              - Effect: Allow
-#                Action:
-#                  - xray:PutTraceSegments
-#                  - xray:PutTelemetryRecords
-#                  - xray:GetSamplingRules
-#                  - xray:GetSamplingTargets
-#                  - xray:GetSamplingStatisticSummaries
-#                Resource: "*"
-#        - PolicyName: SFN
-#          PolicyDocument:
-#            Version: '2012-10-17'
-#            Statement:
-#              - Effect: Allow
-#                Action:
-#                  - states:DescribeExecution
-#                  - states:StartExecution
-#                Resource:
-#                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:core-account-cleanroom-create:*
-#                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:core-account-cleanroom-create
-#                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:core-account-cleanroom-create:*:*
-#                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:core-account-subscription-estimate:*
-#                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:core-account-subscription-estimate
-#                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:core-account-subscription-estimate:*:*
-#                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:core-account-subscription-purchase:*
-#                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:core-account-subscription-purchase
-#                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:core-account-subscription-purchase:*:*
-#        - PolicyName: S3
-#          PolicyDocument:
-#            Version: '2012-10-17'
-#            Statement:
-#              - Effect: Allow
-#                Action: s3:GetObject
-#                Resource: arn:aws:s3:::*/*
-#        - PolicyName: LakeFormation
-#          PolicyDocument:
-#            Version: '2012-10-17'
-#            Statement:
-#              - Effect: Allow
-#                Action:
-#                  - lakeformation:GetDataAccess
-#                  - lakeformation:UpdateResource
-#                  - lakeformation:GetDataAccess
-#                  - lakeformation:RemoveLFTagsFromResource
-#                  - lakeformation:UpdateLFTag
-#                  - lakeformation:RegisterResource
-#                  - lakeformation:GetLFTag
-#                  - lakeformation:GetResourceLFTags
-#                  - lakeformation:DescribeResource
-#                  - lakeformation:RevokePermissions
-#                  - lakeformation:GrantPermissions
-#                  - lakeformation:CreateLFTag
-#                  - lakeformation:AddLFTagsToResource
-#                  - lakeformation:DeleteLFTag
-#                  - lakeformation:DeregisterResource
-#                  - ram:CreateResourceShare
-#                  - ram:GetResourceShares
-#                Resource: "*"
-#              - Effect: Allow
-#                Action:
-#                  - glue:GetDatabases
-#                  - glue:GetDatabase
-#                  - glue:GetTables
-#                  - glue:GetTable
-#                Resource:
-#                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
-#                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/*
-#                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/*/*
-#              - Effect: Allow
-#                Action:
-#                  - ram:ListResourceSharePermissions
-#                  - ram:AssociateResourceShare
-#                  - ram:DeleteResourceShare
-#                  - ram:UpdateResourceShare
-#                Resource:
-#                  - !Sub arn:aws:ram:${AWS::Region}:${AWS::AccountId}:resource-share/*
-#              - Effect: Allow
-#                Action:
-#                  - iam:GetRole
-#                  - iam:PassRole
-#                Resource:
-#                  - !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess
-#
-#  Task:
-#    Type: AWS::ECS::TaskDefinition
-#    Properties:
-#      ContainerDefinitions:
-#        -
-#          Name: !Ref Name
-#          Essential: true
-#          Image: !Sub [ "${URI}:${Version}", { URI: !GetAtt Registry.RepositoryUri, Version: !Ref Version } ]
-#          PortMappings:
-#            - ContainerPort: !Ref Port
-#          Environment:
-#            - Name: SPRING_DATASOURCE_URL
-#              Value: !Sub [ "jdbc:postgresql://${Endpoint}:5432/account_service", { Endpoint: !GetAtt Database.Endpoint.Address } ]
-#          Secrets:
-#            - Name: SPRING_DATASOURCE_USERNAME
-#              ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_USERNAME::"
-#            - Name: SPRING_DATASOURCE_PASSWORD
-#              ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_PASSWORD::"
-#            - Name: SENDGRID_API_KEY
-#              ValueFrom: !Sub "${Secret}:SENDGRID_API_KEY::"
-#            - Name: ACCOUNT_JWT_PRIVATE_KEY
-#              ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_PRIVATE_KEY::"
-#            - Name: ACCOUNT_JWT_KID
-#              ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_KID::"
-#            - Name: ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON
-#              ValueFrom: !Sub "${Secret}:ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON::"
-#            - Name: README_SECRET
-#              ValueFrom: !Sub "${Secret}:README_SECRET::"
-#            - Name: GITHUB_OAUTH_ID
-#              ValueFrom: !Sub "${Secret}:GITHUB_OAUTH_ID::"
-#            - Name: GITHUB_OAUTH_SECRET
-#              ValueFrom: !Sub "${Secret}:GITHUB_OAUTH_SECRET::"
-#            - Name: GOOGLE_OAUTH_ID
-#              ValueFrom: !Sub "${Secret}:GOOGLE_OAUTH_ID::"
-#            - Name: GOOGLE_OAUTH_SECRET
-#              ValueFrom: !Sub "${Secret}:GOOGLE_OAUTH_SECRET::"
-#            - Name: STRIPE_SECRET
-#              ValueFrom: !Sub "${Secret}:STRIPE_SECRET::"
-#            - Name: STRIPE_PRICE
-#              ValueFrom: !Sub "${Secret}:STRIPE_PRICE::"
-#            - Name: EVENT_REGION
-#              ValueFrom: !Sub "${Secret}:EVENT_REGION::"
-#            - Name: ARN_CR_CREATE
-#              ValueFrom: !Sub "${Secret}:ARN_CR_CREATE::"
-#            - Name: ARN_SUB_ESTIMATE
-#              ValueFrom: !Sub "${Secret}:ARN_SUB_ESTIMATE::"
-#            - Name: ARN_SUB_PURCHASE
-#              ValueFrom: !Sub "${Secret}:ARN_SUB_PURCHASE::"
-#          LogConfiguration:
-#            LogDriver: awslogs
-#            Options:
-#              awslogs-region: !Ref AWS::Region
-#              awslogs-group: !Sub "/ecs/${Name}"
-#              awslogs-create-group: true
-#              awslogs-stream-prefix: ecs
-#        -
-#          Name: xray-daemon
-#          Image: public.ecr.aws/xray/aws-xray-daemon:latest
-#          Cpu: 32
-#          MemoryReservation: 256
-#          PortMappings:
-#            - ContainerPort: 2000
-#              Protocol: udp
-#      Cpu: 512
-#      Memory: 2048
-#      NetworkMode: awsvpc
-#      RequiresCompatibilities:
-#        - FARGATE
-#      ExecutionRoleArn: !Ref ExecutionRole
-#      TaskRoleArn: !GetAtt TaskRole.Arn
-#      RuntimePlatform:
-#        CpuArchitecture: X86_64
-#        OperatingSystemFamily: LINUX
-#
-#  Service:
-#    Type: AWS::ECS::Service
-#    Properties:
-#      Cluster: !GetAtt Cluster.Arn
-#      DeploymentConfiguration:
-#        MinimumHealthyPercent: 50
-#      DeploymentController:
-#        Type: ECS
-#      DesiredCount: 2
-#      HealthCheckGracePeriodSeconds: 300
-#      LaunchType: FARGATE
-#      LoadBalancers:
-#        - ContainerName: !Ref Name
-#          ContainerPort: !Ref Port
-#          TargetGroupArn: !GetAtt TargetGroup.TargetGroupArn
-#      NetworkConfiguration:
-#        AwsvpcConfiguration:
-#          AssignPublicIp: ENABLED
-#          SecurityGroups:
-#            - !GetAtt SecurityGroup.GroupId
-#          Subnets: !Ref Subnets
-#      PlatformVersion: LATEST
-#      ServiceName: !Ref Name
-#      TaskDefinition: !GetAtt Task.TaskDefinitionArn
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref Name
+
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "task-${Name}"
+      Description: ECS Task Role for Core Account Service
+      AssumeRolePolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager
+      Policies:
+        - PolicyName: XRay
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - xray:PutTraceSegments
+                  - xray:PutTelemetryRecords
+                  - xray:GetSamplingRules
+                  - xray:GetSamplingTargets
+                  - xray:GetSamplingStatisticSummaries
+                Resource: "*"
+        - PolicyName: SFN
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - states:DescribeExecution
+                  - states:StartExecution
+                Resource:
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:core-account-cleanroom-create:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:core-account-cleanroom-create
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:core-account-cleanroom-create:*:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:core-account-subscription-estimate:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:core-account-subscription-estimate
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:core-account-subscription-estimate:*:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:core-account-subscription-purchase:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:core-account-subscription-purchase
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:core-account-subscription-purchase:*:*
+        - PolicyName: S3
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: arn:aws:s3:::*/*
+        - PolicyName: LakeFormation
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lakeformation:GetDataAccess
+                  - lakeformation:UpdateResource
+                  - lakeformation:GetDataAccess
+                  - lakeformation:RemoveLFTagsFromResource
+                  - lakeformation:UpdateLFTag
+                  - lakeformation:RegisterResource
+                  - lakeformation:GetLFTag
+                  - lakeformation:GetResourceLFTags
+                  - lakeformation:DescribeResource
+                  - lakeformation:RevokePermissions
+                  - lakeformation:GrantPermissions
+                  - lakeformation:CreateLFTag
+                  - lakeformation:AddLFTagsToResource
+                  - lakeformation:DeleteLFTag
+                  - lakeformation:DeregisterResource
+                  - ram:CreateResourceShare
+                  - ram:GetResourceShares
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - glue:GetDatabases
+                  - glue:GetDatabase
+                  - glue:GetTables
+                  - glue:GetTable
+                Resource:
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/*
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/*/*
+              - Effect: Allow
+                Action:
+                  - ram:ListResourceSharePermissions
+                  - ram:AssociateResourceShare
+                  - ram:DeleteResourceShare
+                  - ram:UpdateResourceShare
+                Resource:
+                  - !Sub arn:aws:ram:${AWS::Region}:${AWS::AccountId}:resource-share/*
+              - Effect: Allow
+                Action:
+                  - iam:GetRole
+                  - iam:PassRole
+                Resource:
+                  - !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess
+
+  Task:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        -
+          Name: !Ref Name
+          Essential: true
+          Image: !Sub [ "${URI}:${Version}", { URI: !GetAtt Registry.RepositoryUri, Version: !Ref Version } ]
+          PortMappings:
+            - ContainerPort: !Ref Port
+          Environment:
+            - Name: SPRING_DATASOURCE_URL
+              Value: !Sub [ "jdbc:postgresql://${Endpoint}:5432/account_service", { Endpoint: !GetAtt Database.Endpoint.Address } ]
+          Secrets:
+            - Name: SPRING_DATASOURCE_USERNAME
+              ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_USERNAME::"
+            - Name: SPRING_DATASOURCE_PASSWORD
+              ValueFrom: !Sub "${Secret}:SPRING_DATASOURCE_PASSWORD::"
+            - Name: SENDGRID_API_KEY
+              ValueFrom: !Sub "${Secret}:SENDGRID_API_KEY::"
+            - Name: ACCOUNT_JWT_PRIVATE_KEY
+              ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_PRIVATE_KEY::"
+            - Name: ACCOUNT_JWT_KID
+              ValueFrom: !Sub "${Secret}:ACCOUNT_JWT_KID::"
+            - Name: ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON
+              ValueFrom: !Sub "${Secret}:ACCOUNT_OAUTH_CLIENT_CREDENTIALS_INTERNAL_JSON::"
+            - Name: README_SECRET
+              ValueFrom: !Sub "${Secret}:README_SECRET::"
+            - Name: GITHUB_OAUTH_ID
+              ValueFrom: !Sub "${Secret}:GITHUB_OAUTH_ID::"
+            - Name: GITHUB_OAUTH_SECRET
+              ValueFrom: !Sub "${Secret}:GITHUB_OAUTH_SECRET::"
+            - Name: GOOGLE_OAUTH_ID
+              ValueFrom: !Sub "${Secret}:GOOGLE_OAUTH_ID::"
+            - Name: GOOGLE_OAUTH_SECRET
+              ValueFrom: !Sub "${Secret}:GOOGLE_OAUTH_SECRET::"
+            - Name: STRIPE_SECRET
+              ValueFrom: !Sub "${Secret}:STRIPE_SECRET::"
+            - Name: STRIPE_PRICE
+              ValueFrom: !Sub "${Secret}:STRIPE_PRICE::"
+            - Name: EVENT_REGION
+              ValueFrom: !Sub "${Secret}:EVENT_REGION::"
+            - Name: ARN_CR_CREATE
+              ValueFrom: !Sub "${Secret}:ARN_CR_CREATE::"
+            - Name: ARN_SUB_ESTIMATE
+              ValueFrom: !Sub "${Secret}:ARN_SUB_ESTIMATE::"
+            - Name: ARN_SUB_PURCHASE
+              ValueFrom: !Sub "${Secret}:ARN_SUB_PURCHASE::"
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Sub "/ecs/${Name}"
+              awslogs-create-group: true
+              awslogs-stream-prefix: ecs
+        -
+          Name: xray-daemon
+          Image: public.ecr.aws/xray/aws-xray-daemon:latest
+          Cpu: 32
+          MemoryReservation: 256
+          PortMappings:
+            - ContainerPort: 2000
+              Protocol: udp
+      Cpu: 512
+      Memory: 2048
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !Ref ExecutionRole
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      RuntimePlatform:
+        CpuArchitecture: X86_64
+        OperatingSystemFamily: LINUX
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !GetAtt Cluster.Arn
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 50
+      DeploymentController:
+        Type: ECS
+      DesiredCount: 2
+      HealthCheckGracePeriodSeconds: 300
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: !Ref Name
+          ContainerPort: !Ref Port
+          TargetGroupArn: !GetAtt TargetGroup.TargetGroupArn
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !GetAtt SecurityGroup.GroupId
+          Subnets: !Ref Subnets
+      PlatformVersion: LATEST
+      ServiceName: !Ref Name
+      TaskDefinition: !GetAtt Task.TaskDefinitionArn
