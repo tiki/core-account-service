@@ -35,6 +35,9 @@ Parameters:
   Secret:
     Type: String
     Description: The arn for the secret properties.
+  SfnAccount:
+    Type: String
+    Description: The account id for the step functions.
 
 Resources:
   SecurityGroup:
@@ -176,9 +179,15 @@ Resources:
                   - states:DescribeExecution
                   - states:StartExecution
                 Resource:
-                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:CoreSubscription:*
-                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:CoreSubscription
-                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:CoreSubscription:*:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:core-account-cleanroom-create:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:core-account-cleanroom-create
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:core-account-cleanroom-create:*:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:core-account-subscription-estimate:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:core-account-subscription-estimate
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:core-account-subscription-estimate:*:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:core-account-subscription-purchase:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:core-account-subscription-purchase
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:core-account-subscription-purchase:*:*
         - PolicyName: S3
           PolicyDocument:
             Version: '2012-10-17'

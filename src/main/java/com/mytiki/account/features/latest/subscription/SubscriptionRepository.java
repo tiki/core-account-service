@@ -22,4 +22,6 @@ public interface SubscriptionRepository extends JpaRepository<SubscriptionDO, Lo
 
     @Query("SELECT a FROM SubscriptionDO a INNER JOIN a.cleanroom c INNER JOIN c.org o INNER JOIN o.profiles u WHERE u.userId = :userId AND a.status = :status")
     List<SubscriptionDO> findByStatusAndUserId(@Param("status") SubscriptionStatus status, @Param("userId") UUID userId);
+
+    List<SubscriptionDO> findByEventsRequestId(UUID requestId);
 }

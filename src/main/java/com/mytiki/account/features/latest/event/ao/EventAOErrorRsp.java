@@ -24,4 +24,12 @@ public class EventAOErrorRsp extends EventAOBase {
     public void setCause(String cause) {
         this.cause = cause;
     }
+
+    @Override
+    public String toString() {
+        return "EventAOErrorRsp{" +
+                "message='" + message + '\'' +
+                ", cause='" + cause + '\'' +
+                '}';
+    }
 }
