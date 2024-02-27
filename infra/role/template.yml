@@ -84,6 +84,7 @@ Resources:
               - ec2:DescribeSecurityGroups
               - ec2:DescribeAccountAttributes
               - ec2:DescribeSubnets
+              - ec2:DescribeVpcs
             Resource: "*"
           - Effect: Allow
             Action:
