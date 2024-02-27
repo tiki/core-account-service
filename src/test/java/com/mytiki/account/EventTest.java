@@ -147,7 +147,7 @@ public class EventTest {
         SubscriptionDO subscription = new SubscriptionDO();
         subscription.setQuery("dummy");
 
-        EventDO event = service.createEstimate(subscription);
+        EventDO event = service.createPurchase(subscription);
         EventAOSubPurchaseRsp rsp = new EventAOSubPurchaseRsp();
         rsp.setRequestId(event.getRequestId().toString());
         rsp.setCount(1L);

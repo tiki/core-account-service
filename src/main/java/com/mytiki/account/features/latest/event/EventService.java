@@ -126,13 +126,17 @@ public class EventService {
             rsp.setType(event.getType().toString());
             rsp.setStatus(event.getStatus().toString());
             rsp.setRequestId(event.getRequestId().toString());
-            rsp.setResult(event.getStatus().equals(EventStatus.FAILED) ?
-                    mapper.readValue(event.getResult(), EventAOErrorRsp.class) :
-                    switch (event.getType()) {
-                        case CREATE_CLEANROOM -> mapper.readValue(event.getResult(), EventAOCrCreateRsp.class);
-                        case ESTIMATE_SUBSCRIPTION -> mapper.readValue(event.getResult(), EventAOSubEstimateRsp.class);
-                        case PURCHASE_SUBSCRIPTION -> mapper.readValue(event.getResult(), EventAOSubPurchaseRsp.class);
-                    });
+            if(event.getResult() != null) {
+                rsp.setResult(event.getStatus().equals(EventStatus.FAILED) ?
+                        mapper.readValue(event.getResult(), EventAOErrorRsp.class) :
+                        switch (event.getType()) {
+                            case CREATE_CLEANROOM -> mapper.readValue(event.getResult(), EventAOCrCreateRsp.class);
+                            case ESTIMATE_SUBSCRIPTION ->
+                                    mapper.readValue(event.getResult(), EventAOSubEstimateRsp.class);
+                            case PURCHASE_SUBSCRIPTION ->
+                                    mapper.readValue(event.getResult(), EventAOSubPurchaseRsp.class);
+                        });
+            }
             return rsp;
         }catch (JsonProcessingException | EnumConstantNotPresentException e){
             throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)

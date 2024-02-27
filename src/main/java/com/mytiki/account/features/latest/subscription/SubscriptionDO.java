@@ -85,9 +85,9 @@ public class SubscriptionDO implements Serializable {
         this.status = status;
     }
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "subscription_ocean",
+            name = "subscription_event",
             joinColumns = @JoinColumn(name = "subscription_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id")
     )

@@ -18,6 +18,7 @@ import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileRepository;
 import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.main.App;
+import com.mytiki.account.mocks.SfnMock;
 import com.mytiki.account.mocks.StripeMock;
 import com.mytiki.account.utilities.facade.StripeF;
 import com.stripe.exception.StripeException;
@@ -25,6 +26,8 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.services.sfn.SfnClient;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -62,7 +65,8 @@ public class CleanroomTest {
     @BeforeAll
     public void before() throws StripeException {
         StripeF stripe = StripeMock.facade();
-        EventService eventService = new EventService(new HashMap<>(){{}}, eventRepository, "dummy", mapper);
+        SfnClient client = SfnMock.mock("dummy-execution-arn");
+        EventService eventService = new EventService(new HashMap<>(){{}}, eventRepository, client, mapper);
         service = new CleanroomService(repository, profileService, eventService);
         orgService = new OrgService(orgRepository, stripe);
     }

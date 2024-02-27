@@ -102,9 +102,9 @@ public class CleanroomDO implements Serializable {
         this.modified = modified;
     }
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "cleanroom_ocean",
+            name = "cleanroom_event",
             joinColumns = @JoinColumn(name = "cleanroom_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id")
     )
