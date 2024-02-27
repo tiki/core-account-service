@@ -35,6 +35,10 @@ Parameters:
   Secret:
     Type: String
     Description: The arn for the secret properties.
+  DBSubnet:
+    Type: String
+    Description: The RDS subnet group to use
+    Default: default-all
 
 Resources:
   SecurityGroup:
@@ -132,7 +136,7 @@ Resources:
       StorageEncrypted: true
       MaxAllocatedStorage: 250
       CACertificateIdentifier: rds-ca-ecc384-g1
-      DBSubnetGroupName: default-all
+      DBSubnetGroupName: !Ref DBSubnet
       VPCSecurityGroups:
         - !GetAtt SecurityGroup.GroupId
 
