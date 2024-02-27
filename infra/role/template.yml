@@ -82,6 +82,7 @@ Resources:
           - Effect: Allow
             Action:
               - ec2:DescribeSecurityGroups
+              - ec2:DescribeAccountAttributes
             Resource: "*"
           - Effect: Allow
             Action:
@@ -93,6 +94,7 @@ Resources:
             Resource:
               - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:vpc/*
               - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*
+              - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:*/*
           - Effect: Allow
             Action:
               - elasticloadbalancing:DescribeLoadBalancers
