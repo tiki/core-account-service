@@ -5,12 +5,14 @@
 
 package com.mytiki.account.features.latest.subscription;
 
+import com.mytiki.account.features.latest.event.ao.EventAOBase;
+import com.mytiki.account.features.latest.event.ao.EventAORsp;
+
 import java.util.List;
 
 public class SubscriptionAORsp extends SubscriptionAO {
     private String query;
-    private List<SubscriptionAORspCount> count;
-    private List<SubscriptionAORspSample> sample;
+    private List<EventAORsp<? extends EventAOBase>> events;
 
     public String getQuery() {
         return query;
@@ -20,19 +22,11 @@ public class SubscriptionAORsp extends SubscriptionAO {
         this.query = query;
     }
 
-    public List<SubscriptionAORspCount> getCount() {
-        return count;
+    public List<EventAORsp<? extends EventAOBase>> getEvents() {
+        return events;
     }
 
-    public void setCount(List<SubscriptionAORspCount> count) {
-        this.count = count;
-    }
-
-    public List<SubscriptionAORspSample> getSample() {
-        return sample;
-    }
-
-    public void setSample(List<SubscriptionAORspSample> sample) {
-        this.sample = sample;
+    public void setEvents(List<EventAORsp<? extends EventAOBase>> events) {
+        this.events = events;
     }
 }

@@ -8,17 +8,17 @@ package com.mytiki.account;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.account.features.latest.cleanroom.*;
+import com.mytiki.account.features.latest.event.EventRepository;
+import com.mytiki.account.features.latest.event.EventService;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
-import com.mytiki.account.features.latest.ocean.OceanRepository;
-import com.mytiki.account.features.latest.ocean.OceanService;
 import com.mytiki.account.features.latest.org.OrgRepository;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileRepository;
 import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.main.App;
-import com.mytiki.account.mocks.OceanMock;
+import com.mytiki.account.mocks.SfnMock;
 import com.mytiki.account.mocks.StripeMock;
 import com.mytiki.account.utilities.facade.StripeF;
 import com.stripe.exception.StripeException;
@@ -26,12 +26,16 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.services.sfn.SfnClient;
 
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -42,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CleanroomTest {
     @Autowired
-    private OceanRepository oceanRepository;
+    private EventRepository eventRepository;
     @Autowired
     private CleanroomRepository repository;
     @Autowired
@@ -61,9 +65,9 @@ public class CleanroomTest {
     @BeforeAll
     public void before() throws StripeException {
         StripeF stripe = StripeMock.facade();
-        OceanService oceanService = new OceanService(
-                OceanMock.sf(), OceanMock.lf(), "dummy", mapper, oceanRepository, stripe);
-        service = new CleanroomService(repository, profileService, oceanService);
+        SfnClient client = SfnMock.mock("dummy-execution-arn");
+        EventService eventService = new EventService(new HashMap<>(){{}}, eventRepository, client, mapper);
+        service = new CleanroomService(repository, profileService, eventService);
         orgService = new OrgService(orgRepository, stripe);
     }
 

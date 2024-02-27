@@ -7,7 +7,7 @@ package com.mytiki.account.features.latest;
 
 import com.mytiki.account.features.latest.auth_code.AuthCodeConfig;
 import com.mytiki.account.features.latest.cleanroom.CleanroomConfig;
-import com.mytiki.account.features.latest.ocean.OceanConfig;
+import com.mytiki.account.features.latest.event.EventConfig;
 import com.mytiki.account.features.latest.provider_user.ProviderUserConfig;
 import com.mytiki.account.features.latest.api_key.ApiKeyConfig;
 import com.mytiki.account.features.latest.provider.ProviderConfig;
@@ -37,7 +37,7 @@ import org.springframework.context.annotation.Import;
         OauthConfig.class,
         AuthCodeConfig.class,
         ReadmeConfig.class,
-        OceanConfig.class,
+        EventConfig.class,
         CleanroomConfig.class,
         SubscriptionConfig.class
 })

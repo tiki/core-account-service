@@ -5,11 +5,9 @@
 
 package com.mytiki.account.features.latest.cleanroom;
 
-import com.mytiki.account.features.latest.ocean.OceanDO;
+import com.mytiki.account.features.latest.event.EventDO;
 import com.mytiki.account.features.latest.org.OrgDO;
-import com.mytiki.account.utilities.converter.ListConvert;
 import jakarta.persistence.*;
-import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -27,7 +25,7 @@ public class CleanroomDO implements Serializable {
     private OrgDO org;
     private ZonedDateTime created;
     private ZonedDateTime modified;
-    private OceanDO result;
+    private List<EventDO> events;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -104,17 +102,17 @@ public class CleanroomDO implements Serializable {
         this.modified = modified;
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "cleanroom_ocean",
+            name = "cleanroom_event",
             joinColumns = @JoinColumn(name = "cleanroom_id"),
-            inverseJoinColumns = @JoinColumn(name = "ocean_id")
+            inverseJoinColumns = @JoinColumn(name = "event_id")
     )
-    public OceanDO getResult() {
-        return result;
+    public List<EventDO> getEvents() {
+        return events;
     }
 
-    public void setResult(OceanDO result) {
-        this.result = result;
+    public void setEvents(List<EventDO> events) {
+        this.events = events;
     }
 }

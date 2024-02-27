@@ -3,21 +3,21 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-package com.mytiki.account.features.latest.ocean;
+package com.mytiki.account.features.latest.event.status;
 
-public enum OceanStatus {
+public enum EventStatus {
     PENDING("pending"),
     SUCCESS("success"),
     FAILED("failed");
 
     private final String string;
 
-    OceanStatus(String string) {
+    EventStatus(String string) {
         this.string = string;
     }
 
-    public static OceanStatus fromString(String s) {
-        for(OceanStatus status : values()){
+    public static EventStatus fromString(String s) {
+        for(EventStatus status : values()){
             if( status.toString().equals(s)){
                 return status;
             }
