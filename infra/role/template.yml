@@ -3,28 +3,32 @@ Transform: AWS::Serverless-2016-10-31
 Description: Core Account GitHub deployment
 
 Parameters:
-  RoleName:
+  Name:
     Description: Name of the IAM Role for the deployment
     Type: String
-    Default: "GitHubDeployCoreAccountService"
+    Default: deploy-core-account-service
 
 Resources:
   Role:
-    Type: AWS::Serverless::Application
+    Type: AWS::IAM::Role
     Properties:
-      Location:
-        ApplicationId: arn:aws:serverlessrepo:us-east-2:${AWS::AccountId}:applications/core-aws-github-role
-        SemanticVersion: 0.0.3
-      Parameters:
-        GitHubOrg: tiki
-        RepositoryName: core-account-service
-        RoleName: !Ref RoleName
-
+      RoleName: !Ref Name
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+              StringLike:
+                token.actions.githubusercontent.com:sub: !Sub repo:tiki/core-account-service:*
   Policy:
     Type: AWS::IAM::RolePolicy
     DependsOn: Role
     Properties:
-      RoleName: !Ref RoleName
+      RoleName: !Ref Name
       PolicyName: DeploymentPolicy
       PolicyDocument:
         Version: '2012-10-17'
