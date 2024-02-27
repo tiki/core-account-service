@@ -3,6 +3,10 @@ Transform: AWS::Serverless-2016-10-31
 Description: Core Account Service
 
 Parameters:
+  Name:
+    Type: String
+    Description: Name of the service
+    Default: core-account-service
   VpcId:
     Type: String
     Description: The id of the VPC to use.
@@ -85,7 +89,7 @@ Resources:
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: core-account-service
+      Name: !Ref Name
       Scheme: internet-facing
       Type: application
       SecurityGroups:
@@ -97,7 +101,7 @@ Resources:
     DependsOn: LoadBalancer
     Properties:
       VpcId: !Ref VpcId
-      Name: core-account-service
+      Name: !Ref Name
       Port: !Ref Port
       Protocol: HTTP
       HealthCheckEnabled: true
@@ -125,7 +129,7 @@ Resources:
       AllocatedStorage: 25
       AutoMinorVersionUpgrade: true
       BackupRetentionPeriod: 30
-      DBInstanceIdentifier: core-account-service
+      DBInstanceIdentifier: !Ref Name
       DBInstanceClass: db.t4g.micro
       DeletionProtection: true
       Engine: postgres
@@ -146,18 +150,18 @@ Resources:
       ImageScanningConfiguration:
         ScanOnPush: true
       ImageTagMutability: IMMUTABLE
-      RepositoryName: core-account-service
+      RepositoryName: !Ref Name
       RepositoryPolicyText: !Sub "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"new statement\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\": [\"arn:aws:iam::${AWS::AccountId}:role/${DeployRole}\"]},\"Action\": \"ecr:PutImage\"}]}"
 
   Cluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: core-account-service
+      ClusterName: !Ref Name
 
   TaskRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: TaskRoleCoreAccountService
+      RoleName: !Sub "task-${Name}"
       Description: ECS Task Role for Core Account Service
       AssumeRolePolicyDocument:
         Version: '2008-10-17'
@@ -260,7 +264,7 @@ Resources:
     Properties:
       ContainerDefinitions:
         -
-          Name: core-account-service
+          Name: !Ref Name
           Essential: true
           Image: !Sub [ "${URI}:${Version}", { URI: !GetAtt Registry.RepositoryUri, Version: !Ref Version } ]
           PortMappings:
@@ -307,7 +311,7 @@ Resources:
             LogDriver: awslogs
             Options:
               awslogs-region: !Ref AWS::Region
-              awslogs-group: /ecs/core-account-service
+              awslogs-group: !Sub "/ecs/${Name}"
               awslogs-create-group: true
               awslogs-stream-prefix: ecs
         -
@@ -341,7 +345,7 @@ Resources:
       HealthCheckGracePeriodSeconds: 300
       LaunchType: FARGATE
       LoadBalancers:
-        - ContainerName: core-account-service
+        - ContainerName: !Ref Name
           ContainerPort: !Ref Port
           TargetGroupArn: !GetAtt TargetGroup.TargetGroupArn
       NetworkConfiguration:
@@ -351,5 +355,5 @@ Resources:
             - !GetAtt SecurityGroup.GroupId
           Subnets: !Ref Subnets
       PlatformVersion: LATEST
-      ServiceName: core-account-service
+      ServiceName: !Ref Name
       TaskDefinition: !GetAtt Task.TaskDefinitionArn
