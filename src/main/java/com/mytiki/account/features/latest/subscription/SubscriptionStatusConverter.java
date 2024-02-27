@@ -5,7 +5,6 @@
 
 package com.mytiki.account.features.latest.subscription;
 
-import com.mytiki.account.features.latest.ocean.OceanType;
 import jakarta.persistence.AttributeConverter;
 
 public class SubscriptionStatusConverter implements AttributeConverter<SubscriptionStatus, String> {
