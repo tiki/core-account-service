@@ -132,6 +132,7 @@ Resources:
       StorageEncrypted: true
       MaxAllocatedStorage: 250
       CACertificateIdentifier: rds-ca-ecc384-g1
+      DBSubnetGroupName: default-all
       VPCSecurityGroups:
         - !GetAtt SecurityGroup.GroupId
 
