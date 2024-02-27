@@ -6,10 +6,9 @@
 package com.mytiki.account.features.latest.cleanroom;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.mytiki.account.features.latest.event.EventDO;
+import com.mytiki.account.features.latest.event.EventService;
 import com.mytiki.account.features.latest.oauth.OauthSub;
-import com.mytiki.account.features.latest.ocean.OceanDO;
-import com.mytiki.account.features.latest.ocean.OceanService;
-import com.mytiki.account.features.latest.profile.ProfileAO;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
@@ -19,21 +18,22 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @XRayEnabled
 public class CleanroomService {
 
     private final CleanroomRepository repository;
     private final ProfileService profileService;
-    private final OceanService oceanService;
+    private final EventService eventService;
 
     public CleanroomService(
             CleanroomRepository repository,
             ProfileService profileService,
-            OceanService oceanService) {
+            EventService eventService) {
         this.repository = repository;
         this.profileService = profileService;
-        this.oceanService = oceanService;
+        this.eventService = eventService;
     }
 
     public CleanroomAORsp create(CleanroomAOReq req, OauthSub sub) {
@@ -52,9 +52,10 @@ public class CleanroomService {
             cleanroom.setModified(now);
             cleanroom.setAws(req.getAws());
             cleanroom.setDescription(req.getDescription());
-            OceanDO result = oceanService.createDatabase(cleanroom);
-            cleanroom.setResult(result);
-            return toAORsp(repository.save(cleanroom));
+            EventDO event = eventService.createCleanroom(cleanroom);
+            cleanroom.setEvents(List.of(event));
+            cleanroom = repository.save(cleanroom);
+            return toAORsp(cleanroom);
         }
     }
 
@@ -119,6 +120,7 @@ public class CleanroomService {
         rsp.setModified(src.getModified());
         rsp.setCreated(src.getCreated());
         rsp.setOrgId(src.getOrg().getOrgId().toString());
+        rsp.setEvents(src.getEvents().stream().map(eventService::toAORsp).collect(Collectors.toList()));
         return rsp;
     }
 }

@@ -5,6 +5,9 @@
 
 package com.mytiki.account.features.latest.cleanroom;
 
+import com.mytiki.account.features.latest.event.ao.EventAOBase;
+import com.mytiki.account.features.latest.event.ao.EventAORsp;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -13,6 +16,7 @@ public class CleanroomAORsp extends CleanroomAO {
     private String aws;
     private ZonedDateTime modified;
     private ZonedDateTime created;
+    private List<EventAORsp<? extends EventAOBase>> events;
 
     public String getOrgId() {
         return orgId;
@@ -44,5 +48,13 @@ public class CleanroomAORsp extends CleanroomAO {
 
     public void setCreated(ZonedDateTime created) {
         this.created = created;
+    }
+
+    public List<EventAORsp<? extends EventAOBase>> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<EventAORsp<? extends EventAOBase>> events) {
+        this.events = events;
     }
 }

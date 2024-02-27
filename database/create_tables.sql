@@ -125,39 +125,37 @@ CREATE TABLE IF NOT EXISTS subscription(
 );
 
 -- -----------------------------------------------------------------------
--- OCEAN REQUESTS
+-- EVENT REQUESTS
 -- -----------------------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS ocean(
+CREATE TABLE IF NOT EXISTS event(
     id BIGSERIAL PRIMARY KEY,
     request_id UUID NOT NULL UNIQUE,
     status TEXT NOT NULL,
     type TEXT NOT NULL,
-    execution_arn TEXT NOT NULL,
-    result_uri TEXT,
     result TEXT,
     created_utc TIMESTAMP WITH TIME ZONE NOT NULL,
     modified_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 -- -----------------------------------------------------------------------
--- SUBSCRIPTION ATHENA REQUESTS
+-- SUBSCRIPTION EVENT REQUESTS
 -- -----------------------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS subscription_ocean(
+CREATE TABLE IF NOT EXISTS subscription_event(
     id BIGSERIAL PRIMARY KEY,
     subscription_id BIGINT REFERENCES subscription(id) NOT NULL,
-    ocean_id BIGINT REFERENCES ocean(id) NOT NULL,
-    UNIQUE(subscription_id, ocean_id)
+    event_id BIGINT REFERENCES event(id) NOT NULL,
+    UNIQUE(subscription_id, event_id)
 );
 
 -- -----------------------------------------------------------------------
--- CLEANROOM ATHENA REQUESTS
+-- CLEANROOM EVENT REQUESTS
 -- -----------------------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS cleanroom_ocean(
+CREATE TABLE IF NOT EXISTS cleanroom_event(
     id BIGSERIAL PRIMARY KEY,
     cleanroom_id BIGINT REFERENCES cleanroom(id) NOT NULL,
-    ocean_id BIGINT REFERENCES ocean(id) NOT NULL,
-    UNIQUE(cleanroom_id, ocean_id)
+    event_id BIGINT REFERENCES event(id) NOT NULL,
+    UNIQUE(cleanroom_id, event_id)
 );

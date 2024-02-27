@@ -6,9 +6,7 @@
 package com.mytiki.account.features.latest.subscription;
 
 import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
-import com.mytiki.account.features.latest.ocean.OceanDO;
-import com.mytiki.account.features.latest.ocean.OceanStatusConverter;
-import com.mytiki.account.features.latest.profile.ProfileDO;
+import com.mytiki.account.features.latest.event.EventDO;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -25,7 +23,7 @@ public class SubscriptionDO implements Serializable {
     private CleanroomDO cleanroom;
     private String query;
     private SubscriptionStatus status;
-    private List<OceanDO> results;
+    private List<EventDO> events;
     private ZonedDateTime created;
     private ZonedDateTime modified;
 
@@ -91,14 +89,14 @@ public class SubscriptionDO implements Serializable {
     @JoinTable(
             name = "subscription_ocean",
             joinColumns = @JoinColumn(name = "subscription_id"),
-            inverseJoinColumns = @JoinColumn(name = "ocean_id")
+            inverseJoinColumns = @JoinColumn(name = "event_id")
     )
-    public List<OceanDO> getResults() {
-        return results;
+    public List<EventDO> getEvents() {
+        return events;
     }
 
-    public void setResults(List<OceanDO> results) {
-        this.results = results;
+    public void setEvents(List<EventDO> results) {
+        this.events = results;
     }
 
     @Column(name = "created_utc")

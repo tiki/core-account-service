@@ -7,11 +7,9 @@ package com.mytiki.account.features.latest.subscription;
 
 import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
 import com.mytiki.account.features.latest.cleanroom.CleanroomService;
+import com.mytiki.account.features.latest.event.EventDO;
+import com.mytiki.account.features.latest.event.EventService;
 import com.mytiki.account.features.latest.oauth.OauthSub;
-import com.mytiki.account.features.latest.ocean.OceanDO;
-import com.mytiki.account.features.latest.ocean.OceanService;
-import com.mytiki.account.features.latest.ocean.OceanStatus;
-import com.mytiki.account.features.latest.ocean.OceanType;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.facade.StripeF;
 import com.stripe.exception.StripeException;
@@ -21,23 +19,26 @@ import org.springframework.http.HttpStatus;
 
 import java.lang.invoke.MethodHandles;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class SubscriptionService {
     protected static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final SubscriptionRepository repository;
-    private final OceanService oceanService;
+    private final EventService eventService;
     private final CleanroomService cleanroomService;
     private final StripeF stripe;
 
     public SubscriptionService(
             SubscriptionRepository repository,
-            OceanService oceanService,
+            EventService eventService,
             CleanroomService cleanroomService,
             StripeF stripe) {
         this.repository = repository;
-        this.oceanService = oceanService;
+        this.eventService = eventService;
         this.cleanroomService = cleanroomService;
         this.stripe = stripe;
     }
@@ -65,17 +66,6 @@ public class SubscriptionService {
         if(found.isEmpty()) throw new ErrorBuilder(HttpStatus.NOT_FOUND).exception();
         SubscriptionDO subscription = found.get();
         cleanroomService.guard(sub, subscription.getCleanroom().getCleanroomId().toString());
-
-        List<OceanDO> results = subscription.getResults();
-        if(results != null){
-            List<OceanDO> updated = new ArrayList<>(results.size());
-            results.forEach((res) -> {
-                if(res.getStatus() == OceanStatus.PENDING) updated.add(oceanService.get(res.getRequestId()));
-                else updated.add(res);
-            });
-            subscription.setResults(updated);
-        }
-
         return toAORsp(subscription);
     }
 
@@ -88,12 +78,11 @@ public class SubscriptionService {
         subscription.setStatus(SubscriptionStatus.ESTIMATE);
         subscription.setName(req.getName());
         subscription.setCleanroom(cleanroom);
-        OceanDO res1 = oceanService.count(req.getQuery());
-        OceanDO res2 = oceanService.sample(req.getQuery());
-        subscription.setResults(List.of(res1, res2));
         ZonedDateTime now = ZonedDateTime.now();
         subscription.setCreated(now);
         subscription.setModified(now);
+        EventDO event = eventService.createEstimate(subscription);
+        subscription.setEvents(List.of(event));
         SubscriptionDO saved = repository.save(subscription);
         return toAORsp(saved);
     }
@@ -106,25 +95,20 @@ public class SubscriptionService {
                     .message("Subscription exists")
                     .help("Create a new estimate")
                     .exception();
-
         boolean hasBilling = false;
-        try{
-            hasBilling = stripe.isValid(found.get().getCleanroom().getOrg().getBillingId());
-        } catch (StripeException e) {
-            logger.error("Stripe error", e);
-        }
+        try{ hasBilling = stripe.isValid(found.get().getCleanroom().getOrg().getBillingId()); }
+        catch (StripeException e) { logger.error("Stripe error", e); }
         if(!hasBilling) throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
                 .message("Request requires a valid billing profile")
                 .help("Go to: https://billing.mytiki.com/p/login/3cs2afdmE27veD6288")
                 .exception();
-
         cleanroomService.guard(sub, found.get().getCleanroom().getCleanroomId().toString());
         SubscriptionDO update = found.get();
+        EventDO event = eventService.createPurchase(update);
         update.setStatus(SubscriptionStatus.SUBSCRIBED);
-        OceanDO res = oceanService.ctas(update);
-        List<OceanDO> results = update.getResults() != null ? new ArrayList<>(update.getResults()) : new ArrayList<>();
-        results.add(res);
-        update.setResults(results);
+        List<EventDO> events = update.getEvents() != null ? new ArrayList<>(update.getEvents()) : new ArrayList<>();
+        events.add(event);
+        update.setEvents(events);
         update.setModified(ZonedDateTime.now());
         SubscriptionDO saved = repository.save(update);
         return toAORsp(saved);
@@ -139,63 +123,7 @@ public class SubscriptionService {
         rsp.setQuery(src.getQuery());
         rsp.setStatus(src.getStatus().toString());
         rsp.setName(src.getName());
-
-        List<SubscriptionAORspCount> countList = new ArrayList<>();
-        List<SubscriptionAORspSample> sampleList = new ArrayList<>();
-
-        if(src.getResults() != null){
-            src.getResults().forEach((res) -> {
-                switch (res.getType()){
-                    case SAMPLE -> {
-                        List<String[]> result = oceanService.deserializeResult(res.getResult());
-                        if(result != null && !result.isEmpty()){
-                            SubscriptionAORspSample sample = new SubscriptionAORspSample();
-                            sample.setCreated(res.getCreated());
-                            sample.setModified(res.getModified());
-                            sample.setStatus(res.getStatus().toString());
-                            sample.setRecords(result.stream()
-                                    .map((val) -> {
-                                        String[] wrappedLine = new String[val.length];
-                                        for (int i=0; i<val.length; i++) {
-                                            String cur = val[i];
-                                            if (cur != null) {
-                                                if (cur.contains("\"")) {
-                                                    cur = cur.replace("\"", "\"\"");
-                                                }
-                                                if (cur.contains(",")
-                                                        || cur.contains("\n")
-                                                        || cur.contains("'")
-                                                        || cur.contains("\\")
-                                                        || cur.contains("\"")) {
-                                                    cur = "\"" + cur + "\"";
-                                                }
-                                            }
-                                            wrappedLine[i] = cur;
-                                        }
-                                        return String.join(",", wrappedLine);
-                                    }).toList());
-                            sampleList.add(sample);
-                        }
-                    }
-                    case COUNT -> {
-                        List<String[]> result = oceanService.deserializeResult(res.getResult());
-                        if(result != null && !result.isEmpty()){
-                            SubscriptionAORspCount count = new SubscriptionAORspCount();
-                            count.setCreated(res.getCreated());
-                            count.setModified(res.getModified());
-                            count.setStatus(res.getStatus().toString());
-                            count.setTotal(Long.parseLong(result.get(1)[0]));
-                            countList.add(count);
-                        }
-                    }
-                    default -> {}
-                }
-            });
-        }
-
-        rsp.setCount(countList);
-        rsp.setSample(sampleList);
+        rsp.setEvents(src.getEvents().stream().map(eventService::toAORsp).collect(Collectors.toList()));
         return rsp;
     }
-
 }

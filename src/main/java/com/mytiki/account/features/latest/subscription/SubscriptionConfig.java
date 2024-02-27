@@ -6,11 +6,10 @@
 package com.mytiki.account.features.latest.subscription;
 
 import com.mytiki.account.features.latest.cleanroom.CleanroomService;
-import com.mytiki.account.features.latest.ocean.OceanService;
+import com.mytiki.account.features.latest.event.EventService;
 import com.mytiki.account.utilities.Constants;
 import com.mytiki.account.utilities.facade.StripeF;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -28,9 +27,9 @@ public class SubscriptionConfig {
     @Bean
     public SubscriptionService subscriptionService(
             @Autowired SubscriptionRepository repository,
-            @Autowired OceanService oceanService,
+            @Autowired EventService eventService,
             @Autowired CleanroomService cleanroomService,
             @Autowired StripeF stripe){
-        return new SubscriptionService(repository, oceanService, cleanroomService, stripe);
+        return new SubscriptionService(repository, eventService, cleanroomService, stripe);
     }
 }
