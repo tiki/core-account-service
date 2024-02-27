@@ -6,7 +6,7 @@ info:
   license:
     name: MIT
     url: https://github.com/tiki/core-account-service/blob/main/LICENSE
-  version: 2.9.16
+  version: 2.9.17
 servers:
 - url: https://account.mytiki.com
 paths:
@@ -381,6 +381,28 @@ components:
           type: string
         cleanroomId:
           type: string
+    EventAOBase:
+      type: object
+      properties:
+        requestId:
+          type: string
+    EventAORspEventAOBase:
+      type: object
+      properties:
+        requestId:
+          type: string
+        status:
+          type: string
+        type:
+          type: string
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+        result:
+          $ref: '#/components/schemas/EventAOBase'
     SubscriptionAORsp:
       type: object
       properties:
@@ -400,43 +422,10 @@ components:
           format: date-time
         query:
           type: string
-        count:
+        events:
           type: array
           items:
-            $ref: '#/components/schemas/SubscriptionAORspCount'
-        sample:
-          type: array
-          items:
-            $ref: '#/components/schemas/SubscriptionAORspSample'
-    SubscriptionAORspCount:
-      type: object
-      properties:
-        status:
-          type: string
-        total:
-          type: integer
-          format: int64
-        created:
-          type: string
-          format: date-time
-        modified:
-          type: string
-          format: date-time
-    SubscriptionAORspSample:
-      type: object
-      properties:
-        status:
-          type: string
-        records:
-          type: array
-          items:
-            type: string
-        created:
-          type: string
-          format: date-time
-        modified:
-          type: string
-          format: date-time
+            $ref: '#/components/schemas/EventAORspEventAOBase'
     ProviderAOReq:
       type: object
       properties:
@@ -513,6 +502,10 @@ components:
         created:
           type: string
           format: date-time
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventAORspEventAOBase'
     SubscriptionAO:
       type: object
       properties:
