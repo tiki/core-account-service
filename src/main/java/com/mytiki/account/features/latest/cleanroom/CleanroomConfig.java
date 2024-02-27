@@ -6,7 +6,6 @@
 package com.mytiki.account.features.latest.cleanroom;
 
 import com.mytiki.account.features.latest.event.EventService;
-import com.mytiki.account.features.latest.ocean.OceanService;
 import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
