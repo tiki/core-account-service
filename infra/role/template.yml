@@ -83,6 +83,7 @@ Resources:
             Action:
               - ec2:DescribeSecurityGroups
               - ec2:DescribeAccountAttributes
+              - ec2:DescribeSubnets
             Resource: "*"
           - Effect: Allow
             Action:
