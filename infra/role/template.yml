@@ -64,6 +64,7 @@ Resources:
             Resource:
               - !Sub arn:aws:iam::${AWS::AccountId}:role/core-ocean-sar-*
               - !Sub arn:aws:iam::${AWS::AccountId}:role/task-core-account-service
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/exec-core-account-service
           - Effect: Allow
             Action:
               - ecr:GetAuthorizationToken
@@ -154,4 +155,4 @@ Resources:
             Action: iam:PassRole
             Resource:
               - !Sub arn:aws:iam::${AWS::AccountId}:role/task-core-account-service
-              - !Sub arn:aws:iam::${AWS::AccountId}:role/ecsTaskExecutionRole
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/exec-core-account-service
