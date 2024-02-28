@@ -269,7 +269,7 @@ Resources:
             Principal:
               Service: ecs-tasks.amazonaws.com
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonECSTaskExecutionRolePolicy
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
       Policies:
         - PolicyName: Log
           PolicyDocument:
