@@ -23,9 +23,6 @@ Parameters:
   DeployRole:
     Type: String
     Description: IAM deployment role for uploading containers.
-  ExecutionRole:
-    Type: String
-    Description: Arn for the ecs task execution role.
   Version:
     Type: String
     Description: The container version number.
@@ -259,6 +256,41 @@ Resources:
                 Resource:
                   - !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess
 
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "exec-${Name}"
+      Description: ECS Execution Role for Core Account Service
+      AssumeRolePolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: Log
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: logs:CreateLogGroup
+                Resource: !Sub "arn:aws:logs:*:${AWS::AccountId}:log-group:*"
+        - PolicyName: Secret
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameters
+                  - secretsmanager:GetSecretValue
+                  - kms:Decrypt
+                Resource:
+                  - !Ref Secret
+                  - !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*"
+
   Task:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -327,7 +359,7 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
-      ExecutionRoleArn: !Ref ExecutionRole
+      ExecutionRoleArn: !GetAtt ExecutionRole.Arn
       TaskRoleArn: !GetAtt TaskRole.Arn
       RuntimePlatform:
         CpuArchitecture: X86_64
