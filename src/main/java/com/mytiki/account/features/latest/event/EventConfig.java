@@ -6,6 +6,7 @@
 package com.mytiki.account.features.latest.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mytiki.account.features.latest.subscription.SubscriptionService;
 import com.mytiki.account.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,10 +25,8 @@ public class EventConfig {
     public static final String PACKAGE_PATH = Constants.PKG_FEAT_LATEST_DOT_PATH + ".event";
 
     @Bean
-    public EventCallback eventCallback(
-            @Autowired EventRepository repository,
-            @Autowired ObjectMapper mapper){
-        return new EventCallback(repository, mapper);
+    public EventCallback eventCallback(@Autowired EventHandler handler){
+        return new EventCallback(handler);
     }
 
     @Bean
@@ -37,6 +36,13 @@ public class EventConfig {
             @Value("${com.mytiki.account.event.region}") String region,
             @Autowired ObjectMapper mapper){
         return new EventService(arns, repository, region, mapper);
+    }
+
+    @Bean EventHandler eventHandler(
+            @Autowired EventRepository repository,
+            @Autowired ObjectMapper mapper,
+            @Autowired SubscriptionService subscriptionService){
+        return new EventHandler(repository, mapper, subscriptionService);
     }
 
     @Bean(name = "eventArns")

@@ -28,16 +28,20 @@ jobs:
       - name: AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubDeployBase
+          role-to-assume: arn:aws:iam::${{ secrets.ACCOUNT_ID }}:role/GitHubDeployBase
           role-session-name: ${{ vars.SESSION_NAME }}
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: SetVars
         run: |
-          sed -i 's/${AWS::AccountId}/${{ secrets.AWS_ACCOUNT_ID }}/' infra/role/template.yml
+          sed -i 's/${AWS::AccountId}/${{ secrets.ACCOUNT_ID }}/' infra/role/template.yml
 
       - name: SAM Role
-        run: cd infra/role && sam build && sam package && sam deploy
+        run: | 
+          cd infra/role
+          sam build
+          sam package
+          sam deploy --no-fail-on-empty-changeset
 
   push:
     runs-on: ubuntu-latest
@@ -63,7 +67,7 @@ jobs:
       - name: AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubDeployCoreAccountService
+          role-to-assume: arn:aws:iam::${{ secrets.ACCOUNT_ID }}:role/deploy-core-account-service
           role-session-name: ${{ vars.SESSION_NAME }}
           aws-region: ${{ vars.AWS_REGION }}
 
@@ -77,7 +81,7 @@ jobs:
           context: .
           target: production
           push: true
-          tags: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/core-account-service:${{ steps.version.outputs.version }}
+          tags: ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/core-account-service:${{ steps.version.outputs.version }}
           build-args: JAR_FILE=target/*.jar
 
   deploy:
@@ -91,7 +95,7 @@ jobs:
       - name: AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubDeployCoreAccountService
+          role-to-assume: arn:aws:iam::${{ secrets.ACCOUNT_ID }}:role/deploy-core-account-service
           role-session-name: ${{ vars.SESSION_NAME }}
           aws-region: ${{ vars.AWS_REGION }}
 
@@ -102,9 +106,9 @@ jobs:
       - name: SAM Publish
         run: |
           cd infra/service
-          sam build --parameter-overrides ParameterKey=Subnets,ParameterValue=${{ secrets.SUBNETS }} ParameterKey=VpcId,ParameterValue=${{ secrets.VPCID }} ParameterKey=Certificate,ParameterValue=${{ secrets.CERTIFICATE }} ParameterKey=Username,ParameterValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} ParameterKey=Password,ParameterValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} ParameterKey=DeployRole,ParameterValue=${{ vars.DEPLOYROLE }} ParameterKey=ExecutionRole,ParameterValue=${{ secrets.EXECUTIONROLE }} ParameterKey=Secret,ParameterValue=${{ secrets.SECRETARN }} ParameterKey=Version,ParameterValue=${{ steps.version.outputs.version }}
+          sam build --parameter-overrides ParameterKey=Subnets,ParameterValue=${{ secrets.SUBNETS }} ParameterKey=VpcId,ParameterValue=${{ secrets.VPCID }} ParameterKey=Certificate,ParameterValue=${{ secrets.CERTIFICATE }} ParameterKey=Username,ParameterValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} ParameterKey=Password,ParameterValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} ParameterKey=DeployRole,ParameterValue=${{ vars.DEPLOYROLE }} ParameterKey=Secret,ParameterValue=${{ secrets.SECRETARN }} ParameterKey=Version,ParameterValue=${{ steps.version.outputs.version }}
           sam package
-          sam deploy --parameter-overrides ParameterKey=Subnets,ParameterValue=${{ secrets.SUBNETS }} ParameterKey=VpcId,ParameterValue=${{ secrets.VPCID }} ParameterKey=Certificate,ParameterValue=${{ secrets.CERTIFICATE }} ParameterKey=Username,ParameterValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} ParameterKey=Password,ParameterValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} ParameterKey=DeployRole,ParameterValue=${{ vars.DEPLOYROLE }} ParameterKey=ExecutionRole,ParameterValue=${{ secrets.EXECUTIONROLE }} ParameterKey=Secret,ParameterValue=${{ secrets.SECRETARN }} ParameterKey=Version,ParameterValue=${{ steps.version.outputs.version }}
+          sam deploy --parameter-overrides ParameterKey=Subnets,ParameterValue=${{ secrets.SUBNETS }} ParameterKey=VpcId,ParameterValue=${{ secrets.VPCID }} ParameterKey=Certificate,ParameterValue=${{ secrets.CERTIFICATE }} ParameterKey=Username,ParameterValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} ParameterKey=Password,ParameterValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} ParameterKey=DeployRole,ParameterValue=${{ vars.DEPLOYROLE }} ParameterKey=Secret,ParameterValue=${{ secrets.SECRETARN }} ParameterKey=Version,ParameterValue=${{ steps.version.outputs.version }}
 
   publish:
     runs-on: ubuntu-latest

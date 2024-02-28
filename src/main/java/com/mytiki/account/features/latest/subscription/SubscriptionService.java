@@ -9,6 +9,7 @@ import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
 import com.mytiki.account.features.latest.cleanroom.CleanroomService;
 import com.mytiki.account.features.latest.event.EventDO;
 import com.mytiki.account.features.latest.event.EventService;
+import com.mytiki.account.features.latest.event.ao.EventAOSubPurchaseRsp;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.facade.StripeF;
@@ -112,6 +113,25 @@ public class SubscriptionService {
         update.setModified(ZonedDateTime.now());
         SubscriptionDO saved = repository.save(update);
         return toAORsp(saved);
+    }
+
+    public void callback(EventAOSubPurchaseRsp rsp) {
+        UUID requestId = UUID.fromString(rsp.getRequestId());
+        List<SubscriptionDO> events = repository.findByEventsRequestId(requestId);
+        if(events.size() != 1)
+            throw new ErrorBuilder(HttpStatus.NOT_FOUND)
+                    .message("Issue identifying subscription, multiple or none mapped.")
+                    .properties("requestId", rsp.getRequestId())
+                    .exception();
+        SubscriptionDO subs = events.get(0);
+        try {
+            stripe.usage(subs.getCleanroom().getOrg().getBillingId(), rsp.getCount());
+        }catch (StripeException e) {
+            throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
+                    .message(e.getMessage())
+                    .properties("requestId", rsp.getRequestId())
+                    .exception();
+        }
     }
 
     private SubscriptionAORsp toAORsp(SubscriptionDO src) {

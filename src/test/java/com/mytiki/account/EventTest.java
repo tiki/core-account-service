@@ -7,26 +7,34 @@ package com.mytiki.account;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.account.features.latest.cleanroom.CleanroomDO;
-import com.mytiki.account.features.latest.event.EventCallback;
-import com.mytiki.account.features.latest.event.EventDO;
-import com.mytiki.account.features.latest.event.EventRepository;
-import com.mytiki.account.features.latest.event.EventService;
+import com.mytiki.account.features.latest.cleanroom.CleanroomRepository;
+import com.mytiki.account.features.latest.cleanroom.CleanroomService;
+import com.mytiki.account.features.latest.event.*;
 import com.mytiki.account.features.latest.event.ao.EventAOErrorRsp;
 import com.mytiki.account.features.latest.event.ao.EventAOSubEstimateRsp;
 import com.mytiki.account.features.latest.event.ao.EventAOSubEstimateRspCol;
 import com.mytiki.account.features.latest.event.ao.EventAOSubPurchaseRsp;
 import com.mytiki.account.features.latest.event.status.EventStatus;
 import com.mytiki.account.features.latest.event.type.EventType;
+import com.mytiki.account.features.latest.org.OrgDO;
+import com.mytiki.account.features.latest.org.OrgRepository;
 import com.mytiki.account.features.latest.subscription.SubscriptionDO;
+import com.mytiki.account.features.latest.subscription.SubscriptionRepository;
+import com.mytiki.account.features.latest.subscription.SubscriptionService;
+import com.mytiki.account.features.latest.subscription.SubscriptionStatus;
 import com.mytiki.account.main.App;
 import com.mytiki.account.mocks.JwtMock;
 import com.mytiki.account.mocks.SfnMock;
+import com.mytiki.account.mocks.StripeMock;
+import com.mytiki.account.utilities.facade.StripeF;
+import com.stripe.exception.StripeException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import software.amazon.awssdk.services.sfn.SfnClient;
 
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -47,13 +55,23 @@ public class EventTest {
     @Autowired
     private EventRepository repository;
     @Autowired
-    private EventCallback callback;
+    private SubscriptionRepository subscriptionRepository;
+    @Autowired
+    private CleanroomService cleanroomService;
+    @Autowired
+    private CleanroomRepository cleanroomRepository;
+    @Autowired
+    private OrgRepository orgRepository;
+    private EventHandler handler;
     private EventService service;
 
     @BeforeEach
-    public void before() {
+    public void before() throws StripeException {
         SfnClient client = SfnMock.mock("dummy-execution-arn");
         this.service = new EventService(new HashMap<>(){{}}, repository, client, mapper);
+        StripeF stripe = StripeMock.facade();
+        SubscriptionService subscriptionService = new SubscriptionService(subscriptionRepository, this.service, cleanroomService, stripe);
+        this.handler = new EventHandler(repository, mapper, subscriptionService);
     }
 
     @Test
@@ -111,7 +129,7 @@ public class EventTest {
         EventDO event = service.createEstimate(subscription);
         EventAOSubEstimateRsp rsp = new EventAOSubEstimateRsp();
         rsp.setRequestId(event.getRequestId().toString());
-        callback.handle(rsp);
+        handler.process(EventType.CREATE_CLEANROOM, rsp);
 
         Optional<EventDO> found = repository.findByRequestId(event.getRequestId());
         assertTrue(found.isPresent());
@@ -131,7 +149,7 @@ public class EventTest {
         EventAOSubEstimateRspCol col = new EventAOSubEstimateRspCol();
         col.setValue("dummy");
         rsp.setSample(List.of(List.of(col)));
-        callback.handle(rsp);
+        handler.process(EventType.ESTIMATE_SUBSCRIPTION, rsp);
 
         Optional<EventDO> found = repository.findByRequestId(event.getRequestId());
         assertTrue(found.isPresent());
@@ -144,14 +162,40 @@ public class EventTest {
 
     @Test
     public void Test_Subscription_Purchase_Callback(){
+        OrgDO org = new OrgDO();
+        org.setOrgId(UUID.randomUUID());
+        org.setModified(ZonedDateTime.now());
+        org.setCreated(ZonedDateTime.now());
+        org.setBillingId("dummy");
+        org = orgRepository.save(org);
+
+        CleanroomDO cleanroom = new CleanroomDO();
+        cleanroom.setName("dummy");
+        cleanroom.setModified(ZonedDateTime.now());
+        cleanroom.setCreated(ZonedDateTime.now());
+        cleanroom.setAws("dummy");
+        cleanroom.setDescription("dummy");
+        cleanroom.setCleanroomId(UUID.randomUUID());
+        cleanroom.setOrg(org);
+        cleanroom = cleanroomRepository.save(cleanroom);
+
         SubscriptionDO subscription = new SubscriptionDO();
         subscription.setQuery("dummy");
-
+        subscription.setSubscriptionId(UUID.randomUUID());
+        subscription.setName("dummy");
+        subscription.setStatus(SubscriptionStatus.ESTIMATE);
+        subscription.setModified(ZonedDateTime.now());
+        subscription.setCreated(ZonedDateTime.now());
+        subscription.setCleanroom(cleanroom);
         EventDO event = service.createPurchase(subscription);
+
+        subscription.setEvents(List.of(event));
+        subscriptionRepository.save(subscription);
+
         EventAOSubPurchaseRsp rsp = new EventAOSubPurchaseRsp();
         rsp.setRequestId(event.getRequestId().toString());
         rsp.setCount(1L);
-        callback.handle(rsp);
+        handler.process(EventType.PURCHASE_SUBSCRIPTION, rsp);
 
         Optional<EventDO> found = repository.findByRequestId(event.getRequestId());
         assertTrue(found.isPresent());
@@ -174,7 +218,7 @@ public class EventTest {
         rsp.setRequestId(event.getRequestId().toString());
         rsp.setCause("dummy cause");
         rsp.setMessage("dummy message");
-        callback.handle(EventStatus.FAILED, rsp);
+        handler.error(rsp);
 
         Optional<EventDO> found = repository.findByRequestId(event.getRequestId());
         assertTrue(found.isPresent());

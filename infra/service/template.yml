@@ -3,6 +3,10 @@ Transform: AWS::Serverless-2016-10-31
 Description: Core Account Service
 
 Parameters:
+  Name:
+    Type: String
+    Description: Name of the service
+    Default: core-account-service
   VpcId:
     Type: String
     Description: The id of the VPC to use.
@@ -19,9 +23,6 @@ Parameters:
   DeployRole:
     Type: String
     Description: IAM deployment role for uploading containers.
-  ExecutionRole:
-    Type: String
-    Description: Arn for the ecs task execution role.
   Version:
     Type: String
     Description: The container version number.
@@ -35,13 +36,16 @@ Parameters:
   Secret:
     Type: String
     Description: The arn for the secret properties.
+  DBSubnet:
+    Type: String
+    Description: The RDS subnet group to use
+    Default: default-all
 
 Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId: !Ref VpcId
-      GroupName: core-account-service
       GroupDescription: Core Account Service
       Tags:
         - Key: Name
@@ -53,14 +57,6 @@ Resources:
           CidrIp: 0.0.0.0/0
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 5432
-          ToPort: 5432
-          SourceSecurityGroupName: core-account-service
-        - IpProtocol: tcp
-          FromPort: 8228
-          ToPort: 8228
-          SourceSecurityGroupName: core-account-service
-        - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
@@ -69,10 +65,28 @@ Resources:
           ToPort: 443
           CidrIpv6: ::/0
 
+  DBIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !GetAtt SecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 5432
+      ToPort: 5432
+      SourceSecurityGroupId: !GetAtt SecurityGroup.GroupId
+
+  ServiceIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !GetAtt SecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 8228
+      ToPort: 8228
+      SourceSecurityGroupId: !GetAtt SecurityGroup.GroupId
+
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: core-account-service
+      Name: !Ref Name
       Scheme: internet-facing
       Type: application
       SecurityGroups:
@@ -84,7 +98,7 @@ Resources:
     DependsOn: LoadBalancer
     Properties:
       VpcId: !Ref VpcId
-      Name: core-account-service
+      Name: !Ref Name
       Port: !Ref Port
       Protocol: HTTP
       HealthCheckEnabled: true
@@ -112,7 +126,7 @@ Resources:
       AllocatedStorage: 25
       AutoMinorVersionUpgrade: true
       BackupRetentionPeriod: 30
-      DBInstanceIdentifier: core-account-service
+      DBInstanceIdentifier: !Ref Name
       DBInstanceClass: db.t4g.micro
       DeletionProtection: true
       Engine: postgres
@@ -123,6 +137,7 @@ Resources:
       StorageEncrypted: true
       MaxAllocatedStorage: 250
       CACertificateIdentifier: rds-ca-ecc384-g1
+      DBSubnetGroupName: !Ref DBSubnet
       VPCSecurityGroups:
         - !GetAtt SecurityGroup.GroupId
 
@@ -132,18 +147,18 @@ Resources:
       ImageScanningConfiguration:
         ScanOnPush: true
       ImageTagMutability: IMMUTABLE
-      RepositoryName: core-account-service
+      RepositoryName: !Ref Name
       RepositoryPolicyText: !Sub "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"new statement\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\": [\"arn:aws:iam::${AWS::AccountId}:role/${DeployRole}\"]},\"Action\": \"ecr:PutImage\"}]}"
 
   Cluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: core-account-service
+      ClusterName: !Ref Name
 
   TaskRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: TaskRoleCoreAccountService
+      RoleName: !Sub "task-${Name}"
       Description: ECS Task Role for Core Account Service
       AssumeRolePolicyDocument:
         Version: '2008-10-17'
@@ -176,9 +191,15 @@ Resources:
                   - states:DescribeExecution
                   - states:StartExecution
                 Resource:
-                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:CoreSubscription:*
-                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:CoreSubscription
-                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:CoreSubscription:*:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:core-account-cleanroom-create:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:core-account-cleanroom-create
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:core-account-cleanroom-create:*:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:core-account-subscription-estimate:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:core-account-subscription-estimate
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:core-account-subscription-estimate:*:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:core-account-subscription-purchase:*
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:core-account-subscription-purchase
+                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:express:core-account-subscription-purchase:*:*
         - PolicyName: S3
           PolicyDocument:
             Version: '2012-10-17'
@@ -235,12 +256,47 @@ Resources:
                 Resource:
                   - !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess
 
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "exec-${Name}"
+      Description: ECS Execution Role for Core Account Service
+      AssumeRolePolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: Log
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: logs:CreateLogGroup
+                Resource: !Sub "arn:aws:logs:*:${AWS::AccountId}:log-group:*"
+        - PolicyName: Secret
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameters
+                  - secretsmanager:GetSecretValue
+                  - kms:Decrypt
+                Resource:
+                  - !Ref Secret
+                  - !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*"
+
   Task:
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
         -
-          Name: core-account-service
+          Name: !Ref Name
           Essential: true
           Image: !Sub [ "${URI}:${Version}", { URI: !GetAtt Registry.RepositoryUri, Version: !Ref Version } ]
           PortMappings:
@@ -275,25 +331,19 @@ Resources:
               ValueFrom: !Sub "${Secret}:STRIPE_SECRET::"
             - Name: STRIPE_PRICE
               ValueFrom: !Sub "${Secret}:STRIPE_PRICE::"
-            - Name: OCEAN_BUCKET
-              ValueFrom: !Sub "${Secret}:OCEAN_BUCKET::"
-            - Name: OCEAN_REGION
-              ValueFrom: !Sub "${Secret}:OCEAN_REGION::"
-            - Name: OCEAN_CATALOG
-              ValueFrom: !Sub "${Secret}:OCEAN_CATALOG::"
-            - Name: OCEAN_ARN_STATE
-              ValueFrom: !Sub "${Secret}:OCEAN_ARN_STATE::"
-            - Name: OCEAN_ARN_LOCATION
-              ValueFrom: !Sub "${Secret}:OCEAN_ARN_LOCATION::"
-            - Name: OCEAN_ARN_EXEC
-              ValueFrom: !Sub "${Secret}:OCEAN_ARN_EXEC::"
-            - Name: OCEAN_ARN_ADMIN
-              ValueFrom: !Sub "${Secret}:OCEAN_ARN_ADMIN::"
+            - Name: EVENT_REGION
+              ValueFrom: !Sub "${Secret}:EVENT_REGION::"
+            - Name: ARN_CR_CREATE
+              ValueFrom: !Sub "${Secret}:ARN_CR_CREATE::"
+            - Name: ARN_SUB_ESTIMATE
+              ValueFrom: !Sub "${Secret}:ARN_SUB_ESTIMATE::"
+            - Name: ARN_SUB_PURCHASE
+              ValueFrom: !Sub "${Secret}:ARN_SUB_PURCHASE::"
           LogConfiguration:
             LogDriver: awslogs
             Options:
               awslogs-region: !Ref AWS::Region
-              awslogs-group: /ecs/core-account-service
+              awslogs-group: !Sub "/ecs/${Name}"
               awslogs-create-group: true
               awslogs-stream-prefix: ecs
         -
@@ -309,7 +359,7 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
-      ExecutionRoleArn: !Ref ExecutionRole
+      ExecutionRoleArn: !GetAtt ExecutionRole.Arn
       TaskRoleArn: !GetAtt TaskRole.Arn
       RuntimePlatform:
         CpuArchitecture: X86_64
@@ -327,7 +377,7 @@ Resources:
       HealthCheckGracePeriodSeconds: 300
       LaunchType: FARGATE
       LoadBalancers:
-        - ContainerName: core-account-service
+        - ContainerName: !Ref Name
           ContainerPort: !Ref Port
           TargetGroupArn: !GetAtt TargetGroup.TargetGroupArn
       NetworkConfiguration:
@@ -337,5 +387,5 @@ Resources:
             - !GetAtt SecurityGroup.GroupId
           Subnets: !Ref Subnets
       PlatformVersion: LATEST
-      ServiceName: core-account-service
+      ServiceName: !Ref Name
       TaskDefinition: !GetAtt Task.TaskDefinitionArn
