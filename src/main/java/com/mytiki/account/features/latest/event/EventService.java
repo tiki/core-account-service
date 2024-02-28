@@ -123,8 +123,8 @@ public class EventService {
             EventAORsp<EventAOBase> rsp = new EventAORsp<>();
             rsp.setCreated(event.getCreated());
             rsp.setModified(event.getModified());
-            rsp.setType(event.getType().toString());
-            rsp.setStatus(event.getStatus().toString());
+            rsp.setType(event.getType() != null ? event.getType().toString() : null);
+            rsp.setStatus(event.getStatus() != null ? event.getStatus().toString() : null);
             rsp.setRequestId(event.getRequestId().toString());
             if(event.getResult() != null) {
                 rsp.setResult(event.getStatus().equals(EventStatus.FAILED) ?
