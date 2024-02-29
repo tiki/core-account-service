@@ -55,7 +55,7 @@ public class EventCallback {
 
     @Operation(hidden = true)
     @Secured("SCOPE_account:internal:event")
-    @RequestMapping(method = RequestMethod.POST, path = "/estimate/purchase")
+    @RequestMapping(method = RequestMethod.POST, path = "/subscription/purchase")
     @ResponseStatus(code = HttpStatus.OK)
     public void subPurchase(@RequestBody EventAOSubPurchaseRsp body) {
         handler.process(EventType.PURCHASE_SUBSCRIPTION, body);
