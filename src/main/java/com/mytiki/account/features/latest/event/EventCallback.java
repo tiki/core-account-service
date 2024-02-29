@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = EventCallback.ROUTE)
 public class EventCallback {
-    public static final String ROUTE = Constants.API_LATEST_ROUTE + "ocean";
+    public static final String ROUTE = Constants.API_LATEST_ROUTE + "event";
 
     private final EventHandler handler;
 
@@ -30,7 +30,7 @@ public class EventCallback {
     }
 
     @Operation(hidden = true)
-    @Secured("SCOPE_account:internal:ocean")
+    @Secured("SCOPE_account:internal:event")
     @RequestMapping(method = RequestMethod.POST, path = "/error")
     @ResponseStatus(code = HttpStatus.OK)
     public void error(@RequestBody EventAOErrorRsp body) {
@@ -38,7 +38,7 @@ public class EventCallback {
     }
 
     @Operation(hidden = true)
-    @Secured("SCOPE_account:internal:ocean")
+    @Secured("SCOPE_account:internal:event")
     @RequestMapping(method = RequestMethod.POST, path = "/cleanroom/create")
     @ResponseStatus(code = HttpStatus.OK)
     public void crCreate(@RequestBody EventAOCrCreateRsp body) {
@@ -46,7 +46,7 @@ public class EventCallback {
     }
 
     @Operation(hidden = true)
-    @Secured("SCOPE_account:internal:ocean")
+    @Secured("SCOPE_account:internal:event")
     @RequestMapping(method = RequestMethod.POST, path = "/subscription/estimate")
     @ResponseStatus(code = HttpStatus.OK)
     public void subEstimate(@RequestBody EventAOSubEstimateRsp body) {
@@ -54,7 +54,7 @@ public class EventCallback {
     }
 
     @Operation(hidden = true)
-    @Secured("SCOPE_account:internal:ocean")
+    @Secured("SCOPE_account:internal:event")
     @RequestMapping(method = RequestMethod.POST, path = "/estimate/purchase")
     @ResponseStatus(code = HttpStatus.OK)
     public void subPurchase(@RequestBody EventAOSubPurchaseRsp body) {
