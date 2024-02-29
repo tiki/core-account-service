@@ -108,8 +108,12 @@ public class EventTest {
 
     @Test
     public void Test_Subscription_Purchase_Success(){
+        CleanroomDO cleanroom = new CleanroomDO();
+        cleanroom.setName("dummy");
         SubscriptionDO subscription = new SubscriptionDO();
         subscription.setQuery("dummy");
+        subscription.setName("dummy");
+        subscription.setCleanroom(cleanroom);
 
         EventDO event = service.createPurchase(subscription);
         assertEquals(EventType.PURCHASE_SUBSCRIPTION, event.getType());

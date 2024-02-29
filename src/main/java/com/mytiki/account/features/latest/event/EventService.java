@@ -102,9 +102,11 @@ public class EventService {
     public EventDO createPurchase(SubscriptionDO subscription){
         UUID requestId = UUID.randomUUID();
 
-        EventAOSubEstimateReq req = new EventAOSubEstimateReq();
+        EventAOSubPurchaseReq req = new EventAOSubPurchaseReq();
         req.setQuery(subscription.getQuery());
         req.setRequestId(requestId.toString());
+        req.setTable(subscription.getName());
+        req.setDatabase(subscription.getCleanroom().getName());
         String exec = execute(arns.get("sub_purchase"), req);
         logger.trace("create purchase: " + exec);
 
