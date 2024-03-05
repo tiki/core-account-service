@@ -27,7 +27,7 @@
     <properties>
         <start-class>com.mytiki.account.main.App</start-class>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>20</java.version>
+        <java.version>21</java.version>
         <snakeyaml.version>2.2</snakeyaml.version>
     </properties>
 
