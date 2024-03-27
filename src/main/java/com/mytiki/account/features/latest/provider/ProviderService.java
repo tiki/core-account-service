@@ -6,6 +6,7 @@
 package com.mytiki.account.features.latest.provider;
 
 import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.features.latest.oauth.OauthScopes;
@@ -14,6 +15,7 @@ import com.mytiki.account.utilities.builder.ErrorBuilder;
 import com.mytiki.account.utilities.builder.JwtBuilder;
 import com.mytiki.account.utilities.facade.B64F;
 import com.mytiki.account.utilities.facade.RsaF;
+import com.mytiki.account.utilities.facade.SqsF;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
@@ -36,32 +38,41 @@ public class ProviderService {
     private final ProviderRepository repository;
     private final ProfileService profileService;
     private final JWSSigner signer;
+    private final SqsF trail;
+    private final ObjectMapper mapper;
 
-    public ProviderService(ProviderRepository repository, ProfileService profileService, JWSSigner signer) {
+    public ProviderService(
+            ProviderRepository repository,
+            ProfileService profileService,
+            JWSSigner signer,
+            SqsF trail,
+            ObjectMapper mapper) {
         this.repository = repository;
         this.profileService = profileService;
         this.signer = signer;
+        this.trail = trail;
+        this.mapper = mapper;
     }
 
-    public ProviderAO create(String name, OauthSub sub){
-        if(!sub.isUser()) throw new ErrorBuilder(HttpStatus.UNAUTHORIZED).exception();
-        Optional<ProfileDO> user =  profileService.getDO(sub.getId());
-        if(user.isEmpty())
-        throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
-            else {
-                ZonedDateTime now = ZonedDateTime.now();
-                ProviderDO app = new ProviderDO();
-                app.setName(name);
-                app.setProviderId(UUID.randomUUID());
-                app.setOrg(user.get().getOrg());
-                app.setCreated(now);
-                app.setModified(now);
+    public ProviderAO create(String name, OauthSub sub) {
+        if (!sub.isUser()) throw new ErrorBuilder(HttpStatus.UNAUTHORIZED).exception();
+        Optional<ProfileDO> user = profileService.getDO(sub.getId());
+        if (user.isEmpty())
+            throw new ErrorBuilder(HttpStatus.FORBIDDEN).exception();
+        else {
+            ZonedDateTime now = ZonedDateTime.now();
+            ProviderDO app = new ProviderDO();
+            app.setName(name);
+            app.setProviderId(UUID.randomUUID());
+            app.setOrg(user.get().getOrg());
+            app.setCreated(now);
+            app.setModified(now);
             try {
                 RSAPrivateKey privateKey = RsaF.generate();
-                app.setSignKey(privateKey);
+                writeKey(app.getProviderId(), privateKey);
                 RSAPublicKey publicKey = RsaF.toPublic(privateKey);
                 app.setPubKey(B64F.encode(publicKey.getEncoded()));
-            } catch (JOSEException | IOException e) {
+            } catch (Exception e) {
                 throw new ErrorBuilder(HttpStatus.EXPECTATION_FAILED)
                         .message("Issue with Sign Key")
                         .detail(e.getMessage())
@@ -72,14 +83,14 @@ public class ProviderService {
         }
     }
 
-    public ProviderAO get(String providerId){
+    public ProviderAO get(String providerId) {
         Optional<ProviderDO> found = repository.findByProviderId(UUID.fromString(providerId));
         return found.map(this::toAO).orElse(null);
     }
 
-    public ProviderAO update(String providerId, ProviderAOReq req){
+    public ProviderAO update(String providerId, ProviderAOReq req) {
         Optional<ProviderDO> found = repository.findByProviderId(UUID.fromString(providerId));
-        if(found.isEmpty())
+        if (found.isEmpty())
             throw new ErrorBuilder(HttpStatus.BAD_REQUEST)
                     .detail("Invalid App ID")
                     .exception();
@@ -90,13 +101,13 @@ public class ProviderService {
         return toAO(update);
     }
 
-    public void delete(String providerId){
+    public void delete(String providerId) {
         repository.deleteByProviderId(UUID.fromString(providerId));
     }
 
     public OAuth2AccessTokenResponse authorize(OauthScopes scopes, OauthSub sub, String clientSecret, Long expires) {
         Optional<ProviderDO> found = repository.findByPubKeyAndProviderId(clientSecret, UUID.fromString(sub.getId()));
-        if(found.isEmpty())
+        if (found.isEmpty())
             throw new OAuth2AuthorizationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT));
         try {
             return new JwtBuilder()
@@ -116,19 +127,19 @@ public class ProviderService {
         }
     }
 
-    public Optional<ProviderDO> getDO(String providerId){
+    public Optional<ProviderDO> getDO(String providerId) {
         return repository.findByProviderId(UUID.fromString(providerId));
     }
 
-    public void guard(JwtAuthenticationToken token, String providerId){
-        if(OauthScopes.hasScope(token,"account:internal:read")) return;
+    public void guard(JwtAuthenticationToken token, String providerId) {
+        if (OauthScopes.hasScope(token, "account:internal:read")) return;
         OauthSub sub = new OauthSub(token.getName());
         if (sub.isProvider() && !sub.getId().equals(providerId)) {
             throw new ErrorBuilder(HttpStatus.FORBIDDEN)
                     .detail("Invalid claim: sub")
                     .help("Provider ID does not match claim")
                     .exception();
-        }else if (sub.isUser()){
+        } else if (sub.isUser()) {
             Optional<ProviderDO> app = repository.findByProviderIdAndUserId(UUID.fromString(providerId), UUID.fromString(sub.getId()));
             if (app.isEmpty())
                 throw new ErrorBuilder(HttpStatus.FORBIDDEN)
@@ -138,7 +149,7 @@ public class ProviderService {
         }
     }
 
-    private ProviderAO toAO(ProviderDO src){
+    private ProviderAO toAO(ProviderDO src) {
         ProviderAO rsp = new ProviderAO();
         rsp.setProviderId(src.getProviderId().toString());
         rsp.setName(src.getName());
@@ -147,5 +158,13 @@ public class ProviderService {
         rsp.setOrgId(src.getOrg().getOrgId().toString());
         rsp.setPubKey(src.getPubKey());
         return rsp;
+    }
+
+    private void writeKey(UUID providerId, RSAPrivateKey privateKey) throws IOException {
+        ProviderAOKey req = new ProviderAOKey();
+        req.setTimestamp(ZonedDateTime.now());
+        req.setKey(B64F.encode(privateKey.getEncoded()));
+        String groupId = "init:" + providerId.toString();
+        trail.send(groupId, mapper.writeValueAsString(req));
     }
 }

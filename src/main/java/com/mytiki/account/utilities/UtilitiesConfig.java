@@ -7,6 +7,7 @@ package com.mytiki.account.utilities;
 
 
 import com.mytiki.account.utilities.facade.SendgridF;
+import com.mytiki.account.utilities.facade.SqsF;
 import com.mytiki.account.utilities.facade.StripeF;
 import com.mytiki.account.utilities.xray.XRayConfig;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +27,7 @@ public class UtilitiesConfig {
     @Bean
     public StripeF stripeFacade(
             @Value("${com.mytiki.account.stripe.secret}") String secret,
-            @Value("${com.mytiki.account.stripe.price}") String price){
+            @Value("${com.mytiki.account.stripe.price}") String price) {
         return new StripeF(secret, price);
     }
 }
