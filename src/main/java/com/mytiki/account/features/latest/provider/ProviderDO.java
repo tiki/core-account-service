@@ -6,9 +6,7 @@
 package com.mytiki.account.features.latest.provider;
 
 import com.mytiki.account.features.latest.org.OrgDO;
-import com.mytiki.account.utilities.converter.RsaPrivateConvert;
 import jakarta.persistence.*;
-import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -22,7 +20,6 @@ public class ProviderDO implements Serializable {
     private String name;
     private OrgDO org;
     private String pubKey;
-    private RSAPrivateKey signKey;
     private ZonedDateTime created;
     private ZonedDateTime modified;
 
@@ -36,6 +33,7 @@ public class ProviderDO implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
+
     @Column(name = "provider_id")
     public UUID getProviderId() {
         return providerId;
@@ -71,16 +69,6 @@ public class ProviderDO implements Serializable {
 
     public void setPubKey(String pubId) {
         this.pubKey = pubId;
-    }
-
-    @Column(name = "sign_key")
-    @Convert(converter = RsaPrivateConvert.class)
-    public RSAPrivateKey getSignKey() {
-        return signKey;
-    }
-
-    public void setSignKey(RSAPrivateKey signKey) {
-        this.signKey = signKey;
     }
 
     @Column(name = "created_utc")
