@@ -23,13 +23,18 @@ public class SqsF {
     private final String queue;
 
     public SqsF(String region, String queue) {
+        this(SqsClient.builder()
+                        .overrideConfiguration(ClientOverrideConfiguration
+                                .builder()
+                                .addExecutionInterceptor(new TracingInterceptor())
+                                .build())
+                        .region(Region.of(region)).build(),
+                queue);
+    }
+
+    public SqsF(SqsClient client, String queue) {
         this.queue = queue;
-        sqs = SqsClient.builder()
-                .overrideConfiguration(ClientOverrideConfiguration
-                        .builder()
-                        .addExecutionInterceptor(new TracingInterceptor())
-                        .build())
-                .region(Region.of(region)).build();
+        this.sqs = client;
     }
 
     public void send(String groupId, String body) {

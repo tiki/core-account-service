@@ -5,24 +5,30 @@
 
 package com.mytiki.account;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mytiki.account.features.latest.oauth.OauthSub;
 import com.mytiki.account.features.latest.oauth.OauthSubNamespace;
 import com.mytiki.account.features.latest.org.OrgRepository;
 import com.mytiki.account.features.latest.org.OrgService;
 import com.mytiki.account.features.latest.profile.ProfileDO;
 import com.mytiki.account.features.latest.profile.ProfileRepository;
+import com.mytiki.account.features.latest.profile.ProfileService;
 import com.mytiki.account.features.latest.provider.ProviderAO;
 import com.mytiki.account.features.latest.provider.ProviderRepository;
 import com.mytiki.account.features.latest.provider.ProviderService;
 import com.mytiki.account.main.App;
+import com.mytiki.account.mocks.SqsMock;
 import com.mytiki.account.mocks.StripeMock;
 import com.mytiki.account.utilities.error.ApiException;
+import com.mytiki.account.utilities.facade.SqsF;
+import com.nimbusds.jose.JWSSigner;
 import com.stripe.exception.StripeException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import software.amazon.awssdk.services.sqs.SqsClient;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -45,16 +51,25 @@ public class ProviderTest {
     private ProfileRepository profileRepository;
 
     @Autowired
-    private ProviderService service;
+    private ProfileService profileService;
+
+    @Autowired
+    private JWSSigner jwsSigner;
 
     @Autowired
     private OrgRepository orgRepository;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private OrgService orgService;
+    private ProviderService service;
 
     @BeforeAll
     public void before() throws StripeException {
         orgService = new OrgService(orgRepository, StripeMock.facade());
+        SqsF trail = new SqsF(SqsMock.mock("dummy"), "dummy");
+        service = new ProviderService(repository, profileService, jwsSigner, trail, mapper);
     }
 
     @Test

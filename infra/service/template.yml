@@ -295,8 +295,7 @@ Resources:
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
-        -
-          Name: !Ref Name
+        - Name: !Ref Name
           Essential: true
           Image: !Sub [ "${URI}:${Version}", { URI: !GetAtt Registry.RepositoryUri, Version: !Ref Version } ]
           PortMappings:
@@ -339,6 +338,10 @@ Resources:
               ValueFrom: !Sub "${Secret}:ARN_SUB_ESTIMATE::"
             - Name: ARN_SUB_PURCHASE
               ValueFrom: !Sub "${Secret}:ARN_SUB_PURCHASE::"
+            - Name: TRAIL_SQS_REGION
+              ValueFrom: !Sub "${Secret}:TRAIL_SQS_REGION::"
+            - Name: TRAIL_SQS_URL
+              ValueFrom: !Sub "${Secret}:TRAIL_SQS_URL::"
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -346,8 +349,7 @@ Resources:
               awslogs-group: !Sub "/ecs/${Name}"
               awslogs-create-group: true
               awslogs-stream-prefix: ecs
-        -
-          Name: xray-daemon
+        - Name: xray-daemon
           Image: public.ecr.aws/xray/aws-xray-daemon:latest
           Cpu: 32
           MemoryReservation: 256

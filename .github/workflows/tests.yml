@@ -33,6 +33,8 @@ jobs:
       ARN_CR_CREATE: mocked
       ARN_SUB_ESTIMATE: mocked
       ARN_SUB_PURCHASE: mocked
+      TRAIL_SQS_REGION: mocked
+      TRAIL_SQS_URL: mocked
 
     services:
       postgres:
