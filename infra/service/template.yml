@@ -206,7 +206,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: sqs:SendMessage
-                Resource: arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:ocean-core-trail-write.fifo
+                Resource: !Sub "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:ocean-core-trail-write.fifo"
 
   ExecutionRole:
     Type: AWS::IAM::Role
